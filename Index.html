@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>OblivionX Engine</title>
+    <style>
+        :root {
+            --accent: #8C5AFF;
+            --bg: #000000;
+            --panel: #050505;
+            --border: rgba(255, 255, 255, 0.08);
+            --text-main: #ffffff;
+            --text-dim: #666666;
+            --tab-active: #111111;
+            --modal-bg: rgba(10, 10, 12, 0.85);
+            --card-sub: rgba(20, 20, 25, 0.4);
+            
+            /* Fluid Motion Presets */
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Themes Configuration Layer */
+        .theme-purple   { --accent: #8C5AFF; --bg: #060608; --panel: #0b0b0e; }
+        .theme-gold     { --accent: #FEE227; --bg: #080805; --panel: #0f0f0a; }
+        .theme-vampire  { --accent: #FF3131; --bg: #080303; --panel: #120606; }
+        .theme-ocean    { --accent: #00D1FF; --bg: #03070a; --panel: #060b12; }
+        .theme-matrix   { --accent: #00FF41; --bg: #020502; --panel: #050a05; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96) translateY(4px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        @keyframes tabSpawn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulseGlow { 0% { box-shadow: 0 0 12px rgba(140, 90, 255, 0.1); } 50% { box-shadow: 0 0 20px rgba(140, 90, 255, 0.3); } 100% { box-shadow: 0 0 12px rgba(140, 90, 255, 0.1); } }
+
+        * { box-sizing: border-box; outline: none; transition: background 0.3s var(--ease-out-expo), border 0.3s var(--ease-out-expo), color 0.3s var(--ease-out-expo), transform 0.3s var(--ease-out-expo), box-shadow 0.3s var(--ease-out-expo); }
+        
+        body, html { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            background: var(--bg); color: var(--text-main); 
+            font-family: 'Geist', 'Inter', sans-serif; overflow: hidden; 
+        }
+
+        /* Weather Canvas Layer */
+        #weather-canvas {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 1; opacity: 0.35;
+        }
+
+        .app-shell { 
+            position: relative; display: flex; flex-direction: column; 
+            height: 100vh; border: 1px solid var(--border); z-index: 2; 
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        header { 
+            height: 50px; display: flex; align-items: center; justify-content: space-between; 
+            padding: 0 20px; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(8px);
+        }
+        .logo { font-weight: 800; font-size: 10px; letter-spacing: 3px; color: var(--text-dim); }
+        .logo span { color: var(--accent); }
+
+        .header-actions { display: flex; align-items: center; gap: 12px; }
+        .icon-btn {
+            background: transparent; border: 1px solid var(--border); border-radius: 6px;
+            color: var(--text-dim); padding: 6px 12px; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 6px;
+        }
+        .icon-btn:hover { color: var(--text-main); border-color: var(--accent); background: rgba(255,255,255,0.02); transform: translateY(-1px); }
+        .icon-btn:active { transform: translateY(0); }
+        .icon-btn svg { width: 14px; height: 14px; stroke: currentColor; stroke-width: 2; fill: none; }
+
+        /* Tabs System */
+        .tab-bar { 
+            height: 42px; background: var(--panel); display: flex; align-items: center; 
+            padding: 0 10px; gap: 4px; border-bottom: 1px solid var(--border);
+        }
+        .tab { 
+            display: flex; align-items: center; padding: 6px 14px; font-size: 11px; 
+            cursor: pointer; border-radius: 6px; color: var(--text-dim);
+            border: 1px solid transparent; animation: tabSpawn 0.3s var(--ease-out-expo);
+        }
+        .tab.active { color: var(--text-main); background: var(--tab-active); border-color: var(--border); }
+        .tab .close-x { margin-left: 8px; font-size: 14px; opacity: 0.3; }
+        .tab .close-x:hover { opacity: 1; color: #ff4444; }
+
+        .btn-add { 
+            background: transparent; border: none; color: #555; font-size: 18px; 
+            padding: 0 10px; cursor: pointer; transition: 0.2s; 
+        }
+        .btn-add:hover { color: var(--accent); transform: scale(1.1); }
+
+        main { flex: 1; position: relative; background: transparent; }
+        #monaco-root { width: 100%; height: 100%; }
+
+        /* CLI Zone */
+        .cli-bar { 
+            height: 45px; background: var(--bg); border-top: 1px solid var(--border); 
+            display: flex; align-items: center; padding: 0 20px; gap: 12px;
+        }
+        .cli-input { flex: 1; background: transparent; border: none; color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+        #status-glow { width: 6px; height: 6px; border-radius: 50%; background: #222; transition: all 0.4s var(--ease-out-expo); }
+
+        /* General Modal Shell Layouts */
+        .modal-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(14px);
+            display: none; align-items: center; justify-content: center; z-index: 100;
+            transition: opacity 0.3s var(--ease-in-out);
+        }
+        .modal-card {
+            background: var(--modal-bg); border: 1px solid var(--border);
+            border-radius: 16px; box-shadow: 0 24px 50px rgba(0,0,0,0.6);
+            animation: fadeIn 0.4s var(--ease-out-expo) forwards;
+        }
+
+        /* Settings View Configs */
+        .settings-card { width: 450px; padding: 24px; }
+        .modal-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 12px;
+        }
+        .modal-title { font-size: 13px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+        .setting-row {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 14px; font-size: 12px; color: #aaa;
+        }
+        .setting-label { display: flex; flex-direction: column; gap: 2px; }
+        .setting-desc { font-size: 10px; color: var(--text-dim); }
+
+        /* OblivionX Guard UI Styling */
+        .guard-card {
+            width: 380px; padding: 32px 24px; text-align: center;
+            position: relative; background: linear-gradient(180deg, rgba(12,12,15,0.92) 0%, rgba(6,6,8,0.97) 100%);
+        }
+        .guard-back-btn {
+            display: flex; align-items: center; gap: 6px; font-size: 11px; color: #888;
+            cursor: pointer; background: none; border: none; margin-bottom: 24px; padding: 0;
+        }
+        .guard-back-btn:hover { color: #fff; transform: translateX(-2px); }
+        .guard-icon-wrap {
+            width: 48px; height: 48px; background: rgba(140, 90, 255, 0.05);
+            border: 1px solid rgba(140, 90, 255, 0.15); border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; margin: 0 auto 16px auto;
+            color: var(--accent);
+        }
+        .guard-icon-wrap svg { width: 22px; height: 22px; stroke: currentColor; stroke-width: 2; fill: none; }
+        
+        .guard-title { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+        .guard-sub { font-size: 11px; color: #666; margin-bottom: 24px; }
+        
+        .guard-input {
+            width: 100%; background: #09090b; border: 1px solid var(--border);
+            padding: 14px 16px; border-radius: 8px; color: #fff; font-size: 12px;
+            font-family: monospace; text-align: center; margin-bottom: 20px;
+        }
+        .guard-input:focus { border-color: var(--accent); box-shadow: 0 0 10px rgba(140,90,255,0.2); }
+        
+        .guard-btn-group { display: flex; gap: 10px; }
+        .guard-btn {
+            flex: 1; padding: 12px; border-radius: 8px; font-size: 12px; font-weight: 600;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
+        }
+        .guard-btn svg { width: 14px; height: 14px; stroke: currentColor; stroke-width: 2; fill: none; }
+        
+        .guard-btn.secondary { background: transparent; border: 1px solid var(--border); color: #fff; }
+        .guard-btn.secondary:hover { background: rgba(255,255,255,0.02); border-color: #444; transform: translateY(-1px); }
+        .guard-btn.secondary:active { transform: translateY(0) scale(0.98); }
+        
+        .guard-btn.primary { background: var(--accent); border: none; color: #fff; }
+        .guard-btn.primary:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(140, 90, 255, 0.25); }
+        .guard-btn.primary:active { transform: translateY(0) scale(0.98); }
+
+        /* Provider Selection Layouts */
+        .provider-grid { display: flex; gap: 12px; margin-bottom: 24px; }
+        .provider-box {
+            flex: 1; background: #09090b; border: 1px solid var(--border);
+            border-radius: 12px; padding: 16px; cursor: pointer; text-align: left;
+            position: relative; overflow: hidden;
+        }
+        .provider-box:hover { border-color: rgba(255,255,255,0.15); transform: translateY(-2px); }
+        .provider-box:active { transform: translateY(0) scale(0.97); }
+        .provider-box.selected { 
+            border-color: var(--accent); 
+            background: rgba(140, 90, 255, 0.02);
+            animation: pulseGlow 3s infinite var(--ease-in-out);
+        }
+        
+        .provider-badge {
+            width: 24px; height: 24px; border-radius: 6px; background: rgba(255,255,255,0.03);
+            display: flex; align-items: center; justify-content: center; margin-bottom: 12px;
+            color: #888;
+        }
+        .provider-badge svg { width: 14px; height: 14px; stroke: currentColor; stroke-width: 2; fill: none; }
+        .provider-box.selected .provider-badge { background: rgba(140,90,255,0.1); color: var(--accent); }
+        .provider-name { font-size: 12px; font-weight: 700; color: #fff; margin-bottom: 2px; }
+        .provider-expiry { font-size: 10px; color: #555; }
+
+        /* Checkpoint Context Container */
+        .checkpoint-container {
+            background: #09090b; border: 1px solid var(--border); border-radius: 12px;
+            padding: 16px; text-align: left; margin-bottom: 20px;
+        }
+        .checkpoint-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+        .checkpoint-num {
+            width: 18px; height: 18px; background: var(--accent); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #fff;
+        }
+        .checkpoint-title { font-size: 11px; font-weight: 600; color: #fff; }
+        
+        .checkpoint-go-btn {
+            width: 100%; background: var(--accent); color: #fff; border: none; padding: 12px;
+            border-radius: 8px; font-size: 11px; font-weight: 600; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 14px;
+        }
+        .checkpoint-go-btn:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(140, 90, 255, 0.2); }
+        .checkpoint-go-btn:active { transform: translateY(0) scale(0.98); }
+        .checkpoint-go-btn svg { width: 13px; height: 13px; stroke: currentColor; stroke-width: 2; fill: none; }
+        
+        .hwid-box {
+            background: #040405; border: 1px solid rgba(255,255,255,0.03); border-radius: 6px;
+            padding: 10px; display: flex; align-items: center; justify-content: space-between;
+        }
+        .hwid-txt-wrap { display: flex; flex-direction: column; gap: 2px; }
+        .hwid-label { font-size: 9px; color: #555; }
+        .hwid-val { font-size: 10px; font-family: monospace; color: #888; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        
+        .hwid-copy-btn { background: none; border: none; color: #aaa; font-size: 10px; cursor: pointer; display: flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 4px; }
+        .hwid-copy-btn:hover { color: #fff; background: rgba(255,255,255,0.03); }
+        .hwid-copy-btn:active { transform: scale(0.95); }
+        .hwid-copy-btn svg { width: 11px; height: 11px; stroke: currentColor; stroke-width: 2; fill: none; }
+
+        .guard-footer { font-size: 9px; color: #444; display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 24px; }
+        .guard-footer svg { width: 11px; height: 11px; stroke: currentColor; stroke-width: 2; fill: none; }
+
+        /* Form Components */
+        .switch { position: relative; display: inline-block; width: 34px; height: 20px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #222; border: 1px solid var(--border); border-radius: 20px; transition: .2s;
+        }
+        .slider:before {
+            position: absolute; content: ""; height: 12px; width: 12px; left: 3px; bottom: 3px;
+            background-color: #fff; border-radius: 50%; transition: .2s;
+        }
+        input:checked + .slider { background-color: var(--accent); }
+        input:checked + .slider:before { transform: translateX(14px); }
+
+        .form-select {
+            background: #09090b; color: #fff; border: 1px solid var(--border);
+            padding: 6px 10px; border-radius: 6px; font-size: 11px; width: 150px;
+        }
+        .form-select option { background: #000; }
+    </style>
+</head>
+<body class="theme-purple">
+
+    <canvas id="weather-canvas"></canvas>
+
+    <div class="app-shell">
+        <header>
+            <div class="logo">OBLIVION<span>//</span>PRO</div>
+            <div class="header-actions">
+                <button class="icon-btn" onclick="openModal('gate-login-modal')">
+                    <svg viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3M15.5 7.5L19 4"/></svg>
+                    Secure Access
+                </button>
+                <button class="icon-btn" onclick="openModal('settings-modal')">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    Settings
+                </button>
+            </div>
+        </header>
+
+        <div class="tab-bar">
+            <div id="tab-container" style="display:flex; gap:4px;"></div>
+            <button class="btn-add" onclick="createNewTab()">+</button>
+        </div>
+
+        <main>
+            <div id="monaco-root"></div>
+        </main>
+
+        <div class="cli-bar">
+            <span style="color: var(--accent); font-weight: bold;">></span>
+            <input type="text" id="cli" class="cli-input" placeholder="Type /run, /inject, /new, /exit..." autocomplete="off">
+            <div id="status-glow"></div>
+        </div>
+    </div>
+
+    <div id="settings-modal" class="modal-overlay" onclick="closeModalOnOuter(event, 'settings-modal')">
+        <div class="modal-card settings-card">
+            <div class="modal-header">
+                <div class="modal-title">System Customization</div>
+                <span style="cursor:pointer; color:var(--text-dim);" onclick="closeModal('settings-modal')">×</span>
+            </div>
+            
+            <div class="setting-row">
+                <div class="setting-label">
+                    <span>Discord Rich Presence</span>
+                    <span class="setting-desc">Broadcast runtime activity status</span>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="cfg-discord" onchange="pushConfigUpdate()">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="setting-row">
+                <div class="setting-label">
+                    <span>Auto Attach</span>
+                    <span class="setting-desc">Inject immediately upon client discovery</span>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="cfg-attach" onchange="pushConfigUpdate()">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="setting-row">
+                <div class="setting-label">
+                    <span>Auto Execute</span>
+                    <span class="setting-desc">Deploy loaded buffer content upon link-up</span>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="cfg-execute" onchange="pushConfigUpdate()">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="setting-row">
+                <div class="setting-label">
+                    <span>Always On Top</span>
+                    <span class="setting-desc">Pin window above other native viewports</span>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="cfg-topmost" onchange="pushConfigUpdate()">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="setting-row">
+                <div class="setting-label">
+                    <span>Active Theme Accent</span>
+                    <span class="setting-desc">Color palette theme map</span>
+                </div>
+                <select id="cfg-theme" class="form-select" onchange="applyGlobalTheme(this.value)">
+                    <option value="purple">Infinity Purple</option>
+                    <option value="gold">Midas Gold</option>
+                    <option value="vampire">Vampire Red</option>
+                    <option value="ocean">Abyssal Ocean</option>
+                    <option value="matrix">Matrix Emerald</option>
+                </select>
+            </div>
+
+            <div class="setting-row">
+                <div class="setting-label">
+                    <span>Ambient Weather Engine</span>
+                    <span class="setting-desc">Procedural animation background canvas</span>
+                </div>
+                <select id="cfg-weather" class="form-select" onchange="setWeatherEffect(this.value)">
+                    <option value="matrix">Matrix Cascade</option>
+                    <option value="cybergrid">Cyberpunk Grid</option>
+                    <option value="hyperjump">Hyper Jump Warp</option>
+                    <option value="snow">Blizzard Snow</option>
+                    <option value="rain">Downpours Rain</option>
+                    <option value="stars">Starfield Horizon</option>
+                    <option value="none">Static Darkness</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div id="gate-login-modal" class="modal-overlay" onclick="closeModalOnOuter(event, 'gate-login-modal')">
+        <div class="modal-card guard-card">
+            <div class="guard-icon-wrap">
+                <svg viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3M15.5 7.5L19 4"/></svg>
+            </div>
+            <div class="guard-title">OBLIVION<span>X</span></div>
+            <div class="guard-sub">System Authentication Required</div>
+            
+            <input type="text" id="key-input" class="guard-input" placeholder="Enter Access Key ...">
+            
+            <div class="guard-btn-group">
+                <button class="guard-btn secondary" onclick="switchGuardView('gate-login-modal', 'gate-providers-modal')">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20"/></svg>
+                    Get Key
+                </button>
+                <button class="guard-btn primary" onclick="submitAccessKey()">
+                    Authenticate 
+                    <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </button>
+            </div>
+            
+            <div class="guard-footer">
+                <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10zM12 8v4m0 4h.01"/></svg>
+                Protected by OblivionX Guard
+            </div>
+        </div>
+    </div>
+
+    <div id="gate-providers-modal" class="modal-overlay" onclick="closeModalOnOuter(event, 'gate-providers-modal')">
+        <div class="modal-card guard-card">
+            <button class="guard-back-btn" onclick="switchGuardView('gate-providers-modal', 'gate-login-modal')">← Back to Login</button>
+            
+            <div style="text-align: left; margin-bottom: 20px;">
+                <div style="font-size: 15px; font-weight:700; color:#fff; margin-bottom:4px;">Get Access Key</div>
+                <div style="font-size: 10px; color:#553; line-height: 14px;">Select a provider below to complete a quick checkpoint and receive your key.</div>
+            </div>
+
+            <div class="provider-grid">
+                <div class="provider-box" id="prov-loot" onclick="selectProvider('loot')">
+                    <div class="provider-badge">
+                        <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                    </div>
+                    <div class="provider-name">LootLabs</div>
+                    <div class="provider-expiry">24 Hours Key</div>
+                </div>
+                <div class="provider-box selected" id="prov-link" onclick="selectProvider('link')">
+                    <div class="provider-badge">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    </div>
+                    <div class="provider-name">Linkvertise</div>
+                    <div class="provider-expiry">48 Hours Key</div>
+                </div>
+            </div>
+
+            <div class="checkpoint-container">
+                <div class="checkpoint-header">
+                    <div class="checkpoint-num">1</div>
+                    <div class="checkpoint-title">Complete Checkpoint</div>
+                </div>
+                
+                <button class="checkpoint-go-btn" onclick="openCheckpointLink()">
+                    Go to Checkpoint 
+                    <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+                </button>
+                
+                <div class="hwid-box">
+                    <div class="hwid-txt-wrap">
+                        <span class="hwid-label">Your HWID (Might be needed)</span>
+                        <span class="hwid-val" id="hwid-display">WEB-GATHERING-DATA</span>
+                    </div>
+                    <button class="hwid-copy-btn" onclick="copyHardwareIdentifier()">
+                        <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        Copy
+                    </button>
+                </div>
+            </div>
+
+            <div class="guard-footer">
+                <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10zM12 8v4m0 4h.01"/></svg>
+                Protected by OblivionX Guard
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.0/min/vs/loader.min.js"></script>
+    <script>
+        let editor;
+        let currentFile = 'main.lua';
+        let files = JSON.parse(localStorage.getItem('obv_fs')) || { 'main.lua': "-- System Armed\nprint('OblivionX Elite Loaded')" };
+        let isSystemVerified = false;
+        let selectedProviderKey = 'link';
+        let plainHardwareString = "WEB-UNKNOWN-HASH";
+
+        /* =========================================
+            PROPORTIONAL NATIVE FINGERPRINT GENERATOR
+        ========================================= */
+        function createDeterministicBrowserFingerprint() {
+            try {
+                let criteria = [
+                    navigator.userAgent,
+                    navigator.language,
+                    screen.colorDepth,
+                    screen.width + "x" + screen.height,
+                    new Date().getTimezoneOffset(),
+                    navigator.hardwareConcurrency || 4,
+                    navigator.deviceMemory || 8
+                ];
+                
+                let canvas = document.createElement('canvas');
+                let ctx = canvas.getContext('2d');
+                if(ctx) {
+                    ctx.textBaseline = "top";
+                    ctx.font = "14px 'Arial'";
+                    ctx.fillStyle = "#f60";
+                    ctx.fillRect(125,1,62,20);
+                    ctx.fillStyle = "#069";
+                    ctx.fillText("OblivionX-Engine-Fingerprint-Matrix", 2, 2);
+                    criteria.push(canvas.toDataURL());
+                }
+
+                let rawInputStr = criteria.join("||");
+                
+                let hash = 0;
+                for (let i = 0; i < rawInputStr.length; i++) {
+                    let character = rawInputStr.charCodeAt(i);
+                    hash = ((hash << 5) - hash) + character;
+                    hash = hash & hash; 
+                }
+                
+                let absoluteValueHex = Math.abs(hash).toString(16).toUpperCase().padStart(8, '0');
+                let derivedSignature = `OBX-${absoluteValueHex.substring(0,4)}-${absoluteValueHex.substring(4,8)}`;
+                
+                localStorage.setItem('obv_hwid_fallback', derivedSignature);
+                return derivedSignature;
+            } catch(e) {
+                return "OBX-FALLBACK-998A";
+            }
+        }
+
+        // Initialize unique string key data values
+        plainHardwareString = localStorage.getItem('obv_hwid_fallback') || createDeterministicBrowserFingerprint();
+
+        /* =========================================
+            NATIVE HTML AUTHENTICATION ENGINE
+        ========================================= */
+        function computeDeterministicValidationToken(hardwareId) {
+            let hashValue = 0;
+            let targetString = "OBLIVIONX-SYS-SECURE-99812A"; 
+            
+            if(hardwareId && hardwareId !== "WEB-GATHERING-DATA" && hardwareId !== "WEB-UNKNOWN-HASH") {
+                targetString = hardwareId;
+            }
+
+            for (let i = 0; i < targetString.length; i++) {
+                hashValue = ((hashValue << 5) - hashValue) + targetString.charCodeAt(i);
+                hashValue |= 0; 
+            }
+            return `OBX-KEY-${Math.abs(hashValue).toString(16).toUpperCase()}`;
+        }
+
+        /* =========================================
+            MONACO CONFIGURATION & LOADOUT
+        ========================================= */
+        require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.0/min/vs' }});
+        require(['vs/editor/editor.main'], function() {
+            editor = monaco.editor.create(document.getElementById('monaco-root'), {
+                value: files[currentFile],
+                language: 'lua',
+                theme: 'vs-dark',
+                automaticLayout: true,
+                minimap: { enabled: false },
+                fontSize: 13,
+                fontFamily: 'JetBrains Mono, monospace',
+                lineHeight: 22,
+                cursorSmoothCaretAnimation: true,
+            });
+
+            const savedTheme = localStorage.getItem('obv_theme') || 'purple';
+            document.getElementById('cfg-theme').value = savedTheme;
+            applyGlobalTheme(savedTheme);
+
+            const savedWeather = localStorage.getItem('obv_weather') || 'matrix';
+            document.getElementById('cfg-weather').value = savedWeather;
+            setWeatherEffect(savedWeather);
+
+            renderTabs();
+            window.chrome.webview.postMessage({ action: 'request_settings' });
+            window.chrome.webview.postMessage({ action: 'request_key_status' });
+        });
+
+        function save() {
+            if(editor) {
+                files[currentFile] = editor.getValue();
+                localStorage.setItem('obv_fs', JSON.stringify(files));
+            }
+        }
+
+        function getEditorBuffer() {
+            if(editor) {
+                window.chrome.webview.postMessage({ action: 'execute', code: editor.getValue() });
+            }
+        }
+
+        function SetText(text) {
+            if(editor) {
+                editor.setValue(text);
+                save();
+            }
+        }
+
+        /* =========================================
+            TABS INTERFACE ROUTINES
+        ========================================= */
+        function renderTabs() {
+            const container = document.getElementById('tab-container');
+            container.innerHTML = '';
+            Object.keys(files).forEach(f => {
+                const tab = document.createElement('div');
+                tab.className = `tab ${f === currentFile ? 'active' : ''}`;
+                tab.innerHTML = `
+                    <span ondblclick="renameTab('${f}')">${f}</span>
+                    <span class="close-x" onclick="event.stopPropagation(); closeTab('${f}')">×</span>
+                `;
+                tab.onclick = () => {
+                    save();
+                    currentFile = f;
+                    editor.setValue(files[f]);
+                    renderTabs();
+                };
+                container.appendChild(tab);
+            });
+        }
+
+        function createNewTab() {
+            save();
+            const name = `script_${Object.keys(files).length + 1}.lua`;
+            files[name] = "-- New Code Execution Stream\n";
+            currentFile = name;
+            renderTabs();
+            editor.setValue(files[name]);
+            save();
+        }
+
+        function closeTab(f) {
+            if (Object.keys(files).length <= 1) return;
+            delete files[f];
+            if (currentFile === f) currentFile = Object.keys(files)[0];
+            editor.setValue(files[currentFile]);
+            renderTabs();
+            save();
+        }
+
+        function renameTab(oldName) {
+            const namePrompt = prompt("Rename workbook tracking reference to:", oldName);
+            if (namePrompt && namePrompt !== oldName) {
+                files[namePrompt] = files[oldName];
+                delete files[oldName];
+                currentFile = namePrompt;
+                renderTabs();
+                save();
+            }
+        }
+
+        /* =========================================
+            MODAL WINDOW DRIVERS
+        ========================================= */
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function closeModalOnOuter(e, id) { if(e.target.id === id) closeModal(id); }
+        
+        function switchGuardView(closeId, openId) {
+            closeModal(closeId);
+            openModal(openId);
+        }
+
+        function selectProvider(type) {
+            selectedProviderKey = type;
+            document.getElementById('prov-loot').classList.toggle('selected', type === 'loot');
+            document.getElementById('prov-link').classList.toggle('selected', type === 'link');
+        }
+
+        function openCheckpointLink() {
+            // Updated links with user parameters injected dynamically
+            const url = selectedProviderKey === 'loot' 
+                ? `https://links.lootlabs.gg/s?2b0IxdAD&hwid=${encodeURIComponent(plainHardwareString)}`
+                : `https://linkvertise.com/4282013/corML2Stdnb5?o=sharing&hwid=${encodeURIComponent(plainHardwareString)}`;
+            window.chrome.webview.postMessage({ action: 'open_url', url: url });
+        }
+
+        function copyHardwareIdentifier() {
+            navigator.clipboard.writeText(plainHardwareString);
+            window.chrome.webview.postMessage({ action: 'console', message: "HWID copied to local clipboard memory pipeline.", type: "info" });
+        }
+
+        /* =========================================
+            BRIDGE MESSAGING LAYER & HOST CONTROLS
+        ========================================= */
+        function applyGlobalTheme(name) {
+            document.body.className = `theme-${name}`;
+            localStorage.setItem('obv_theme', name);
+            
+            setTimeout(() => {
+                const accent = getComputedStyle(document.body).getPropertyValue('--accent').trim();
+                const bg = getComputedStyle(document.body).getPropertyValue('--bg').trim();
+
+                if(window.monaco) {
+                    monaco.editor.defineTheme('obv-theme', {
+                        base: 'vs-dark', inherit: true, rules: [],
+                        colors: {
+                            'editor.background': bg,
+                            'editorCursor.foreground': accent,
+                            'editorLineNumber.activeForeground': accent
+                        }
+                    });
+                    monaco.editor.setTheme('obv-theme');
+                }
+            }, 50);
+
+            window.chrome.webview.postMessage({ action: 'theme', value: name });
+        }
+
+        function pushConfigUpdate() {
+            const settings = {
+                discordRpc: document.getElementById('cfg-discord').checked,
+                autoAttach: document.getElementById('cfg-attach').checked,
+                autoExecute: document.getElementById('cfg-execute').checked,
+                alwaysOnTop: document.getElementById('cfg-topmost').checked
+            };
+            window.chrome.webview.postMessage({ action: 'update_config', settings });
+        }
+
+        function loadExecutorSettings(cfg) {
+            document.getElementById('cfg-discord').checked = cfg.discordRpc;
+            document.getElementById('cfg-attach').checked = cfg.autoAttach;
+            document.getElementById('cfg-execute').checked = cfg.autoExecute;
+            document.getElementById('cfg-topmost').checked = cfg.alwaysOnTop;
+        }
+
+        function submitAccessKey() {
+            const token = document.getElementById('key-input').value.trim();
+            const computedMatchToken = computeDeterministicValidationToken(plainHardwareString);
+            
+            // Hardcoded developer bypass token parameter match definitions inside logic arrays
+            if (token === computedMatchToken || token === "OblivionXDevPass2026") {
+                window.chrome.webview.postMessage({ action: 'submit_key', key: token });
+            } else {
+                isSystemVerified = false;
+                updateStatusGlow('error');
+                const inputField = document.getElementById('key-input');
+                inputField.style.borderColor = '#ef4444';
+                setTimeout(() => inputField.style.borderColor = 'var(--border)', 2000);
+            }
+        }
+
+        /* =========================================
+            BACKEND EVENT INTERCEPTORS
+        ========================================= */
+        window.chrome.webview.addEventListener('message', event => {
+            const msg = event.data;
+            
+            if(msg.action === "key_status_update") {
+                if(msg.hwid && msg.hwid !== "OBLIVIONX-SYS-SECURE-99812A") {
+                    plainHardwareString = msg.hwid;
+                }
+                document.getElementById('hwid-display').innerText = plainHardwareString;
+                isSystemVerified = msg.verified;
+                updateStatusGlow(isSystemVerified ? 'connected' : 'idle');
+            }
+            
+            if(msg.action === "key_auth_result") {
+                if(msg.success) {
+                    isSystemVerified = true;
+                    updateStatusGlow('connected');
+                    closeModal('gate-login-modal');
+                } else {
+                    isSystemVerified = false;
+                    updateStatusGlow('error');
+                    const inputField = document.getElementById('key-input');
+                    inputField.style.borderColor = '#ef4444';
+                    setTimeout(() => inputField.style.borderColor = 'var(--border)', 2000);
+                }
+            }
+
+            if(msg.action === "pid_update") {
+                updateStatusGlow('attached');
+            }
+
+            if(msg.action === "clear_pid") {
+                updateStatusGlow(isSystemVerified ? 'connected' : 'idle');
+            }
+        });
+
+        function updateStatusGlow(state) {
+            const glow = document.getElementById('status-glow');
+            if(state === 'attached') {
+                glow.style.background = 'var(--accent)';
+                glow.style.boxShadow = '0 0 10px var(--accent)';
+            } else if(state === 'connected') {
+                glow.style.background = '#22c55e';
+                glow.style.boxShadow = '0 0 10px #22c55e';
+            } else if(state === 'error') {
+                glow.style.background = '#ef4444';
+                glow.style.boxShadow = '0 0 10px #ef4444';
+            } else {
+                glow.style.background = '#222';
+                glow.style.boxShadow = 'none';
+            }
+        }
+
+        document.getElementById('cli').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const cmd = e.target.value.toLowerCase().trim();
+                if (cmd === '/run') getEditorBuffer();
+                if (cmd === '/inject') window.chrome.webview.postMessage({ action: 'inject' });
+                if (cmd === '/new') createNewTab();
+                if (cmd === '/exit') window.chrome.webview.postMessage({ action: 'exit' });
+                e.target.value = '';
+                save();
+            }
+        });
+
+        /* =========================================
+            PROCEDURAL WEATHER BACKGROUND ENGINE
+        ========================================= */
+        const canvas = document.getElementById('weather-canvas');
+        const ctx = canvas.getContext('2d');
+        let animationId;
+        let weatherMode = 'matrix';
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        let matrixParticles = [];
+        let gridLines = [];
+        let warpStars = [];
+        let environmentDrops = [];
+
+        function initWeather(mode) {
+            matrixParticles = []; gridLines = []; warpStars = []; environmentDrops = [];
+            const columns = Math.floor(canvas.width / 14) + 1;
+            
+            if(mode === 'matrix') {
+                for(let i=0; i<columns; i++) matrixParticles.push({ x: i*14, y: Math.random() * -500, speed: 2 + Math.random() * 5 });
+            } else if(mode === 'hyperjump' || mode === 'stars') {
+                for(let i=0; i<150; i++) warpStars.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, z: Math.random()*canvas.width, color: Math.random() > 0.5 ? '#fff' : 'var(--accent)' });
+            } else if(mode === 'rain' || mode === 'snow') {
+                for(let i=0; i<120; i++) environmentDrops.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, speed: 4 + Math.random()*6, size: 1 + Math.random()*3 });
+            }
+        }
+
+        function setWeatherEffect(mode) {
+            weatherMode = mode;
+            localStorage.setItem('obv_weather', mode);
+            document.getElementById('cfg-weather').value = mode;
+            cancelAnimationFrame(animationId);
+            if(mode !== 'none') {
+                initWeather(mode);
+                renderWeatherLoop();
+            } else {
+                ctx.clearRect(0,0, canvas.width, canvas.height);
+            }
+            window.chrome.webview.postMessage({ action: 'set_weather', weather: mode });
+        }
+
+        function renderWeatherLoop() {
+            const accentColor = getComputedStyle(document.body).getPropertyValue('--accent').trim();
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if(weatherMode === 'matrix') {
+                ctx.fillStyle = 'rgba(0,0,0,0.05)';
+                ctx.font = '11px monospace';
+                matrixParticles.forEach(p => {
+                    ctx.fillStyle = accentColor;
+                    const char = String.fromCharCode(0x30A0 + Math.random() * 96);
+                    ctx.fillText(char, p.x, p.y);
+                    p.y += p.speed;
+                    if(p.y > canvas.height) { p.y = -50; p.speed = 2 + Math.random() * 5; }
+                });
+            }
+            else if(weatherMode === 'cybergrid') {
+                ctx.strokeStyle = accentColor;
+                ctx.lineWidth = 0.4;
+                const step = 45;
+                const offset = (Date.now() / 30) % step;
+                for(let x = offset; x < canvas.width; x += step) {
+                    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+                }
+                for(let y = offset; y < canvas.height; y += step) {
+                    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+                }
+            }
+            else if(weatherMode === 'hyperjump') {
+                warpStars.forEach(s => {
+                    s.z -= 8;
+                    if(s.z <= 0) { s.z = canvas.width; s.x = Math.random()*canvas.width; s.y = Math.random()*canvas.height; }
+                    const cx = canvas.width / 2; const cy = canvas.height / 2;
+                    const px = (s.x - cx) * (canvas.width / s.z) + cx;
+                    const py = (s.y - cy) * (canvas.width / s.z) + cy;
+                    ctx.strokeStyle = s.color; ctx.lineWidth = 2;
+                    ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px + (px - cx)*0.09, py + (py - cy)*0.09); ctx.stroke();
+                });
+            }
+            else if(weatherMode === 'stars') {
+                warpStars.forEach(s => {
+                    ctx.fillStyle = s.color;
+                    ctx.fillRect(s.x, s.y, 1.5, 1.5);
+                    s.y += 0.2; if(s.y > canvas.height) s.y = 0;
+                });
+            }
+            else if(weatherMode === 'rain') {
+                ctx.strokeStyle = accentColor;
+                ctx.lineWidth = 1;
+                environmentDrops.forEach(d => {
+                    ctx.beginPath(); ctx.moveTo(d.x, d.y); ctx.lineTo(d.x + 1, d.y + 12); ctx.stroke();
+                    d.y += d.speed; d.x += 0.5;
+                    if(d.y > canvas.height) { d.y = -20; d.x = Math.random()*canvas.width; }
+                });
+            }
+            else if(weatherMode === 'snow') {
+                ctx.fillStyle = '#ffffff';
+                environmentDrops.forEach(d => {
+                    ctx.beginPath(); ctx.arc(d.x, d.y, d.size/2, 0, Math.PI*2); ctx.fill();
+                    d.y += d.speed * 0.25; d.x += Math.sin(d.y/30) * 0.5;
+                    if(d.y > canvas.height) { d.y = -10; d.x = Math.random()*canvas.width; }
+                });
+            }
+
+            animationId = requestAnimationFrame(renderWeatherLoop);
+        }
+    </script>
+</body>
+</html>
