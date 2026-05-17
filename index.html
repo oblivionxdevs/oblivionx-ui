@@ -111,7 +111,7 @@
         }
 
         /* Settings View Configs */
-        .settings-card { width: 450px; padding: 24px; }
+        .settings-card { width: 450px; padding: 24px; max-height: 90vh; overflow-y: auto; }
         .modal-header {
             display: flex; justify-content: space-between; align-items: center;
             margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 12px;
@@ -120,12 +120,13 @@
         .setting-row {
             display: flex; align-items: center; justify-content: space-between;
             margin-bottom: 14px; font-size: 12px; color: #aaa;
+            gap: 16px;
         }
         .setting-label { display: flex; flex-direction: column; gap: 2px; }
         .setting-desc { font-size: 10px; color: var(--text-dim); }
 
         /* Form Components */
-        .switch { position: relative; display: inline-block; width: 34px; height: 20px; }
+        .switch { position: relative; display: inline-block; width: 34px; height: 20px; flex-shrink: 0; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider {
             position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
@@ -138,9 +139,16 @@
         input:checked + .slider { background-color: var(--accent); }
         input:checked + .slider:before { transform: translateX(14px); }
 
-        .form-select {
+        .form-select, .form-input {
             background: #09090b; color: #fff; border: 1px solid var(--border);
-            padding: 6px 10px; border-radius: 6px; font-size: 11px; width: 150px;
+            padding: 6px 10px; border-radius: 6px; font-size: 11px; width: 160px;
+        }
+        .form-input {
+            width: 160px;
+            transition: border-color 0.2s var(--ease-out-expo);
+        }
+        .form-input:focus {
+            border-color: var(--accent);
         }
         .form-select option { background: #000; }
     </style>
@@ -192,6 +200,22 @@
                     <input type="checkbox" id="cfg-discord" onchange="pushConfigUpdate()">
                     <span class="slider"></span>
                 </label>
+            </div>
+
+            <div class="setting-row" id="rpc-details-row">
+                <div class="setting-label">
+                    <span>RPC Details Description</span>
+                    <span class="setting-desc">Top line presence message summary</span>
+                </div>
+                <input type="text" id="cfg-rpc-details" class="form-input" placeholder="OblivionX Executor" oninput="pushRpcMessageUpdate()">
+            </div>
+
+            <div class="setting-row" id="rpc-state-row">
+                <div class="setting-label">
+                    <span>RPC Custom State</span>
+                    <span class="setting-desc">Status descriptor message append line</span>
+                </div>
+                <input type="text" id="cfg-rpc-state" class="form-input" placeholder="Idle" oninput="pushRpcMessageUpdate()">
             </div>
 
             <div class="setting-row">
@@ -289,6 +313,10 @@
             const savedWeather = localStorage.getItem('obv_weather') || 'matrix';
             document.getElementById('cfg-weather').value = savedWeather;
             setWeatherEffect(savedWeather);
+
+            // Seed localized fallback storage elements for custom string data lines
+            document.getElementById('cfg-rpc-details').value = localStorage.getItem('obv_rpc_details') || "OblivionX Executor";
+            document.getElementById('cfg-rpc-state').value = localStorage.getItem('obv_rpc_state') || "Idle";
 
             renderTabs();
             window.chrome.webview.postMessage({ action: 'request_settings' });
@@ -402,13 +430,36 @@
         }
 
         function pushConfigUpdate() {
+            const isRpcOn = document.getElementById('cfg-discord').checked;
+            
+            // Adjust visual visibility bounds dynamically
+            document.getElementById('rpc-details-row').style.opacity = isRpcOn ? "1" : "0.4";
+            document.getElementById('rpc-details-row').style.pointerEvents = isRpcOn ? "all" : "none";
+            document.getElementById('rpc-state-row').style.opacity = isRpcOn ? "1" : "0.4";
+            document.getElementById('rpc-state-row').style.pointerEvents = isRpcOn ? "all" : "none";
+
             const settings = {
-                discordRpc: document.getElementById('cfg-discord').checked,
+                discordRpc: isRpcOn,
                 autoAttach: document.getElementById('cfg-attach').checked,
                 autoExecute: document.getElementById('cfg-execute').checked,
                 alwaysOnTop: document.getElementById('cfg-topmost').checked
             };
             window.chrome.webview.postMessage({ action: 'update_config', settings });
+            pushRpcMessageUpdate();
+        }
+
+        function pushRpcMessageUpdate() {
+            const detailsText = document.getElementById('cfg-rpc-details').value;
+            const stateText = document.getElementById('cfg-rpc-state').value;
+            
+            localStorage.setItem('obv_rpc_details', detailsText);
+            localStorage.setItem('obv_rpc_state', stateText);
+
+            window.chrome.webview.postMessage({ 
+                action: 'update_rpc_details', 
+                details: detailsText || "OblivionX Executor", 
+                state: stateText || "Idle" 
+            });
         }
 
         function loadExecutorSettings(cfg) {
@@ -416,6 +467,12 @@
             document.getElementById('cfg-attach').checked = cfg.autoAttach;
             document.getElementById('cfg-execute').checked = cfg.autoExecute;
             document.getElementById('cfg-topmost').checked = cfg.alwaysOnTop;
+            
+            const isRpcOn = cfg.discordRpc;
+            document.getElementById('rpc-details-row').style.opacity = isRpcOn ? "1" : "0.4";
+            document.getElementById('rpc-details-row').style.pointerEvents = isRpcOn ? "all" : "none";
+            document.getElementById('rpc-state-row').style.opacity = isRpcOn ? "1" : "0.4";
+            document.getElementById('rpc-state-row').style.pointerEvents = isRpcOn ? "all" : "none";
         }
 
         /* =========================================
