@@ -1,630 +1,564 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>OblivionX Engine</title>
-    <style>
-        :root {
-            --accent: #8C5AFF;
-            --bg: #000000;
-            --panel: #050505;
-            --border: rgba(255, 255, 255, 0.08);
-            --text-main: #ffffff;
-            --text-dim: #666666;
-            --tab-active: #111111;
-            --modal-bg: rgba(10, 10, 12, 0.85);
-            
-            /* Fluid Motion Presets */
-            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-            --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
-        }
+<meta charset="UTF-8">
+<title>OblivionX</title>
 
-        /* Themes Configuration Layer */
-        .theme-purple   { --accent: #8C5AFF; --bg: #060608; --panel: #0b0b0e; }
-        .theme-gold     { --accent: #FEE227; --bg: #080805; --panel: #0f0f0a; }
-        .theme-vampire  { --accent: #FF3131; --bg: #080303; --panel: #120606; }
-        .theme-ocean    { --accent: #00D1FF; --bg: #03070a; --panel: #060b12; }
-        .theme-matrix   { --accent: #00FF41; --bg: #020502; --panel: #050a05; }
+<style>
+:root{
+    --accent:#8C5AFF;
+    --bg:#050505;
+    --panel:#0B0B0D;
+    --border:rgba(255,255,255,.08);
+    --text:#fff;
+    --dim:#777;
+}
 
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96) translateY(4px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-        @keyframes tabSpawn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Inter,sans-serif;
+}
 
-        * { box-sizing: border-box; outline: none; transition: background 0.3s var(--ease-out-expo), border 0.3s var(--ease-out-expo), color 0.3s var(--ease-out-expo), transform 0.3s var(--ease-out-expo), box-shadow 0.3s var(--ease-out-expo); }
-        
-        body, html { 
-            margin: 0; padding: 0; width: 100%; height: 100%; 
-            background: var(--bg); color: var(--text-main); 
-            font-family: 'Geist', 'Inter', sans-serif; overflow: hidden; 
-        }
+body,html{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:var(--bg);
+    color:white;
+}
 
-        /* Weather Canvas Layer */
-        #weather-canvas {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; z-index: 1; opacity: 0.35;
-        }
+/* =========================================
+    WEATHER CANVAS
+========================================= */
 
-        .app-shell { 
-            position: relative; display: flex; flex-direction: column; 
-            height: 100vh; border: 1px solid var(--border); z-index: 2; 
-            background: rgba(0, 0, 0, 0.2);
-        }
+#weather{
+    position:fixed;
+    inset:0;
+    z-index:0;
+    opacity:.35;
+}
 
-        header { 
-            height: 50px; display: flex; align-items: center; justify-content: space-between; 
-            padding: 0 20px; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(8px);
-        }
-        .logo { font-weight: 800; font-size: 10px; letter-spacing: 3px; color: var(--text-dim); }
-        .logo span { color: var(--accent); }
+/* =========================================
+    APP
+========================================= */
 
-        .header-actions { display: flex; align-items: center; gap: 12px; }
-        .icon-btn {
-            background: transparent; border: 1px solid var(--border); border-radius: 6px;
-            color: var(--text-dim); padding: 6px 12px; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 6px;
-        }
-        .icon-btn:hover { color: var(--text-main); border-color: var(--accent); background: rgba(255,255,255,0.02); transform: translateY(-1px); }
-        .icon-btn:active { transform: translateY(0); }
-        .icon-btn svg { width: 14px; height: 14px; stroke: currentColor; stroke-width: 2; fill: none; }
+.app{
+    position:relative;
+    z-index:2;
+    width:100%;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    backdrop-filter:blur(10px);
+}
 
-        /* Tabs System */
-        .tab-bar { 
-            height: 42px; background: var(--panel); display: flex; align-items: center; 
-            padding: 0 10px; gap: 4px; border-bottom: 1px solid var(--border);
-        }
-        .tab { 
-            display: flex; align-items: center; padding: 6px 14px; font-size: 11px; 
-            cursor: pointer; border-radius: 6px; color: var(--text-dim);
-            border: 1px solid transparent; animation: tabSpawn 0.3s var(--ease-out-expo);
-        }
-        .tab.active { color: var(--text-main); background: var(--tab-active); border-color: var(--border); }
-        .tab .close-x { margin-left: 8px; font-size: 14px; opacity: 0.3; }
-        .tab .close-x:hover { opacity: 1; color: #ff4444; }
+/* =========================================
+    TOP BAR
+========================================= */
 
-        .btn-add { 
-            background: transparent; border: none; color: #555; font-size: 18px; 
-            padding: 0 10px; cursor: pointer; transition: 0.2s; 
-        }
-        .btn-add:hover { color: var(--accent); transform: scale(1.1); }
+.topbar{
+    height:42px;
+    background:rgba(0,0,0,.55);
+    border-bottom:1px solid var(--border);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 14px;
+    -webkit-app-region:drag;
+}
 
-        main { flex: 1; position: relative; background: transparent; }
-        #monaco-root { width: 100%; height: 100%; }
+.logo{
+    font-size:11px;
+    letter-spacing:3px;
+    font-weight:700;
+    color:#aaa;
+}
 
-        /* CLI Zone */
-        .cli-bar { 
-            height: 45px; background: var(--bg); border-top: 1px solid var(--border); 
-            display: flex; align-items: center; padding: 0 20px; gap: 12px;
-        }
-        .cli-input { flex: 1; background: transparent; border: none; color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
-        #status-glow { width: 6px; height: 6px; border-radius: 50%; background: #222; transition: all 0.4s var(--ease-out-expo); }
+.logo span{
+    color:var(--accent);
+}
 
-        /* General Modal Shell Layouts */
-        .modal-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(14px);
-            display: none; align-items: center; justify-content: center; z-index: 100;
-            transition: opacity 0.3s var(--ease-in-out);
-        }
-        .modal-card {
-            background: var(--modal-bg); border: 1px solid var(--border);
-            border-radius: 16px; box-shadow: 0 24px 50px rgba(0,0,0,0.6);
-            animation: fadeIn 0.4s var(--ease-out-expo) forwards;
-        }
+.window-controls{
+    display:flex;
+    gap:8px;
+    -webkit-app-region:no-drag;
+}
 
-        /* Settings View Configs */
-        .settings-card { width: 450px; padding: 24px; max-height: 90vh; overflow-y: auto; }
-        .modal-header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 12px;
-        }
-        .modal-title { font-size: 13px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
-        .setting-row {
-            display: flex; align-items: center; justify-content: space-between;
-            margin-bottom: 14px; font-size: 12px; color: #aaa;
-            gap: 16px;
-        }
-        .setting-label { display: flex; flex-direction: column; gap: 2px; }
-        .setting-desc { font-size: 10px; color: var(--text-dim); }
+.win-btn{
+    width:30px;
+    height:30px;
+    border:none;
+    border-radius:8px;
+    background:transparent;
+    color:#aaa;
+    cursor:pointer;
+    transition:.2s;
+}
 
-        /* Form Components */
-        .switch { position: relative; display: inline-block; width: 34px; height: 20px; flex-shrink: 0; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider {
-            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #222; border: 1px solid var(--border); border-radius: 20px; transition: .2s;
-        }
-        .slider:before {
-            position: absolute; content: ""; height: 12px; width: 12px; left: 3px; bottom: 3px;
-            background-color: #fff; border-radius: 50%; transition: .2s;
-        }
-        input:checked + .slider { background-color: var(--accent); }
-        input:checked + .slider:before { transform: translateX(14px); }
+.win-btn:hover{
+    background:rgba(255,255,255,.06);
+    color:white;
+}
 
-        .form-select, .form-input {
-            background: #09090b; color: #fff; border: 1px solid var(--border);
-            padding: 6px 10px; border-radius: 6px; font-size: 11px; width: 160px;
-        }
-        .form-input {
-            width: 160px;
-            transition: border-color 0.2s var(--ease-out-expo);
-        }
-        .form-input:focus {
-            border-color: var(--accent);
-        }
-        .form-select option { background: #000; }
-    </style>
+.close-btn:hover{
+    background:#ff3b30;
+    color:white;
+}
+
+/* =========================================
+    HEADER
+========================================= */
+
+.header{
+    height:52px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 16px;
+    background:rgba(0,0,0,.35);
+    border-bottom:1px solid var(--border);
+}
+
+.inject-status{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:11px;
+    color:#aaa;
+}
+
+.dot{
+    width:10px;
+    height:10px;
+    border-radius:50%;
+    background:#444;
+    transition:.3s;
+}
+
+.dot.attached{
+    background:var(--accent);
+    box-shadow:0 0 12px var(--accent);
+}
+
+/* =========================================
+    BUTTONS
+========================================= */
+
+.btns{
+    display:flex;
+    gap:10px;
+}
+
+.btn{
+    background:#0F0F12;
+    border:1px solid var(--border);
+    color:white;
+    padding:8px 14px;
+    border-radius:10px;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.btn:hover{
+    border-color:var(--accent);
+    transform:translateY(-1px);
+}
+
+/* =========================================
+    EDITOR
+========================================= */
+
+#editor{
+    flex:1;
+}
+
+/* =========================================
+    NOTIFICATIONS
+========================================= */
+
+.notifications{
+    position:fixed;
+    top:60px;
+    right:20px;
+    z-index:9999;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.toast{
+    min-width:260px;
+    background:rgba(10,10,12,.95);
+    border:1px solid var(--border);
+    border-left:4px solid var(--accent);
+    padding:14px;
+    border-radius:12px;
+    animation:slide .3s ease;
+    box-shadow:0 10px 30px rgba(0,0,0,.4);
+}
+
+.toast-title{
+    font-size:12px;
+    font-weight:700;
+    margin-bottom:4px;
+}
+
+.toast-msg{
+    font-size:11px;
+    color:#aaa;
+}
+
+@keyframes slide{
+    from{
+        opacity:0;
+        transform:translateX(40px);
+    }
+    to{
+        opacity:1;
+        transform:translateX(0);
+    }
+}
+</style>
 </head>
-<body class="theme-purple">
 
-    <canvas id="weather-canvas"></canvas>
+<body>
 
-    <div class="app-shell">
-        <header>
-            <div class="logo">OBLIVION<span>//</span>PRO</div>
-            <div class="header-actions">
-                <button class="icon-btn" onclick="openModal('settings-modal')">
-                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-                    Settings
-                </button>
-            </div>
-        </header>
+<canvas id="weather"></canvas>
 
-        <div class="tab-bar">
-            <div id="tab-container" style="display:flex; gap:4px;"></div>
-            <button class="btn-add" onclick="createNewTab()">+</button>
+<div class="notifications" id="notifications"></div>
+
+<div class="app">
+
+    <!-- TOP BAR -->
+
+    <div class="topbar">
+
+        <div class="logo">
+            OBLIVION<span>X</span>
         </div>
 
-        <main>
-            <div id="monaco-root"></div>
-        </main>
+        <div class="window-controls">
 
-        <div class="cli-bar">
-            <span style="color: var(--accent); font-weight: bold;">></span>
-            <input type="text" id="cli" class="cli-input" placeholder="Type /run, /inject, /new, /exit..." autocomplete="off">
-            <div id="status-glow"></div>
+            <button
+                class="win-btn"
+                onclick="minimizeWindow()"
+            >
+                —
+            </button>
+
+            <button
+                class="win-btn close-btn"
+                onclick="closeWindow()"
+            >
+                ×
+            </button>
+
         </div>
+
     </div>
 
-    <div id="settings-modal" class="modal-overlay" onclick="closeModalOnOuter(event, 'settings-modal')">
-        <div class="modal-card settings-card">
-            <div class="modal-header">
-                <div class="modal-title">System Customization</div>
-                <span style="cursor:pointer; color:var(--text-dim);" onclick="closeModal('settings-modal')">×</span>
-            </div>
-            
-            <div class="setting-row">
-                <div class="setting-label">
-                    <span>Discord Rich Presence</span>
-                    <span class="setting-desc">Broadcast runtime activity status</span>
-                </div>
-                <label class="switch">
-                    <input type="checkbox" id="cfg-discord" onchange="pushConfigUpdate()">
-                    <span class="slider"></span>
-                </label>
-            </div>
+    <!-- HEADER -->
 
-            <div class="setting-row" id="rpc-details-row">
-                <div class="setting-label">
-                    <span>RPC Details Description</span>
-                    <span class="setting-desc">Top line presence message summary</span>
-                </div>
-                <input type="text" id="cfg-rpc-details" class="form-input" placeholder="OblivionX Executor" oninput="pushRpcMessageUpdate()">
-            </div>
+    <div class="header">
 
-            <div class="setting-row" id="rpc-state-row">
-                <div class="setting-label">
-                    <span>RPC Custom State</span>
-                    <span class="setting-desc">Status descriptor message append line</span>
-                </div>
-                <input type="text" id="cfg-rpc-state" class="form-input" placeholder="Idle" oninput="pushRpcMessageUpdate()">
-            </div>
+        <div class="inject-status">
 
-            <div class="setting-row">
-                <div class="setting-label">
-                    <span>Auto Attach</span>
-                    <span class="setting-desc">Inject immediately upon client discovery</span>
-                </div>
-                <label class="switch">
-                    <input type="checkbox" id="cfg-attach" onchange="pushConfigUpdate()">
-                    <span class="slider"></span>
-                </label>
-            </div>
+            <div id="inject-dot" class="dot"></div>
 
-            <div class="setting-row">
-                <div class="setting-label">
-                    <span>Auto Execute</span>
-                    <span class="setting-desc">Deploy loaded buffer content upon link-up</span>
-                </div>
-                <label class="switch">
-                    <input type="checkbox" id="cfg-execute" onchange="pushConfigUpdate()">
-                    <span class="slider"></span>
-                </label>
-            </div>
+            <span id="inject-text">
+                Not Attached
+            </span>
 
-            <div class="setting-row">
-                <div class="setting-label">
-                    <span>Always On Top</span>
-                    <span class="setting-desc">Pin window above other native viewports</span>
-                </div>
-                <label class="switch">
-                    <input type="checkbox" id="cfg-topmost" onchange="pushConfigUpdate()">
-                    <span class="slider"></span>
-                </label>
-            </div>
-
-            <div class="setting-row">
-                <div class="setting-label">
-                    <span>Active Theme Accent</span>
-                    <span class="setting-desc">Color palette theme map</span>
-                </div>
-                <select id="cfg-theme" class="form-select" onchange="applyGlobalTheme(this.value)">
-                    <option value="purple">Infinity Purple</option>
-                    <option value="gold">Midas Gold</option>
-                    <option value="vampire">Vampire Red</option>
-                    <option value="ocean">Abyssal Ocean</option>
-                    <option value="matrix">Matrix Emerald</option>
-                </select>
-            </div>
-
-            <div class="setting-row">
-                <div class="setting-label">
-                    <span>Ambient Weather Engine</span>
-                    <span class="setting-desc">Procedural animation background canvas</span>
-                </div>
-                <select id="cfg-weather" class="form-select" onchange="setWeatherEffect(this.value)">
-                    <option value="matrix">Matrix Cascade</option>
-                    <option value="cybergrid">Cyberpunk Grid</option>
-                    <option value="hyperjump">Hyper Jump Warp</option>
-                    <option value="snow">Blizzard Snow</option>
-                    <option value="rain">Downpours Rain</option>
-                    <option value="stars">Starfield Horizon</option>
-                    <option value="none">Static Darkness</option>
-                </select>
-            </div>
         </div>
+
+        <div class="btns">
+
+            <button
+                class="btn"
+                onclick="inject()"
+            >
+                Inject
+            </button>
+
+            <button
+                class="btn"
+                onclick="executeScript()"
+            >
+                Execute
+            </button>
+
+        </div>
+
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.0/min/vs/loader.min.js"></script>
-    <script>
-        let editor;
-        let currentFile = 'main.lua';
-        let files = JSON.parse(localStorage.getItem('obv_fs')) || { 'main.lua': "-- System Armed\nprint('OblivionX Elite Loaded')" };
+    <div id="editor"></div>
 
-        /* =========================================
-            MONACO CONFIGURATION & LOADOUT
-        ========================================= */
-        require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.0/min/vs' }});
-        require(['vs/editor/editor.main'], function() {
-            editor = monaco.editor.create(document.getElementById('monaco-root'), {
-                value: files[currentFile],
-                language: 'lua',
-                theme: 'vs-dark',
-                automaticLayout: true,
-                minimap: { enabled: false },
-                fontSize: 13,
-                fontFamily: 'JetBrains Mono, monospace',
-                lineHeight: 22,
-                cursorSmoothCaretAnimation: true,
-            });
+</div>
 
-            const savedTheme = localStorage.getItem('obv_theme') || 'purple';
-            document.getElementById('cfg-theme').value = savedTheme;
-            applyGlobalTheme(savedTheme);
+<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/loader.min.js"></script>
 
-            const savedWeather = localStorage.getItem('obv_weather') || 'matrix';
-            document.getElementById('cfg-weather').value = savedWeather;
-            setWeatherEffect(savedWeather);
+<script>
 
-            // Seed localized fallback storage elements for custom string data lines
-            document.getElementById('cfg-rpc-details').value = localStorage.getItem('obv_rpc_details') || "OblivionX Executor";
-            document.getElementById('cfg-rpc-state').value = localStorage.getItem('obv_rpc_state') || "Idle";
+/* =========================================
+    MONACO
+========================================= */
 
-            renderTabs();
-            window.chrome.webview.postMessage({ action: 'request_settings' });
-        });
+let editor;
 
-        function save() {
-            if(editor) {
-                files[currentFile] = editor.getValue();
-                localStorage.setItem('obv_fs', JSON.stringify(files));
+require.config({
+    paths:{
+        vs:'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs'
+    }
+});
+
+require(['vs/editor/editor.main'], function(){
+
+    editor = monaco.editor.create(
+        document.getElementById('editor'),
+        {
+            value:
+`print("OblivionX Loaded")`,
+            language:'lua',
+            theme:'vs-dark',
+            automaticLayout:true,
+            minimap:{enabled:false},
+            fontSize:13,
+            smoothScrolling:true
+        }
+    );
+});
+
+/* =========================================
+    WINDOW CONTROLS
+========================================= */
+
+function minimizeWindow(){
+    window.chrome.webview.postMessage({
+        action:'minimize'
+    });
+}
+
+function closeWindow(){
+    window.chrome.webview.postMessage({
+        action:'exit'
+    });
+}
+
+/* =========================================
+    EXECUTOR
+========================================= */
+
+function inject(){
+
+    notify(
+        "Injector",
+        "Attempting injection..."
+    );
+
+    window.chrome.webview.postMessage({
+        action:'inject'
+    });
+}
+
+function executeScript(){
+
+    if(!editor) return;
+
+    window.chrome.webview.postMessage({
+        action:'execute',
+        code:editor.getValue()
+    });
+
+    notify(
+        "Execution",
+        "Script sent to executor."
+    );
+}
+
+/* =========================================
+    STATUS
+========================================= */
+
+function setAttached(state){
+
+    const dot =
+        document.getElementById('inject-dot');
+
+    const text =
+        document.getElementById('inject-text');
+
+    if(state){
+
+        dot.classList.add('attached');
+
+        text.innerText =
+            'Injected';
+
+    }else{
+
+        dot.classList.remove('attached');
+
+        text.innerText =
+            'Not Attached';
+    }
+}
+
+/* =========================================
+    NOTIFICATIONS
+========================================= */
+
+function notify(title,msg){
+
+    const holder =
+        document.getElementById(
+            'notifications'
+        );
+
+    const toast =
+        document.createElement('div');
+
+    toast.className = 'toast';
+
+    toast.innerHTML =
+`
+<div class="toast-title">
+${title}
+</div>
+
+<div class="toast-msg">
+${msg}
+</div>
+`;
+
+    holder.appendChild(toast);
+
+    setTimeout(()=>{
+        toast.remove();
+    },3500);
+}
+
+/* =========================================
+    WEBVIEW EVENTS
+========================================= */
+
+window.chrome.webview.addEventListener(
+    'message',
+    event => {
+
+        const msg = event.data;
+
+        if(msg.action === 'console'){
+
+            notify(
+                msg.type.toUpperCase(),
+                msg.message
+            );
+
+            if(
+                msg.message
+                    .toLowerCase()
+                    .includes('inject')
+            ){
+                setAttached(true);
             }
         }
 
-        function getEditorBuffer() {
-            if(editor) {
-                window.chrome.webview.postMessage({ action: 'execute', code: editor.getValue() });
-            }
+        if(
+            msg.action === 'clear_pid'
+        ){
+            setAttached(false);
         }
+    }
+);
 
-        function SetText(text) {
-            if(editor) {
-                editor.setValue(text);
-                save();
-            }
+/* =========================================
+    WEATHER ENGINE
+========================================= */
+
+const canvas =
+    document.getElementById('weather');
+
+const ctx =
+    canvas.getContext('2d');
+
+function resize(){
+
+    canvas.width =
+        window.innerWidth;
+
+    canvas.height =
+        window.innerHeight;
+}
+
+window.addEventListener(
+    'resize',
+    resize
+);
+
+resize();
+
+const rain = [];
+
+for(let i=0;i<180;i++){
+
+    rain.push({
+
+        x:Math.random()*canvas.width,
+        y:Math.random()*canvas.height,
+        l:Math.random()*20,
+        s:4+Math.random()*6
+
+    });
+}
+
+function animate(){
+
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    ctx.strokeStyle =
+        'rgba(140,90,255,.35)';
+
+    ctx.lineWidth = 1;
+
+    rain.forEach(r=>{
+
+        ctx.beginPath();
+
+        ctx.moveTo(r.x,r.y);
+
+        ctx.lineTo(
+            r.x+2,
+            r.y+r.l
+        );
+
+        ctx.stroke();
+
+        r.y += r.s;
+        r.x += 0.5;
+
+        if(r.y > canvas.height){
+
+            r.y = -20;
+            r.x = Math.random()
+                * canvas.width;
         }
+    });
 
-        /* =========================================
-            TABS INTERFACE ROUTINES
-        ========================================= */
-        function renderTabs() {
-            const container = document.getElementById('tab-container');
-            container.innerHTML = '';
-            Object.keys(files).forEach(f => {
-                const tab = document.createElement('div');
-                tab.className = `tab ${f === currentFile ? 'active' : ''}`;
-                tab.innerHTML = `
-                    <span ondblclick="renameTab('${f}')">${f}</span>
-                    <span class="close-x" onclick="event.stopPropagation(); closeTab('${f}')">×</span>
-                `;
-                tab.onclick = () => {
-                    save();
-                    currentFile = f;
-                    editor.setValue(files[f]);
-                    renderTabs();
-                };
-                container.appendChild(tab);
-            });
-        }
+    requestAnimationFrame(
+        animate
+    );
+}
 
-        function createNewTab() {
-            save();
-            const name = `script_${Object.keys(files).length + 1}.lua`;
-            files[name] = "-- New Code Execution Stream\n";
-            currentFile = name;
-            renderTabs();
-            editor.setValue(files[name]);
-            save();
-        }
+animate();
 
-        function closeTab(f) {
-            if (Object.keys(files).length <= 1) return;
-            delete files[f];
-            if (currentFile === f) currentFile = Object.keys(files)[0];
-            editor.setValue(files[currentFile]);
-            renderTabs();
-            save();
-        }
+</script>
 
-        function renameTab(oldName) {
-            const namePrompt = prompt("Rename workbook tracking reference to:", oldName);
-            if (namePrompt && namePrompt !== oldName) {
-                files[namePrompt] = files[oldName];
-                delete files[oldName];
-                currentFile = namePrompt;
-                renderTabs();
-                save();
-            }
-        }
-
-        /* =========================================
-            MODAL WINDOW DRIVERS
-        ========================================= */
-        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        function closeModalOnOuter(e, id) { if(e.target.id === id) closeModal(id); }
-
-        /* =========================================
-            BRIDGE MESSAGING LAYER & HOST CONTROLS
-        ========================================= */
-        function applyGlobalTheme(name) {
-            document.body.className = `theme-${name}`;
-            localStorage.setItem('obv_theme', name);
-            
-            setTimeout(() => {
-                const accent = getComputedStyle(document.body).getPropertyValue('--accent').trim();
-                const bg = getComputedStyle(document.body).getPropertyValue('--bg').trim();
-
-                if(window.monaco) {
-                    monaco.editor.defineTheme('obv-theme', {
-                        base: 'vs-dark', inherit: true, rules: [],
-                        colors: {
-                            'editor.background': bg,
-                            'editorCursor.foreground': accent,
-                            'editorLineNumber.activeForeground': accent
-                        }
-                    });
-                    monaco.editor.setTheme('obv-theme');
-                }
-            }, 50);
-
-            window.chrome.webview.postMessage({ action: 'theme', value: name });
-        }
-
-        function pushConfigUpdate() {
-            const isRpcOn = document.getElementById('cfg-discord').checked;
-            
-            // Adjust visual visibility bounds dynamically
-            document.getElementById('rpc-details-row').style.opacity = isRpcOn ? "1" : "0.4";
-            document.getElementById('rpc-details-row').style.pointerEvents = isRpcOn ? "all" : "none";
-            document.getElementById('rpc-state-row').style.opacity = isRpcOn ? "1" : "0.4";
-            document.getElementById('rpc-state-row').style.pointerEvents = isRpcOn ? "all" : "none";
-
-            const settings = {
-                discordRpc: isRpcOn,
-                autoAttach: document.getElementById('cfg-attach').checked,
-                autoExecute: document.getElementById('cfg-execute').checked,
-                alwaysOnTop: document.getElementById('cfg-topmost').checked
-            };
-            window.chrome.webview.postMessage({ action: 'update_config', settings });
-            pushRpcMessageUpdate();
-        }
-
-        function pushRpcMessageUpdate() {
-            const detailsText = document.getElementById('cfg-rpc-details').value;
-            const stateText = document.getElementById('cfg-rpc-state').value;
-            
-            localStorage.setItem('obv_rpc_details', detailsText);
-            localStorage.setItem('obv_rpc_state', stateText);
-
-            window.chrome.webview.postMessage({ 
-                action: 'update_rpc_details', 
-                details: detailsText || "OblivionX Executor", 
-                state: stateText || "Idle" 
-            });
-        }
-
-        function loadExecutorSettings(cfg) {
-            document.getElementById('cfg-discord').checked = cfg.discordRpc;
-            document.getElementById('cfg-attach').checked = cfg.autoAttach;
-            document.getElementById('cfg-execute').checked = cfg.autoExecute;
-            document.getElementById('cfg-topmost').checked = cfg.alwaysOnTop;
-            
-            const isRpcOn = cfg.discordRpc;
-            document.getElementById('rpc-details-row').style.opacity = isRpcOn ? "1" : "0.4";
-            document.getElementById('rpc-details-row').style.pointerEvents = isRpcOn ? "all" : "none";
-            document.getElementById('rpc-state-row').style.opacity = isRpcOn ? "1" : "0.4";
-            document.getElementById('rpc-state-row').style.pointerEvents = isRpcOn ? "all" : "none";
-        }
-
-        /* =========================================
-            BACKEND EVENT INTERCEPTORS
-        ========================================= */
-        window.chrome.webview.addEventListener('message', event => {
-            const msg = event.data;
-            
-            if(msg.action === "pid_update") {
-                updateStatusGlow('attached');
-            }
-
-            if(msg.action === "clear_pid") {
-                updateStatusGlow('idle');
-            }
-        });
-
-        function updateStatusGlow(state) {
-            const glow = document.getElementById('status-glow');
-            if(state === 'attached') {
-                glow.style.background = 'var(--accent)';
-                glow.style.boxShadow = '0 0 10px var(--accent)';
-            } else {
-                glow.style.background = '#222';
-                glow.style.boxShadow = 'none';
-            }
-        }
-
-        document.getElementById('cli').addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                const cmd = e.target.value.toLowerCase().trim();
-                if (cmd === '/run') getEditorBuffer();
-                if (cmd === '/inject') window.chrome.webview.postMessage({ action: 'inject' });
-                if (cmd === '/new') createNewTab();
-                if (cmd === '/exit') window.chrome.webview.postMessage({ action: 'exit' });
-                e.target.value = '';
-                save();
-            }
-        });
-
-        /* =========================================
-            PROCEDURAL WEATHER BACKGROUND ENGINE
-        ========================================= */
-        const canvas = document.getElementById('weather-canvas');
-        const ctx = canvas.getContext('2d');
-        let animationId;
-        let weatherMode = 'matrix';
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        let matrixParticles = [];
-        let gridLines = [];
-        let warpStars = [];
-        let environmentDrops = [];
-
-        function initWeather(mode) {
-            matrixParticles = []; gridLines = []; warpStars = []; environmentDrops = [];
-            const columns = Math.floor(canvas.width / 14) + 1;
-            
-            if(mode === 'matrix') {
-                for(let i=0; i<columns; i++) matrixParticles.push({ x: i*14, y: Math.random() * -500, speed: 2 + Math.random() * 5 });
-            } else if(mode === 'hyperjump' || mode === 'stars') {
-                for(let i=0; i<150; i++) warpStars.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, z: Math.random()*canvas.width, color: Math.random() > 0.5 ? '#fff' : 'var(--accent)' });
-            } else if(mode === 'rain' || mode === 'snow') {
-                for(let i=0; i<120; i++) environmentDrops.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, speed: 4 + Math.random()*6, size: 1 + Math.random()*3 });
-            }
-        }
-
-        function setWeatherEffect(mode) {
-            weatherMode = mode;
-            localStorage.setItem('obv_weather', mode);
-            document.getElementById('cfg-weather').value = mode;
-            cancelAnimationFrame(animationId);
-            if(mode !== 'none') {
-                initWeather(mode);
-                renderWeatherLoop();
-            } else {
-                ctx.clearRect(0,0, canvas.width, canvas.height);
-            }
-            window.chrome.webview.postMessage({ action: 'set_weather', weather: mode });
-        }
-
-        function renderWeatherLoop() {
-            const accentColor = getComputedStyle(document.body).getPropertyValue('--accent').trim();
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            if(weatherMode === 'matrix') {
-                ctx.fillStyle = 'rgba(0,0,0,0.05)';
-                ctx.font = '11px monospace';
-                matrixParticles.forEach(p => {
-                    ctx.fillStyle = accentColor;
-                    const char = String.fromCharCode(0x30A0 + Math.random() * 96);
-                    ctx.fillText(char, p.x, p.y);
-                    p.y += p.speed;
-                    if(p.y > canvas.height) { p.y = -50; p.speed = 2 + Math.random() * 5; }
-                });
-            }
-            else if(weatherMode === 'cybergrid') {
-                ctx.strokeStyle = accentColor;
-                ctx.lineWidth = 0.4;
-                const step = 45;
-                const offset = (Date.now() / 30) % step;
-                for(let x = offset; x < canvas.width; x += step) {
-                    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
-                }
-                for(let y = offset; y < canvas.height; y += step) {
-                    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
-                }
-            }
-            else if(weatherMode === 'hyperjump') {
-                warpStars.forEach(s => {
-                    s.z -= 8;
-                    if(s.z <= 0) { s.z = canvas.width; s.x = Math.random()*canvas.width; s.y = Math.random()*canvas.height; }
-                    const cx = canvas.width / 2; const cy = canvas.height / 2;
-                    const px = (s.x - cx) * (canvas.width / s.z) + cx;
-                    const py = (s.y - cy) * (canvas.width / s.z) + cy;
-                    ctx.strokeStyle = s.color; ctx.lineWidth = 2;
-                    ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px + (px - cx)*0.09, py + (py - cy)*0.09); ctx.stroke();
-                });
-            }
-            else if(weatherMode === 'stars') {
-                warpStars.forEach(s => {
-                    ctx.fillStyle = s.color;
-                    ctx.fillRect(s.x, s.y, 1.5, 1.5);
-                    s.y += 0.2; if(s.y > canvas.height) s.y = 0;
-                });
-            }
-            else if(weatherMode === 'rain') {
-                ctx.strokeStyle = accentColor;
-                ctx.lineWidth = 1;
-                environmentDrops.forEach(d => {
-                    ctx.beginPath(); ctx.moveTo(d.x, d.y); ctx.lineTo(d.x + 1, d.y + 12); ctx.stroke();
-                    d.y += d.speed; d.x += 0.5;
-                    if(d.y > canvas.height) { d.y = -20; d.x = Math.random()*canvas.width; }
-                });
-            }
-            else if(weatherMode === 'snow') {
-                ctx.fillStyle = '#ffffff';
-                environmentDrops.forEach(d => {
-                    ctx.beginPath(); ctx.arc(d.x, d.y, d.size/2, 0, Math.PI*2); ctx.fill();
-                    d.y += d.speed * 0.25; d.x += Math.sin(d.y/30) * 0.5;
-                    if(d.y > canvas.height) { d.y = -10; d.x = Math.random()*canvas.width; }
-                });
-            }
-
-            animationId = requestAnimationFrame(renderWeatherLoop);
-        }
-    </script>
 </body>
 </html>
