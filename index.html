@@ -28,6 +28,13 @@
 
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.96) translateY(4px); } to { opacity: 1; transform: scale(1) translateY(0); } }
         @keyframes tabSpawn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Pulse Animation for the top status indicator dot */
+        @keyframes dotPulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.15); opacity: 1; box-shadow: 0 0 12px var(--accent), 0 0 4px var(--accent); }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
 
         * { box-sizing: border-box; outline: none; transition: background 0.3s var(--ease-out-expo), border 0.3s var(--ease-out-expo), color 0.3s var(--ease-out-expo), transform 0.3s var(--ease-out-expo), box-shadow 0.3s var(--ease-out-expo); }
         
@@ -55,8 +62,31 @@
             backdrop-filter: blur(8px);
             -webkit-app-region: drag;
         }
-        .logo { font-weight: 800; font-size: 10px; letter-spacing: 3px; color: var(--text-dim); -webkit-app-region: drag; }
+        
+        .brand-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            -webkit-app-region: drag;
+        }
+        
+        .logo { font-weight: 800; font-size: 10px; letter-spacing: 3px; color: var(--text-dim); }
         .logo span { color: var(--accent); }
+
+        /* Top Bar Dynamic Attachment Status Dot */
+        .attach-indicator-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #252529;
+            box-shadow: inset 0 1px 1px rgba(0,0,0,0.5);
+            transition: background 0.4s var(--ease-out-expo), box-shadow 0.4s var(--ease-out-expo);
+        }
+        .attach-indicator-dot.active {
+            background: var(--accent);
+            box-shadow: 0 0 10px var(--accent);
+            animation: dotPulse 2s infinite ease-in-out;
+        }
 
         .header-actions { display: flex; align-items: center; gap: 8px; -webkit-app-region: no-drag; }
         .icon-btn {
@@ -165,7 +195,11 @@
 
     <div class="app-shell">
         <div class="topbar">
-            <div class="logo">OBLIVION<span>//</span>PRO</div>
+            <div class="brand-wrapper">
+                <div class="logo">OBLIVION<span>//</span>PRO</div>
+                <div id="top-attach-dot" class="attach-indicator-dot" title="Attachment Status"></div>
+            </div>
+            
             <div class="header-actions">
                 <button class="icon-btn" onclick="openModal('settings-modal')">
                     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -521,13 +555,21 @@
         });
 
         function updateStatusGlow(state) {
-            const glow = document.getElementById('status-glow');
+            const bottomGlow = document.getElementById('status-glow');
+            const topDot = document.getElementById('top-attach-dot');
+            
             if(state === 'attached') {
-                glow.style.background = 'var(--accent)';
-                glow.style.boxShadow = '0 0 10px var(--accent)';
+                bottomGlow.style.background = 'var(--accent)';
+                bottomGlow.style.boxShadow = '0 0 10px var(--accent)';
+                
+                // Toggle Top Dot Attached Indicator Active state
+                if (topDot) topDot.classList.add('active');
             } else {
-                glow.style.background = '#222';
-                glow.style.boxShadow = 'none';
+                bottomGlow.style.background = '#222';
+                bottomGlow.style.boxShadow = 'none';
+                
+                // Dim Top Dot Indicator back to resting state
+                if (topDot) topDot.classList.remove('active');
             }
         }
 
