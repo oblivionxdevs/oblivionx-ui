@@ -29,7 +29,7 @@
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.96) translateY(4px); } to { opacity: 1; transform: scale(1) translateY(0); } }
         @keyframes tabSpawn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* Pulse Animation for the top bar indicator dot */
+        /* Pulse Animation for the top status indicator dot */
         @keyframes dotPulse {
             0% { transform: scale(1); opacity: 0.8; }
             50% { transform: scale(1.15); opacity: 1; box-shadow: 0 0 12px var(--accent), 0 0 4px var(--accent); }
@@ -66,26 +66,54 @@
         .brand-wrapper {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             -webkit-app-region: drag;
         }
         
         .logo { font-weight: 800; font-size: 10px; letter-spacing: 3px; color: var(--text-dim); }
         .logo span { color: var(--accent); }
 
-        /* Top Bar Dynamic Attachment Status Dot */
+        /* Status Label Framework */
+        .status-badge-container {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
         .attach-indicator-dot {
-            width: 7px;
-            height: 7px;
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
-            background: #252529;
-            box-shadow: inset 0 1px 1px rgba(0,0,0,0.5);
+            background: #3f3f46;
             transition: background 0.4s var(--ease-out-expo), box-shadow 0.4s var(--ease-out-expo);
         }
         .attach-indicator-dot.active {
             background: var(--accent);
             box-shadow: 0 0 10px var(--accent);
             animation: dotPulse 2s infinite ease-in-out;
+        }
+        .attach-indicator-dot.failed {
+            background: #ef4444;
+            box-shadow: 0 0 10px #ef4444;
+        }
+
+        #status-text {
+            transition: color 0.3s var(--ease-out-expo);
+        }
+        #status-text.active {
+            color: var(--text-main);
+        }
+        #status-text.failed {
+            color: #ef4444;
         }
 
         .header-actions { display: flex; align-items: center; gap: 8px; -webkit-app-region: no-drag; }
@@ -197,7 +225,10 @@
         <div class="topbar">
             <div class="brand-wrapper">
                 <div class="logo">OBLIVION<span>//</span>PRO</div>
-                <div id="top-attach-dot" class="attach-indicator-dot" title="Attachment Status"></div>
+                <div class="status-badge-container">
+                    <div id="top-attach-dot" class="attach-indicator-dot"></div>
+                    <span id="status-text">Not Injected</span>
+                </div>
             </div>
             
             <div class="header-actions">
@@ -382,7 +413,6 @@
             }
         }
 
-        /* Expose workspace code buffer explicitly for background worker queues */
         window.getEditorBuffer = function() {
             if(editor) {
                 window.chrome?.webview.postMessage({ action: "execute", code: editor.getValue() });
@@ -551,22 +581,40 @@
 
         window.chrome?.webview.addEventListener('message', event => {
             const msg = event.data;
-            if(msg.action === "pid_update") updateStatusGlow('attached');
+            if(msg.action === "pid_update") updateStatusGlow('attached', msg.pid);
             if(msg.action === "clear_pid") updateStatusGlow('idle');
+            if(msg.action === "injection_failed") updateStatusGlow('failed');
         });
 
-        function updateStatusGlow(state) {
+        function updateStatusGlow(state, extraInfo = null) {
             const bottomGlow = document.getElementById('status-glow');
             const topDot = document.getElementById('top-attach-dot');
+            const textLabel = document.getElementById('status-text');
             
+            // Clean dynamic classes
+            topDot.classList.remove('active', 'failed');
+            textLabel.classList.remove('active', 'failed');
+
             if(state === 'attached') {
                 bottomGlow.style.background = 'var(--accent)';
                 bottomGlow.style.boxShadow = '0 0 10px var(--accent)';
-                if (topDot) topDot.classList.add('active');
-            } else {
+                
+                topDot.classList.add('active');
+                textLabel.classList.add('active');
+                textLabel.innerText = extraInfo ? `Injected (PID: ${extraInfo})` : "Injected";
+            } 
+            else if(state === 'failed') {
+                bottomGlow.style.background = '#ef4444';
+                bottomGlow.style.boxShadow = '0 0 10px #ef4444';
+                
+                topDot.classList.add('failed');
+                textLabel.classList.add('failed');
+                textLabel.innerText = "Injection Failed";
+            }
+            else {
                 bottomGlow.style.background = '#222';
                 bottomGlow.style.boxShadow = 'none';
-                if (topDot) topDot.classList.remove('active');
+                textLabel.innerText = "Not Injected";
             }
         }
 
