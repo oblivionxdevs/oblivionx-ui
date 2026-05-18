@@ -5,370 +5,240 @@
 <title>OblivionX Engine</title>
 
 <style>
-:root {
-    --accent:#8C5AFF;
-    --bg:#000;
-    --panel:#050505;
-    --border:rgba(255,255,255,0.08);
-    --text:#fff;
-    --dim:#777;
-}
-
-/* THEMES */
-.theme-purple { --accent:#8C5AFF; --bg:#060608; --panel:#0b0b0e; }
-.theme-gold { --accent:#FEE227; --bg:#080805; --panel:#0f0f0a; }
-.theme-vampire { --accent:#FF3131; --bg:#080303; --panel:#120606; }
-.theme-ocean { --accent:#00D1FF; --bg:#03070a; --panel:#060b12; }
-.theme-matrix { --accent:#00FF41; --bg:#020502; --panel:#050a05; }
-
-* { margin:0; padding:0; box-sizing:border-box; }
-
 body {
-    background:var(--bg);
-    color:var(--text);
-    font-family:Inter, sans-serif;
+    margin:0;
     overflow:hidden;
+    background:#000;
+    font-family:Inter, sans-serif;
+    color:white;
 }
 
-/* WEATHER */
-#weather-canvas {
-    position:absolute;
-    inset:0;
-    z-index:0;
-    opacity:0.35;
-    pointer-events:none;
+#editor {
+    width:100%;
+    height:calc(100vh - 80px);
 }
 
-/* APP */
-.app {
-    position:relative;
-    z-index:2;
-    height:100vh;
-    display:flex;
-    flex-direction:column;
-    border:1px solid var(--border);
-}
-
-/* TOP BAR */
 .topbar {
-    height:42px;
+    height:40px;
     display:flex;
     justify-content:space-between;
     align-items:center;
     padding:0 10px;
-    background:rgba(10,10,15,0.8);
-    border-bottom:1px solid var(--border);
+    background:#111;
     -webkit-app-region: drag;
 }
 
-.title {
-    font-size:12px;
-    letter-spacing:2px;
-    color:var(--dim);
-}
-.title span { color:var(--accent); }
-
-.win-controls {
+.controls {
     display:flex;
     gap:8px;
-    -webkit-app-region: no-drag;
+    -webkit-app-region:no-drag;
 }
 
-.win-btn {
-    width:30px;
-    height:24px;
+button {
     background:transparent;
-    border:1px solid var(--border);
-    color:#aaa;
+    border:1px solid #333;
+    color:white;
+    width:30px;
+    height:25px;
     cursor:pointer;
 }
-.win-btn:hover { color:#fff; border-color:var(--accent); }
 
-/* TABS */
 .tabs {
+    height:30px;
     display:flex;
     gap:6px;
-    padding:6px;
-    background:var(--panel);
-    border-bottom:1px solid var(--border);
+    background:#0b0b0b;
+    align-items:center;
+    padding:4px;
 }
 
 .tab {
-    padding:6px 10px;
-    font-size:11px;
-    color:var(--dim);
-    border:1px solid transparent;
+    padding:4px 10px;
+    font-size:12px;
+    border:1px solid #222;
     cursor:pointer;
 }
+
 .tab.active {
-    color:#fff;
-    border-color:var(--border);
-    background:#111;
+    border-color:#8C5AFF;
 }
 
-/* EDITOR */
-#editor {
-    flex:1;
-}
-
-/* CLI */
 .cli {
-    height:42px;
+    height:40px;
     display:flex;
     align-items:center;
     padding:0 10px;
-    border-top:1px solid var(--border);
+    background:#111;
 }
 
 .cli input {
     flex:1;
     background:transparent;
     border:none;
-    color:#fff;
+    color:white;
     outline:none;
 }
-
-/* STATUS DOT */
-.dot {
-    width:6px;
-    height:6px;
-    border-radius:50%;
-    background:#222;
-}
 </style>
-
 </head>
 
-<body class="theme-purple">
+<body>
 
-<canvas id="weather-canvas"></canvas>
-
-<div class="app">
-
-    <!-- TOP BAR -->
-    <div class="topbar">
-        <div class="title">OBLIVION<span>//</span>X</div>
-
-        <div class="win-controls">
-            <button class="win-btn" onclick="minimize()">—</button>
-            <button class="win-btn" onclick="closeApp()">✕</button>
-        </div>
+<!-- TOPBAR -->
+<div class="topbar">
+    <div>OblivionX</div>
+    <div class="controls">
+        <button onclick="minimize()">—</button>
+        <button onclick="closeApp()">✕</button>
     </div>
-
-    <!-- TABS -->
-    <div class="tabs" id="tabs"></div>
-
-    <!-- MONACO -->
-    <div id="editor"></div>
-
-    <!-- CLI -->
-    <div class="cli">
-        <span style="color:var(--accent);margin-right:8px;">></span>
-        <input id="cli" placeholder="/run /inject /new /topmost /weather">
-        <div class="dot" id="status"></div>
-    </div>
-
 </div>
 
-<!-- SETTINGS (RESTORED FULL LOGIC HOOKS) -->
+<!-- TABS -->
+<div class="tabs" id="tabs"></div>
+
+<!-- EDITOR -->
+<div id="editor"></div>
+
+<!-- CLI -->
+<div class="cli">
+    <input id="cli" placeholder="/run /inject /new /topmost">
+</div>
+
+<!-- WEATHER CANVAS (optional hook) -->
+<canvas id="weather"></canvas>
+
+<!-- MONACO LOADER (FIXED SAFE VERSION) -->
 <script>
 let editor;
-let files = JSON.parse(localStorage.getItem("obv_fs")||"{}") || {
-    "main.lua":"print('OblivionX restored')"
-};
+let files = { "main.lua":"print('OblivionX')" };
 let current = "main.lua";
 
 /* =========================
-   WINDOW CONTROLS (FIXED)
+   SAFE MONACO LOADER FIX
 ========================= */
-function minimize(){
-    window.chrome?.webview.postMessage({ action:"minimize" });
-}
-function closeApp(){
-    window.chrome?.webview.postMessage({ action:"exit" });
-}
+function loadMonaco(callback){
 
-/* FIXED TOPMOST SYSTEM */
-let topmost = true;
-function setTopMost(v){
-    topmost = v;
-    window.chrome?.webview.postMessage({ action:"topmost", value:v });
+    const script = document.createElement("script");
+    script.src = "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.0/min/vs/loader.min.js";
+
+    script.onload = () => {
+
+        require.config({
+            paths: {
+                vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.0/min/vs"
+            }
+        });
+
+        require(["vs/editor/editor.main"], function () {
+            callback();
+        });
+
+    };
+
+    document.body.appendChild(script);
 }
 
 /* =========================
-   MONACO RESTORE
+   INIT EDITOR
 ========================= */
-require.config({ paths:{ vs:"https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.0/min/vs" }});
+loadMonaco(() => {
 
-require(["vs/editor/editor.main"], function(){
-    editor = monaco.editor.create(document.getElementById("editor"),{
-        value:files[current],
-        language:"lua",
-        theme:"vs-dark",
-        automaticLayout:true,
-        minimap:{enabled:false}
+    editor = monaco.editor.create(document.getElementById("editor"), {
+        value: files[current],
+        language: "lua",
+        theme: "vs-dark",
+        automaticLayout: true,
+        minimap: { enabled: false }
     });
 
     renderTabs();
 });
 
 /* =========================
-   SAVE SYSTEM
-========================= */
-function save(){
-    if(editor){
-        files[current]=editor.getValue();
-        localStorage.setItem("obv_fs", JSON.stringify(files));
-    }
-}
-
-/* =========================
-   TABS (FULL RESTORE)
+   TABS SYSTEM
 ========================= */
 function renderTabs(){
-    const t=document.getElementById("tabs");
-    t.innerHTML="";
+    const t = document.getElementById("tabs");
+    t.innerHTML = "";
 
-    Object.keys(files).forEach(f=>{
-        let d=document.createElement("div");
-        d.className="tab"+(f===current?" active":"");
-        d.innerText=f;
+    Object.keys(files).forEach(f => {
+        let tab = document.createElement("div");
+        tab.className = "tab" + (f === current ? " active" : "");
+        tab.innerText = f;
 
-        d.onclick=()=>{
+        tab.onclick = () => {
             save();
-            current=f;
+            current = f;
             editor.setValue(files[f]);
             renderTabs();
         };
 
-        t.appendChild(d);
+        t.appendChild(tab);
     });
 }
 
-function newTab(){
-    let name="script_"+Object.keys(files).length+".lua";
-    files[name]="";
-    current=name;
-    renderTabs();
-    editor.setValue("");
-    save();
+function save(){
+    if(editor){
+        files[current] = editor.getValue();
+    }
 }
 
 /* =========================
-   CLI SYSTEM (FULL RESTORE)
+   CLI COMMANDS
 ========================= */
-document.getElementById("cli").addEventListener("keydown",e=>{
-    if(e.key==="Enter"){
-        let cmd=e.target.value.trim();
+document.getElementById("cli").addEventListener("keydown", e => {
+    if(e.key === "Enter"){
+        let cmd = e.target.value.trim();
 
-        if(cmd==="/run")
-            window.chrome?.webview.postMessage({ action:"execute", code:editor.getValue() });
+        if(cmd === "/run"){
+            window.chrome?.webview.postMessage({
+                action:"execute",
+                code: editor.getValue()
+            });
+        }
 
-        if(cmd==="/inject")
+        if(cmd === "/inject"){
             window.chrome?.webview.postMessage({ action:"inject" });
+        }
 
-        if(cmd==="/new")
-            newTab();
+        if(cmd === "/new"){
+            let n = "script_" + Object.keys(files).length + ".lua";
+            files[n] = "";
+            current = n;
+            renderTabs();
+            editor.setValue("");
+        }
 
-        if(cmd==="/topmost")
-            setTopMost(!topmost);
+        if(cmd === "/topmost"){
+            toggleTopMost();
+        }
 
-        if(cmd==="/exit")
-            window.chrome?.webview.postMessage({ action:"exit" });
-
-        e.target.value="";
+        e.target.value = "";
     }
 });
 
 /* =========================
-   WEATHER ENGINE (FULL RESTORE)
+   TOPMOST FIX (REAL)
 ========================= */
-const canvas=document.getElementById("weather-canvas");
-const ctx=canvas.getContext("2d");
+let topmost = true;
 
-let mode="matrix";
-let particles=[],stars=[],drops=[],grid=[];
-
-function resize(){
-    canvas.width=innerWidth;
-    canvas.height=innerHeight;
+function toggleTopMost(){
+    topmost = !topmost;
+    window.chrome?.webview.postMessage({
+        action:"topmost",
+        value: topmost
+    });
 }
-window.onresize=resize;
-resize();
-
-function initWeather(){
-    particles=[]; stars=[]; drops=[];
-
-    for(let i=0;i<120;i++){
-        particles.push({
-            x:Math.random()*canvas.width,
-            y:Math.random()*canvas.height,
-            s:Math.random()*4+1
-        });
-
-        stars.push({
-            x:Math.random()*canvas.width,
-            y:Math.random()*canvas.height
-        });
-
-        drops.push({
-            x:Math.random()*canvas.width,
-            y:Math.random()*canvas.height,
-            s:Math.random()*6+2
-        });
-    }
-}
-initWeather();
-
-function loop(){
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-
-    const accent=getComputedStyle(document.body).getPropertyValue("--accent");
-
-    /* MATRIX */
-    if(mode==="matrix"){
-        ctx.fillStyle=accent;
-        particles.forEach(p=>{
-            ctx.fillText(String.fromCharCode(0x30A0+Math.random()*96),p.x,p.y);
-            p.y+=p.s;
-            if(p.y>canvas.height)p.y=0;
-        });
-    }
-
-    /* STARS */
-    if(mode==="stars"){
-        ctx.fillStyle="#fff";
-        stars.forEach(s=>{
-            ctx.fillRect(s.x,s.y,2,2);
-            s.y+=0.3;
-            if(s.y>canvas.height)s.y=0;
-        });
-    }
-
-    /* RAIN */
-    if(mode==="rain"){
-        ctx.strokeStyle=accent;
-        drops.forEach(d=>{
-            ctx.beginPath();
-            ctx.moveTo(d.x,d.y);
-            ctx.lineTo(d.x,d.y+10);
-            ctx.stroke();
-            d.y+=d.s;
-            if(d.y>canvas.height)d.y=0;
-        });
-    }
-
-    requestAnimationFrame(loop);
-}
-loop();
 
 /* =========================
-   CLI COMMAND EXTENSION
+   WINDOW CONTROLS
 ========================= */
-function setWeather(m){
-    mode=m;
+function minimize(){
+    window.chrome?.webview.postMessage({ action:"minimize" });
 }
 
+function closeApp(){
+    window.chrome?.webview.postMessage({ action:"exit" });
+}
 </script>
 
 </body>
