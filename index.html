@@ -29,7 +29,7 @@
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.96) translateY(4px); } to { opacity: 1; transform: scale(1) translateY(0); } }
         @keyframes tabSpawn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* Pulse Animation for the top status indicator dot */
+        /* Pulse Animation for the top bar indicator dot */
         @keyframes dotPulse {
             0% { transform: scale(1); opacity: 0.8; }
             50% { transform: scale(1.15); opacity: 1; box-shadow: 0 0 12px var(--accent), 0 0 4px var(--accent); }
@@ -382,7 +382,8 @@
             }
         }
 
-        function getEditorBuffer() {
+        /* Expose workspace code buffer explicitly for background worker queues */
+        window.getEditorBuffer = function() {
             if(editor) {
                 window.chrome?.webview.postMessage({ action: "execute", code: editor.getValue() });
             }
@@ -561,14 +562,10 @@
             if(state === 'attached') {
                 bottomGlow.style.background = 'var(--accent)';
                 bottomGlow.style.boxShadow = '0 0 10px var(--accent)';
-                
-                // Toggle Top Dot Attached Indicator Active state
                 if (topDot) topDot.classList.add('active');
             } else {
                 bottomGlow.style.background = '#222';
                 bottomGlow.style.boxShadow = 'none';
-                
-                // Dim Top Dot Indicator back to resting state
                 if (topDot) topDot.classList.remove('active');
             }
         }
@@ -579,6 +576,7 @@
         const canvas = document.getElementById('weather-canvas');
         const ctx = canvas.getContext('2d');
         let animationId;
+        let weatherMode = 'matrix';
 
         function resizeCanvas() {
             canvas.width = window.innerWidth;
