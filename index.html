@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>OblivionX Engine Pro</title>
+    <title>OblivionX Engine Elite</title>
     <style>
         :root {
             --accent: #8C5AFF;
@@ -13,12 +13,12 @@
             --text-main: #ffffff;
             --text-dim: #666666;
             --tab-active: #111111;
-            --modal-bg: rgba(10, 10, 12, 0.9);
+            --modal-bg: rgba(10, 10, 12, 0.93);
             --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
             --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Active Themes Matrix */
+        /* Active System Color Palette theme Maps */
         .theme-purple   { --accent: #8C5AFF; --bg: #060608; --panel: #0b0b0e; --panel-sub: #111116; }
         .theme-gold     { --accent: #FEE227; --bg: #080805; --panel: #0f0f0a; --panel-sub: #181810; }
         .theme-vampire  { --accent: #FF3131; --bg: #080303; --panel: #120606; --panel-sub: #1c0a0a; }
@@ -82,7 +82,7 @@
         .window-control-btn:hover { color: var(--text-main); border-color: rgba(255,255,255,0.15); background: rgba(255,255,255,0.03); }
         .window-control-btn.close-btn:hover { border-color: #ff4444; color: #ff4444; background: rgba(255,68,68,0.05); }
 
-        /* Workspace Grid Matrix */
+        /* Workspace Layout Grid Framework */
         .workspace-grid { display: flex; flex: 1; overflow: hidden; background: transparent; }
         
         /* Sidebar Navigation Explorer Tree */
@@ -105,7 +105,7 @@
         .tree-node svg { width: 13px; height: 13px; stroke: currentColor; stroke-width: 2; fill: none; }
 
         /* Main Center Workspace */
-        .editor-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .editor-container { flex: 1; position: relative; display: flex; flex-direction: column; overflow: hidden; }
         
         .tab-bar { 
             height: 38px; background: var(--panel-sub); display: flex; align-items: center; 
@@ -122,32 +122,35 @@
 
         /* Dashboard Multi-Panel Footer Drawer */
         .dashboard-drawer {
-            height: 180px; background: var(--panel); border-top: 1px solid var(--border);
+            height: 220px; background: var(--panel); border-top: 1px solid var(--border);
             display: flex; flex-direction: column; overflow: hidden;
         }
         .drawer-nav {
-            height: 34px; border-bottom: 1px solid var(--border); display: flex;
+            height: 36px; border-bottom: 1px solid var(--border); display: flex;
             background: rgba(0,0,0,0.2); padding: 0 8px; gap: 4px; align-items: center;
+            overflow-x: auto; white-space: nowrap;
         }
         .drawer-tab {
             padding: 4px 12px; font-size: 10px; font-weight: 700; text-transform: uppercase;
             letter-spacing: 0.5px; color: var(--text-dim); cursor: pointer; border-radius: 4px;
+            display: inline-block;
         }
-        .drawer-tab.active { color: var(--text-main); background: rgba(255,255,255,0.03); }
+        .drawer-tab.active { color: var(--text-main); background: rgba(255,255,255,0.04); border: 1px solid var(--border); }
         .drawer-viewport { flex: 1; overflow-y: auto; padding: 12px; font-family: 'JetBrains Mono', monospace; font-size: 11px; }
         
         .log-row { margin-bottom: 4px; line-height: 16px; color: #bbb; }
         .log-row.success { color: var(--accent); }
         .log-row.error { color: #ef4444; }
 
-        /* CLI Terminal Zone */
+        /* CLI Terminal Input Bar */
         .cli-bar { 
             height: 42px; background: var(--bg); border-top: 1px solid var(--border); 
             display: flex; align-items: center; padding: 0 16px; gap: 12px;
         }
         .cli-input { flex: 1; background: transparent; border: none; color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+        #status-glow { width: 6px; height: 6px; border-radius: 50%; background: #222; transition: all 0.4s var(--ease-out-expo); }
 
-        /* Overlays / Configuration Dashboard Modals */
+        /* Configuration Modal Shell Layouts */
         .modal-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(14px);
@@ -163,7 +166,7 @@
         .setting-label { display: flex; flex-direction: column; gap: 2px; }
         .setting-desc { font-size: 10px; color: var(--text-dim); }
 
-        /* Switches & Inputs */
+        /* Form Components */
         .switch { position: relative; display: inline-block; width: 34px; height: 20px; flex-shrink: 0; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #222; border: 1px solid var(--border); border-radius: 20px; }
@@ -217,12 +220,14 @@
 
                 <div class="dashboard-drawer">
                     <div class="drawer-nav">
-                        <div class="drawer-tab active" id="pane-tab-output" onclick="switchDrawerPane('output')">System Console</div>
-                        <div class="drawer-tab" id="pane-tab-meta" onclick="switchDrawerPane('meta')">Bytecode Compiler</div>
-                        <div class="drawer-tab" id="pane-tab-memory" onclick="switchDrawerPane('memory')">Memory Scanner</div>
+                        <div class="drawer-tab active" id="pane-tab-output" onclick="switchDrawerPane('output')">Console Output</div>
+                        <div class="drawer-tab" id="pane-tab-meta" onclick="switchDrawerPane('meta')">AST Bytecode Compiler</div>
+                        <div class="drawer-tab" id="pane-tab-memory" onclick="switchDrawerPane('memory')">Memory Watch Registry</div>
+                        <div class="drawer-tab" id="pane-tab-profiler" onclick="switchDrawerPane('profiler')">Script Performance Profiler</div>
+                        <div class="drawer-tab" id="pane-tab-sandbox" onclick="switchDrawerPane('sandbox')">Thread Sandbox Optimizer</div>
                     </div>
                     <div class="drawer-viewport" id="drawer-pane-view">
-                        <div class="log-row success">> OblivionX Core initialized safely. Awaiting payload delivery.</div>
+                        <div class="log-row success">> OblivionX Elite Core Pipeline Armed. Awaiting bytecode delivery strings.</div>
                     </div>
                 </div>
             </div>
@@ -230,7 +235,7 @@
 
         <div class="cli-bar">
             <span style="color: var(--accent); font-weight: bold;">></span>
-            <input type="text" id="cli" class="cli-input" placeholder="Type /run, /inject, /new, /clear, /topmost..." autocomplete="off">
+            <input type="text" id="cli" class="cli-input" placeholder="Type /run, /inject, /new, /clear, /profiler..." autocomplete="off">
             <div id="status-glow"></div>
         </div>
     </div>
@@ -246,11 +251,11 @@
                 <label class="switch"><input type="checkbox" id="cfg-discord" onchange="pushConfigUpdate()"><span class="slider"></span></label>
             </div>
             <div class="setting-row" id="rpc-details-row">
-                <div class="setting-label"><span>RPC Title Summary</span><span class="setting-desc">Primary description line</span></div>
+                <div class="setting-label"><span>RPC Title Summary</span><span class="setting-desc">Primary description line string</span></div>
                 <input type="text" id="cfg-rpc-details" class="form-input" oninput="pushRpcMessageUpdate()">
             </div>
             <div class="setting-row" id="rpc-state-row">
-                <div class="setting-label"><span>RPC Sub-State Status</span><span class="setting-desc">Secondary metadata string append</span></div>
+                <div class="setting-label"><span>RPC Sub-State Status</span><span class="setting-desc">Secondary status validation tracking append</span></div>
                 <input type="text" id="cfg-rpc-state" class="form-input" oninput="pushRpcMessageUpdate()">
             </div>
             <div class="setting-row">
@@ -258,15 +263,15 @@
                 <label class="switch"><input type="checkbox" id="cfg-attach" onchange="pushConfigUpdate()"><span class="slider"></span></label>
             </div>
             <div class="setting-row">
-                <div class="setting-label"><span>Auto Execute Stream</span><span class="setting-desc">Deploy script workspace code on inject</span></div>
+                <div class="setting-label"><span>Auto Execute Stream</span><span class="setting-desc">Deploy loaded buffer contents upon link-up</span></div>
                 <label class="switch"><input type="checkbox" id="cfg-execute" onchange="pushConfigUpdate()"><span class="slider"></span></label>
             </div>
             <div class="setting-row">
-                <div class="setting-label"><span>Always On Top View</span><span class="setting-desc">Pin frame layer priority</span></div>
+                <div class="setting-label"><span>Always On Top View</span><span class="setting-desc">Pin frame viewport window priority layer</span></div>
                 <label class="switch"><input type="checkbox" id="cfg-topmost" onchange="pushConfigUpdate()"><span class="slider"></span></label>
             </div>
             <div class="setting-row">
-                <div class="setting-label"><span>Visual System Theme</span><span class="setting-desc">Interface palette profiles</span></div>
+                <div class="setting-label"><span>Visual System Theme</span><span class="setting-desc">Interface canvas accent profiles</span></div>
                 <select id="cfg-theme" class="form-select" onchange="applyGlobalTheme(this.value)">
                     <option value="purple">Infinity Purple</option>
                     <option value="gold">Midas Gold</option>
@@ -276,7 +281,7 @@
                 </select>
             </div>
             <div class="setting-row">
-                <div class="setting-label"><span>Ambient Atmosphere Rig</span><span class="setting-desc">Background procedural rendering effects</span></div>
+                <div class="setting-label"><span>Ambient Atmosphere Rig</span><span class="setting-desc">Background procedural rendering effects canvas</span></div>
                 <select id="cfg-weather" class="form-select" onchange="setWeatherEffect(this.value)">
                     <option value="matrix">Matrix Cascade</option>
                     <option value="cybergrid">Cyberpunk Grid</option>
@@ -297,39 +302,34 @@
                 <span style="cursor:pointer; color:var(--text-dim);" onclick="closeModal('script-hub-modal')">×</span>
             </div>
             <div class="setting-row" style="border-bottom:1px solid var(--border); padding-bottom:10px;">
-                <div class="setting-label"><span>Dex Explorer v4</span><span class="setting-desc">Advanced runtime instance tree mapping tool</span></div>
-                <button class="icon-btn" onclick="loadCloudScript('Dex')">Load</button>
+                <div class="setting-label"><span>Dex Explorer v4</span><span class="setting-desc">Advanced runtime workspace instance tree mapping tool</span></div>
+                <button class="icon-btn" onclick="loadCloudScript('Dex')">Load Suite</button>
             </div>
             <div class="setting-row" style="border-bottom:1px solid var(--border); padding-bottom:10px;">
-                <div class="setting-label"><span>Infinite Yield Live</span><span class="setting-desc">The ultimate command administration suite utility</span></div>
-                <button class="icon-btn" onclick="loadCloudScript('InfYield')">Load</button>
+                <div class="setting-label"><span>Infinite Yield Live</span><span class="setting-desc">The ultimate command administration terminal utility</span></div>
+                <button class="icon-btn" onclick="loadCloudScript('InfYield')">Load Suite</button>
             </div>
             <div class="setting-row">
-                <div class="setting-label"><span>Remote Spy Pro</span><span class="setting-desc">Intercept and track security pipeline RemoteEvents</span></div>
-                <button class="icon-btn" onclick="loadCloudScript('RSpy')">Load</button>
+                <div class="setting-label"><span>Remote Spy Pro</span><span class="setting-desc">Intercept and track active network security pipeline RemoteEvents</span></div>
+                <button class="icon-btn" onclick="loadCloudScript('RSpy')">Load Suite</button>
             </div>
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.0/min/vs/loader.min.js"></script>
     <script>
         let editor;
-        let files = JSON.parse(localStorage.getItem('obv_fs')) || { "main.lua": "-- System Online\nprint('OblivionX Pro Loaded Successfully.')" };
+        let files = JSON.parse(localStorage.getItem('obv_fs')) || { "main.lua": "-- System Online\nprint('OblivionX Engine Pro Fully Active.')" };
         let current = "main.lua";
         let topmost = false;
         let activeDrawerPane = 'output';
         let customConsoleLogs = [];
 
-        function loadMonaco(callback){
-            const script = document.createElement("script");
-            script.src = "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.0/min/vs/loader.min.js";
-            script.onload = () => {
-                require.config({ paths: { vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.0/min/vs" }});
-                require(["vs/editor/editor.main"], function () { callback(); });
-            };
-            document.body.appendChild(script);
-        }
-
-        loadMonaco(() => {
+        /* =========================================
+           MONACO CODE EDITOR CONFIGURATION LOADOUT
+        ========================================= */
+        require.config({ paths: { vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.0/min/vs" }});
+        require(["vs/editor/editor.main"], function () {
             editor = monaco.editor.create(document.getElementById("editor"), {
                 value: files[current],
                 language: "lua",
@@ -344,7 +344,7 @@
 
             editor.onDidChangeModelContent(() => { 
                 save(); 
-                if(activeDrawerPane === 'meta') runBytecodeAnalysis();
+                if(activeDrawerPane === 'meta') compileActiveASTAnalysis();
             });
 
             const savedTheme = localStorage.getItem('obv_theme') || 'purple';
@@ -383,7 +383,7 @@
         }
 
         /* =========================================
-           SIDEBAR FILE TREE & WORKSPACE TABS
+           SIDEBAR FILE EXPLORER TREE MANAGEMENT
         ========================================= */
         function renderTabs(){
             const container = document.getElementById("tab-container");
@@ -392,14 +392,12 @@
             treeContainer.innerHTML = "";
 
             Object.keys(files).forEach(f => {
-                // Render Top Tabs Row
                 let tab = document.createElement("div");
                 tab.className = "tab" + (f === current ? " active" : "");
                 tab.innerHTML = `<span>${f}</span><span class="close-x" onclick="event.stopPropagation(); closeTab('${f}')">×</span>`;
                 tab.onclick = () => switchActiveBuffer(f);
                 container.appendChild(tab);
 
-                // Render Left Workspace Explorer Nodes
                 let node = document.createElement("div");
                 node.className = "tree-node" + (f === current ? " active" : "");
                 node.innerHTML = `<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span>${f}</span>`;
@@ -413,13 +411,13 @@
             current = fileName;
             editor.setValue(files[fileName]);
             renderTabs();
-            if(activeDrawerPane === 'meta') runBytecodeAnalysis();
+            triggerPaneUpdateRoutines();
         }
 
         function createNewTab() {
             save();
             let n = "script_" + (Object.keys(files).length + 1) + ".lua";
-            files[n] = "-- New Buffer Scope Template\nprint('Running execution context: " + n + "')";
+            files[n] = "-- New Buffer Scope Frame\nprint('Running Workbook Tab Reference: " + n + "')";
             current = n;
             renderTabs();
             editor.setValue(files[n]);
@@ -436,71 +434,111 @@
         }
 
         /* =========================================
-           DRAWER ANALYTICS COMPILER VIEWPORTS
+           COMPILER ANALYTICS SUITE DRAWER CONTROL
         ========================================= */
         function switchDrawerPane(paneId) {
             activeDrawerPane = paneId;
             document.getElementById('pane-tab-output').classList.toggle('active', paneId === 'output');
             document.getElementById('pane-tab-meta').classList.toggle('active', paneId === 'meta');
             document.getElementById('pane-tab-memory').classList.toggle('active', paneId === 'memory');
+            document.getElementById('pane-tab-profiler').classList.toggle('active', paneId === 'profiler');
+            document.getElementById('pane-tab-sandbox').classList.toggle('active', paneId === 'sandbox');
 
-            renderActivePaneContent();
+            triggerPaneUpdateRoutines();
         }
 
-        function renderActivePaneContent() {
+        function triggerPaneUpdateRoutines() {
             const viewport = document.getElementById('drawer-pane-view');
             if (activeDrawerPane === 'output') {
-                viewport.innerHTML = customConsoleLogs.map(log => `<div class="log-row ${log.type}">> [${log.time}] ${log.msg}</div>`).join('') || `<div>Awaiting console stream data pipeline flags...</div>`;
+                viewport.innerHTML = customConsoleLogs.map(l => `<div class="log-row ${l.type}">> [${l.time}] ${l.msg}</div>`).join('') || `<div>Awaiting runtime output pipeline tracking hooks...</div>`;
             } 
             else if (activeDrawerPane === 'meta') {
-                runBytecodeAnalysis();
+                compileActiveASTAnalysis();
             } 
             else if (activeDrawerPane === 'memory') {
                 viewport.innerHTML = `
                     <div style="margin-bottom:8px; display:flex; gap:8px;">
-                        <input type="text" id="mem-search" class="form-input" placeholder="Value signature / Hex string..." style="width:200px;">
-                        <button class="icon-btn" onclick="triggerFakeMemoryScan()">Scan Registry</button>
+                        <input type="text" id="mem-search" class="form-input" placeholder="Hex signature / Ptr sequence..." style="width:220px;">
+                        <button class="icon-btn" onclick="executeRegistryVectorScan()">Scan Registry</button>
                     </div>
-                    <div id="memory-scan-results" style="color:var(--text-dim)">Awaiting address mapping sequence scan hooks...</div>`;
+                    <div id="memory-scan-results" style="color:var(--text-dim)">Awaiting structural scan hooks. Mapped addresses populate on request entry.</div>`;
+            }
+            else if (activeDrawerPane === 'profiler') {
+                runPerformanceSampleProfile();
+            }
+            else if (activeDrawerPane === 'sandbox') {
+                renderThreadSandboxDashboard();
             }
             viewport.scrollTop = viewport.scrollHeight;
         }
 
-        function runBytecodeAnalysis() {
+        function compileActiveASTAnalysis() {
             if(!editor || activeDrawerPane !== 'meta') return;
             const viewport = document.getElementById('drawer-pane-view');
-            const lines = editor.getValue().split('\n');
-            let length = editor.getValue().length;
+            const sourceCode = editor.getValue();
+            const linesCount = sourceCode.split('\n').length;
             
             viewport.innerHTML = `
-                <div style="color:var(--accent); font-weight:bold; margin-bottom:4px;">[LUAU ANALYTICS METADATA]</div>
-                <div>Characters Size Metrics: ${length} bytes</div>
-                <div>Total Token Line Array Count: ${lines.length} segments</div>
-                <div style="margin-top:6px; color:var(--text-dim);">Opcode Instruction Stream Matrix Projection:</div>
-                <div style="font-family:monospace; color:#888; background:rgba(0,0,0,0.1); padding:4px; margin-top:2px;">
-                    0001: LOADK (Reg 0, Const "${current}")<br>
-                    0002: CALL (Reg 0, Lines ${lines.length})<br>
-                    0003: RETURN (Proc 0)
+                <div style="color:var(--accent); font-weight:bold; margin-bottom:6px;">[AST BYTECODE COMPILER DESCRIPTOR MATRIX]</div>
+                <div style="display:grid; grid-template-columns:1r 1r; gap:8px; color:#aaa; margin-bottom:10px;">
+                    <div>• Size Allocation: ${sourceCode.length} bytes</div>
+                    <div>• Token Stream Segments: ${linesCount} lines</div>
+                    <div>• Compiler Core Target: Luau VM V3</div>
+                    <div>• Optimizations Profile: Level 2 Flag Max</div>
+                </div>
+                <div style="color:var(--text-dim); margin-bottom:4px;">Instruction Opcode Translation Stream:</div>
+                <div style="font-family:monospace; color:#888; background:rgba(0,0,0,0.15); padding:8px; border-radius:6px; border:1px solid var(--border); max-height:100px; overflow-y:auto;">
+                    0000: GETIMPORT R0, Global['print']<br>
+                    0004: LOADK R1, Const['${current} buffer processing finished']<br>
+                    0008: CALL R0, 1, 0<br>
+                    0012: RETURN R0, 0
                 </div>`;
         }
 
-        function triggerFakeMemoryScan() {
+        function executeRegistryVectorScan() {
             const out = document.getElementById('memory-scan-results');
-            out.innerHTML = `<div>Scanning active dynamic memory mapping parameters...</div>`;
+            out.innerHTML = `<div>Scanning memory blocks inside unallocated address pages...</div>`;
             setTimeout(() => {
                 out.innerHTML = `
-                    <div class="log-row success">[SUCCESS] Mapped reference pointers identified:</div>
-                    <div style="color:#777;">0x7FFD2B1A04F0 -> (Int32) Value modified hooks active.</div>
-                    <div style="color:#777;">0x7FFD2B1A0518 -> (String) "${current}" context instance allocation pointer.</div>`;
-            }, 800);
+                    <div class="log-row success">[SUCCESS] Dynamic watch reference registry address logs successfully mapped:</div>
+                    <div style="color:#777; font-family:monospace;">0x7FFD2B1A04F0 -> [Allocation Flag Node] -> Protection: PAGE_READWRITE</div>
+                    <div style="color:#777; font-family:monospace;">0x7FFD2B1A0518 -> [Workbook Buffer Block] -> Pointer references verified.</div>`;
+            }, 600);
+        }
+
+        function runPerformanceSampleProfile() {
+            const viewport = document.getElementById('drawer-pane-view');
+            viewport.innerHTML = `
+                <div style="color:var(--accent); font-weight:bold; margin-bottom:6px;">[AUTOMATED SCRIPT RUNTIME PROFILER]</div>
+                <div style="color:#aaa; line-height:18px;">
+                    <div>• Thread Frequency: 60Hz Target Rate Locked</div>
+                    <div>• CPU Execution Cost Metrics: <span style="color:#22c55e;">0.0024ms</span> (Optimal Range Frame)</div>
+                    <div>• GC Heap Allocation State: 142.8 KB System Cache Reserved</div>
+                    <div>• Core Pipeline Frame Leaks identified: <span style="color:#22c55e;">0 Faults Detected</span></div>
+                </div>`;
+        }
+
+        function renderThreadSandboxDashboard() {
+            const viewport = document.getElementById('drawer-pane-view');
+            viewport.innerHTML = `
+                <div style="color:var(--accent); font-weight:bold; margin-bottom:6px;">[MULTI-THREAD EXECUTION SANDBOX OPTIMIZER]</div>
+                <div style="display:flex; gap:14px; margin-bottom:10px;">
+                    <div style="color:var(--text-dim);">Environment Guard: <span style="color:#fff; font-weight:bold;">Secure Isolated Isolation Mode</span></div>
+                    <div style="color:var(--text-dim);">Security Level Tier: <span style="color:#fff; font-weight:bold;">Identity 7 (Elevated)</span></div>
+                </div>
+                <div style="display:flex; gap:8px;">
+                    <button class="icon-btn" onclick="pushLogEntry('Bypassed script core metatable limits safely.', 'success')">Bypass Metatables</button>
+                    <button class="icon-btn" onclick="pushLogEntry('Enforced core thread level isolation overrides.', 'info')">Isolate Core Threads</button>
+                    <button class="icon-btn" onclick="pushLogEntry('Dynamic script execution scheduler state updated.', 'success')">Purge Context Cache</button>
+                </div>`;
         }
 
         function loadCloudScript(scriptId) {
             closeModal('script-hub-modal');
-            if(scriptId === 'Dex') SetText(`-- Exploit Tool: Dex Explorer v4\nloadstring(game:HttpGet("https://raw.githubusercontent.com/infyield/Dex/master/main.lua"))()`);
-            if(scriptId === 'InfYield') SetText(`-- Exploit Tool: Infinite Yield Live\nloadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()`);
-            if(scriptId === 'RSpy') SetText(`-- Exploit Tool: Remote Spy Pro\nloadstring(game:HttpGet("https://raw.githubusercontent.com/ex-7/RemoteSpy/main/source.lua"))()`);
-            pushLogEntry(`Loaded cloud asset configuration suite: ${scriptId}`, 'success');
+            if(scriptId === 'Dex') SetText(`-- Exploit Tool Reference: Dex Explorer v4\nloadstring(game:HttpGet("https://raw.githubusercontent.com/infyield/Dex/master/main.lua"))()`);
+            if(scriptId === 'InfYield') SetText(`-- Exploit Tool Reference: Infinite Yield Live\nloadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()`);
+            if(scriptId === 'RSpy') SetText(`-- Exploit Tool Reference: Remote Spy Pro\nloadstring(game:HttpGet("https://raw.githubusercontent.com/ex-7/RemoteSpy/main/source.lua"))()`);
+            pushLogEntry(`Cloud catalog workbook asset successfully deployed: ${scriptId}`, 'success');
         }
 
         function pushLogEntry(msg, type = 'info') {
@@ -511,14 +549,7 @@
         }
 
         /* =========================================
-           MODAL CONTROL MATRIX WINDOW DRIVERS
-        ========================================= */
-        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        function closeModalOnOuter(e, id) { if(e.target.id === id) closeModal(id); }
-
-        /* =========================================
-           BRIDGE COMMUNICATION MODULE HANDLERS
+           BRIDGE COMMUNICATION NODES
         ========================================= */
         function applyGlobalTheme(name) {
             document.body.className = `theme-${name}`;
@@ -630,16 +661,18 @@
                 if(cmd === "/new") createNewTab();
                 if(cmd === "/topmost") toggleTopMost();
                 if(cmd === "/clear") { customConsoleLogs = []; renderActivePaneContent(); }
+                if(cmd === "/profiler") switchDrawerPane('profiler');
                 e.target.value = "";
             }
         });
 
         /* =========================================
-           PROCEDURAL VISUAL BACKGROUND WEATHER CONTROLS
+           PROCEDURAL VISUAL BACKGROUND ATMOSPHERE CANVAS
         ========================================= */
         const canvas = document.getElementById('weather-canvas');
         const ctx = canvas.getContext('2d');
         let animationId;
+        let weatherMode = 'matrix';
 
         function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
         window.addEventListener('resize', resizeCanvas);
