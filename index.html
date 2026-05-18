@@ -1,245 +1,646 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>OblivionX Engine</title>
+    <meta charset="UTF-8">
+    <title>OblivionX Engine</title>
+    <style>
+        :root {
+            --accent: #8C5AFF;
+            --bg: #000000;
+            --panel: #050505;
+            --border: rgba(255, 255, 255, 0.08);
+            --text-main: #ffffff;
+            --text-dim: #666666;
+            --tab-active: #111111;
+            --modal-bg: rgba(10, 10, 12, 0.85);
+            
+            /* Fluid Motion Presets */
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-<style>
-body {
-    margin:0;
-    overflow:hidden;
-    background:#000;
-    font-family:Inter, sans-serif;
-    color:white;
-}
+        /* Themes Configuration Layer */
+        .theme-purple   { --accent: #8C5AFF; --bg: #060608; --panel: #0b0b0e; }
+        .theme-gold     { --accent: #FEE227; --bg: #080805; --panel: #0f0f0a; }
+        .theme-vampire  { --accent: #FF3131; --bg: #080303; --panel: #120606; }
+        .theme-ocean    { --accent: #00D1FF; --bg: #03070a; --panel: #060b12; }
+        .theme-matrix   { --accent: #00FF41; --bg: #020502; --panel: #050a05; }
 
-#editor {
-    width:100%;
-    height:calc(100vh - 80px);
-}
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.96) translateY(4px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        @keyframes tabSpawn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-.topbar {
-    height:40px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:0 10px;
-    background:#111;
-    -webkit-app-region: drag;
-}
+        * { box-sizing: border-box; outline: none; transition: background 0.3s var(--ease-out-expo), border 0.3s var(--ease-out-expo), color 0.3s var(--ease-out-expo), transform 0.3s var(--ease-out-expo), box-shadow 0.3s var(--ease-out-expo); }
+        
+        body, html { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            background: var(--bg); color: var(--text-main); 
+            font-family: 'Geist', 'Inter', sans-serif; overflow: hidden; 
+        }
 
-.controls {
-    display:flex;
-    gap:8px;
-    -webkit-app-region:no-drag;
-}
+        /* Weather Canvas Layer */
+        #weather-canvas {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 1; opacity: 0.35;
+        }
 
-button {
-    background:transparent;
-    border:1px solid #333;
-    color:white;
-    width:30px;
-    height:25px;
-    cursor:pointer;
-}
+        .app-shell { 
+            position: relative; display: flex; flex-direction: column; 
+            height: 100vh; border: 1px solid var(--border); z-index: 2; 
+            background: rgba(0, 0, 0, 0.2);
+        }
 
-.tabs {
-    height:30px;
-    display:flex;
-    gap:6px;
-    background:#0b0b0b;
-    align-items:center;
-    padding:4px;
-}
+        .topbar { 
+            height: 50px; display: flex; align-items: center; justify-content: space-between; 
+            padding: 0 20px; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(8px);
+            -webkit-app-region: drag;
+        }
+        .logo { font-weight: 800; font-size: 10px; letter-spacing: 3px; color: var(--text-dim); -webkit-app-region: drag; }
+        .logo span { color: var(--accent); }
 
-.tab {
-    padding:4px 10px;
-    font-size:12px;
-    border:1px solid #222;
-    cursor:pointer;
-}
+        .header-actions { display: flex; align-items: center; gap: 8px; -webkit-app-region: no-drag; }
+        .icon-btn {
+            background: transparent; border: 1px solid var(--border); border-radius: 6px;
+            color: var(--text-dim); padding: 6px 12px; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 6px;
+        }
+        .icon-btn:hover { color: var(--text-main); border-color: var(--accent); background: rgba(255,255,255,0.02); transform: translateY(-1px); }
+        .icon-btn:active { transform: translateY(0); }
+        .icon-btn svg { width: 12px; height: 12px; stroke: currentColor; stroke-width: 2; fill: none; }
 
-.tab.active {
-    border-color:#8C5AFF;
-}
+        .window-control-btn {
+            background: transparent; border: 1px solid var(--border); color: var(--text-dim);
+            width: 28px; height: 28px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+        .window-control-btn:hover { color: var(--text-main); border-color: rgba(255,255,255,0.15); background: rgba(255,255,255,0.03); }
+        .window-control-btn.close-btn:hover { border-color: #ff4444; color: #ff4444; background: rgba(255,68,68,0.05); }
+        .window-control-btn svg { width: 12px; height: 12px; stroke: currentColor; stroke-width: 2; }
 
-.cli {
-    height:40px;
-    display:flex;
-    align-items:center;
-    padding:0 10px;
-    background:#111;
-}
+        /* Tabs System */
+        .tab-bar { 
+            height: 42px; background: var(--panel); display: flex; align-items: center; 
+            padding: 0 10px; gap: 4px; border-bottom: 1px solid var(--border);
+        }
+        .tab { 
+            display: flex; align-items: center; padding: 6px 14px; font-size: 11px; 
+            cursor: pointer; border-radius: 6px; color: var(--text-dim);
+            border: 1px solid transparent; animation: tabSpawn 0.3s var(--ease-out-expo);
+            background: rgba(255,255,255,0.01);
+        }
+        .tab:hover { color: var(--text-main); border-color: rgba(255,255,255,0.04); }
+        .tab.active { color: var(--text-main); background: var(--tab-active); border-color: var(--border); }
+        .tab .close-x { margin-left: 8px; font-size: 14px; opacity: 0.3; transition: all 0.2s; }
+        .tab .close-x:hover { opacity: 1; color: #ff4444; }
 
-.cli input {
-    flex:1;
-    background:transparent;
-    border:none;
-    color:white;
-    outline:none;
-}
-</style>
+        .btn-add { 
+            background: transparent; border: none; color: #555; font-size: 18px; 
+            padding: 0 10px; cursor: pointer; transition: 0.2s; 
+        }
+        .btn-add:hover { color: var(--accent); transform: scale(1.1); }
+
+        main { flex: 1; position: relative; background: transparent; }
+        #editor { width: 100%; height: 100%; }
+
+        /* CLI Zone */
+        .cli-bar { 
+            height: 45px; background: var(--bg); border-top: 1px solid var(--border); 
+            display: flex; align-items: center; padding: 0 20px; gap: 12px;
+        }
+        .cli-input { flex: 1; background: transparent; border: none; color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+        #status-glow { width: 6px; height: 6px; border-radius: 50%; background: #222; transition: all 0.4s var(--ease-out-expo); }
+
+        /* General Modal Shell Layouts */
+        .modal-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(14px);
+            display: none; align-items: center; justify-content: center; z-index: 100;
+            transition: opacity 0.3s var(--ease-in-out);
+        }
+        .modal-card {
+            background: var(--modal-bg); border: 1px solid var(--border);
+            border-radius: 16px; box-shadow: 0 24px 50px rgba(0,0,0,0.6);
+            animation: fadeIn 0.4s var(--ease-out-expo) forwards;
+        }
+
+        /* Settings View Configs */
+        .settings-card { width: 450px; padding: 24px; max-height: 90vh; overflow-y: auto; }
+        .modal-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 12px;
+        }
+        .modal-title { font-size: 13px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+        .setting-row {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 14px; font-size: 12px; color: #aaa;
+            gap: 16px;
+        }
+        .setting-label { display: flex; flex-direction: column; gap: 2px; }
+        .setting-desc { font-size: 10px; color: var(--text-dim); }
+
+        /* Form Components */
+        .switch { position: relative; display: inline-block; width: 34px; height: 20px; flex-shrink: 0; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #222; border: 1px solid var(--border); border-radius: 20px; transition: .2s;
+        }
+        .slider:before {
+            position: absolute; content: ""; height: 12px; width: 12px; left: 3px; bottom: 3px;
+            background-color: #fff; border-radius: 50%; transition: .2s;
+        }
+        input:checked + .slider { background-color: var(--accent); }
+        input:checked + .slider:before { transform: translateX(14px); }
+
+        .form-select, .form-input {
+            background: #09090b; color: #fff; border: 1px solid var(--border);
+            padding: 6px 10px; border-radius: 6px; font-size: 11px; width: 160px;
+        }
+        .form-input { width: 160px; transition: border-color 0.2s var(--ease-out-expo); }
+        .form-input:focus { border-color: var(--accent); }
+        .form-select option { background: #000; }
+    </style>
 </head>
+<body class="theme-purple">
 
-<body>
+    <canvas id="weather-canvas"></canvas>
 
-<!-- TOPBAR -->
-<div class="topbar">
-    <div>OblivionX</div>
-    <div class="controls">
-        <button onclick="minimize()">—</button>
-        <button onclick="closeApp()">✕</button>
+    <div class="app-shell">
+        <div class="topbar">
+            <div class="logo">OBLIVION<span>//</span>PRO</div>
+            <div class="header-actions">
+                <button class="icon-btn" onclick="openModal('settings-modal')">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    Settings
+                </button>
+                <button class="window-control-btn" onclick="minimize()">
+                    <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                </button>
+                <button class="window-control-btn close-btn" onclick="closeApp()">
+                    <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="tab-bar">
+            <div id="tab-container" style="display:flex; gap:4px;"></div>
+            <button class="btn-add" onclick="createNewTab()">+</button>
+        </div>
+
+        <main>
+            <div id="editor"></div>
+        </main>
+
+        <div class="cli-bar">
+            <span style="color: var(--accent); font-weight: bold;">></span>
+            <input type="text" id="cli" class="cli-input" placeholder="Type /run, /inject, /new, /topmost..." autocomplete="off">
+            <div id="status-glow"></div>
+        </div>
     </div>
-</div>
 
-<!-- TABS -->
-<div class="tabs" id="tabs"></div>
+    <div id="settings-modal" class="modal-overlay" onclick="closeModalOnOuter(event, 'settings-modal')">
+        <div class="modal-card settings-card">
+            <div class="modal-header">
+                <div class="modal-title">System Customization</div>
+                <span style="cursor:pointer; color:var(--text-dim);" onclick="closeModal('settings-modal')">×</span>
+            </div>
+            
+            <div class="setting-row">
+                <div class="setting-label">
+                    <span>Discord Rich Presence</span>
+                    <span class="setting-desc">Broadcast runtime activity status</span>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="cfg-discord" onchange="pushConfigUpdate()">
+                    <span class="slider"></span>
+                </label>
+            </div>
 
-<!-- EDITOR -->
-<div id="editor"></div>
+            <div class="setting-row" id="rpc-details-row">
+                <div class="setting-label">
+                    <span>RPC Details Description</span>
+                    <span class="setting-desc">Top line presence message summary</span>
+                </div>
+                <input type="text" id="cfg-rpc-details" class="form-input" placeholder="OblivionX Executor" oninput="pushRpcMessageUpdate()">
+            </div>
 
-<!-- CLI -->
-<div class="cli">
-    <input id="cli" placeholder="/run /inject /new /topmost">
-</div>
+            <div class="setting-row" id="rpc-state-row">
+                <div class="setting-label">
+                    <span>RPC Custom State</span>
+                    <span class="setting-desc">Status descriptor message append line</span>
+                </div>
+                <input type="text" id="cfg-rpc-state" class="form-input" placeholder="Idle" oninput="pushRpcMessageUpdate()">
+            </div>
 
-<!-- WEATHER CANVAS (optional hook) -->
-<canvas id="weather"></canvas>
+            <div class="setting-row">
+                <div class="setting-label">
+                    <span>Auto Attach</span>
+                    <span class="setting-desc">Inject immediately upon client discovery</span>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="cfg-attach" onchange="pushConfigUpdate()">
+                    <span class="slider"></span>
+                </label>
+            </div>
 
-<!-- MONACO LOADER (FIXED SAFE VERSION) -->
-<script>
-let editor;
-let files = { "main.lua":"print('OblivionX')" };
-let current = "main.lua";
+            <div class="setting-row">
+                <div class="setting-label">
+                    <span>Auto Execute</span>
+                    <span class="setting-desc">Deploy loaded buffer content upon link-up</span>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="cfg-execute" onchange="pushConfigUpdate()">
+                    <span class="slider"></span>
+                </label>
+            </div>
 
-/* =========================
-   SAFE MONACO LOADER FIX
-========================= */
-function loadMonaco(callback){
+            <div class="setting-row">
+                <div class="setting-label">
+                    <span>Always On Top</span>
+                    <span class="setting-desc">Pin window above other native viewports</span>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="cfg-topmost" onchange="pushConfigUpdate()">
+                    <span class="slider"></span>
+                </label>
+            </div>
 
-    const script = document.createElement("script");
-    script.src = "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.0/min/vs/loader.min.js";
+            <div class="setting-row">
+                <div class="setting-label">
+                    <span>Active Theme Accent</span>
+                    <span class="setting-desc">Color palette theme map</span>
+                </div>
+                <select id="cfg-theme" class="form-select" onchange="applyGlobalTheme(this.value)">
+                    <option value="purple">Infinity Purple</option>
+                    <option value="gold">Midas Gold</option>
+                    <option value="vampire">Vampire Red</option>
+                    <option value="ocean">Abyssal Ocean</option>
+                    <option value="matrix">Matrix Emerald</option>
+                </select>
+            </div>
 
-    script.onload = () => {
+            <div class="setting-row">
+                <div class="setting-label">
+                    <span>Ambient Weather Engine</span>
+                    <span class="setting-desc">Procedural animation background canvas</span>
+                </div>
+                <select id="cfg-weather" class="form-select" onchange="setWeatherEffect(this.value)">
+                    <option value="matrix">Matrix Cascade</option>
+                    <option value="cybergrid">Cyberpunk Grid</option>
+                    <option value="hyperjump">Hyper Jump Warp</option>
+                    <option value="snow">Blizzard Snow</option>
+                    <option value="rain">Downpours Rain</option>
+                    <option value="stars">Starfield Horizon</option>
+                    <option value="none">Static Darkness</option>
+                </select>
+            </div>
+        </div>
+    </div>
 
-        require.config({
-            paths: {
-                vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.0/min/vs"
-            }
-        });
+    <script>
+        let editor;
+        let files = JSON.parse(localStorage.getItem('obv_fs')) || { "main.lua": "-- System Started\nprint('OblivionX Engine Live')" };
+        let current = "main.lua";
+        let topmost = false;
 
-        require(["vs/editor/editor.main"], function () {
-            callback();
-        });
+        function loadMonaco(callback){
+            const script = document.createElement("script");
+            script.src = "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.0/min/vs/loader.min.js";
+            script.onload = () => {
+                require.config({ paths: { vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.0/min/vs" }});
+                require(["vs/editor/editor.main"], function () { callback(); });
+            };
+            document.body.appendChild(script);
+        }
 
-    };
+        loadMonaco(() => {
+            editor = monaco.editor.create(document.getElementById("editor"), {
+                value: files[current],
+                language: "lua",
+                theme: "vs-dark",
+                automaticLayout: true,
+                minimap: { enabled: false },
+                fontSize: 13,
+                fontFamily: 'JetBrains Mono, monospace',
+                lineHeight: 22,
+                cursorSmoothCaretAnimation: true,
+            });
 
-    document.body.appendChild(script);
-}
+            editor.onDidChangeModelContent(() => { save(); });
 
-/* =========================
-   INIT EDITOR
-========================= */
-loadMonaco(() => {
+            const savedTheme = localStorage.getItem('obv_theme') || 'purple';
+            document.getElementById('cfg-theme').value = savedTheme;
+            applyGlobalTheme(savedTheme);
 
-    editor = monaco.editor.create(document.getElementById("editor"), {
-        value: files[current],
-        language: "lua",
-        theme: "vs-dark",
-        automaticLayout: true,
-        minimap: { enabled: false }
-    });
+            const savedWeather = localStorage.getItem('obv_weather') || 'matrix';
+            document.getElementById('cfg-weather').value = savedWeather;
+            setWeatherEffect(savedWeather);
 
-    renderTabs();
-});
+            document.getElementById('cfg-rpc-details').value = localStorage.getItem('obv_rpc_details') || "OblivionX Executor";
+            document.getElementById('cfg-rpc-state').value = localStorage.getItem('obv_rpc_state') || "Idle";
 
-/* =========================
-   TABS SYSTEM
-========================= */
-function renderTabs(){
-    const t = document.getElementById("tabs");
-    t.innerHTML = "";
-
-    Object.keys(files).forEach(f => {
-        let tab = document.createElement("div");
-        tab.className = "tab" + (f === current ? " active" : "");
-        tab.innerText = f;
-
-        tab.onclick = () => {
-            save();
-            current = f;
-            editor.setValue(files[f]);
             renderTabs();
-        };
+            window.chrome?.webview.postMessage({ action: "request_settings" });
+        });
 
-        t.appendChild(tab);
-    });
-}
+        function save(){
+            if(editor){
+                files[current] = editor.getValue();
+                localStorage.setItem('obv_fs', JSON.stringify(files));
+            }
+        }
 
-function save(){
-    if(editor){
-        files[current] = editor.getValue();
-    }
-}
+        function getEditorBuffer() {
+            if(editor) {
+                window.chrome?.webview.postMessage({ action: "execute", code: editor.getValue() });
+            }
+        }
 
-/* =========================
-   CLI COMMANDS
-========================= */
-document.getElementById("cli").addEventListener("keydown", e => {
-    if(e.key === "Enter"){
-        let cmd = e.target.value.trim();
+        function SetText(text) {
+            if(editor) {
+                editor.setValue(text);
+                save();
+            }
+        }
 
-        if(cmd === "/run"){
-            window.chrome?.webview.postMessage({
-                action:"execute",
-                code: editor.getValue()
+        /* =========================
+           TABS WORKSPACE MONITOR
+        ========================= */
+        function renderTabs(){
+            const container = document.getElementById("tab-container");
+            container.innerHTML = "";
+
+            Object.keys(files).forEach(f => {
+                let tab = document.createElement("div");
+                tab.className = "tab" + (f === current ? " active" : "");
+                tab.innerHTML = `
+                    <span>${f}</span>
+                    <span class="close-x" onclick="event.stopPropagation(); closeTab('${f}')">×</span>
+                `;
+
+                tab.onclick = () => {
+                    save();
+                    current = f;
+                    editor.setValue(files[f]);
+                    renderTabs();
+                };
+
+                container.appendChild(tab);
             });
         }
 
-        if(cmd === "/inject"){
-            window.chrome?.webview.postMessage({ action:"inject" });
-        }
-
-        if(cmd === "/new"){
-            let n = "script_" + Object.keys(files).length + ".lua";
-            files[n] = "";
+        function createNewTab() {
+            save();
+            let n = "script_" + (Object.keys(files).length + 1) + ".lua";
+            files[n] = "-- New Buffer Scope\n";
             current = n;
             renderTabs();
-            editor.setValue("");
+            editor.setValue(files[n]);
+            save();
         }
 
-        if(cmd === "/topmost"){
-            toggleTopMost();
+        function closeTab(f) {
+            if (Object.keys(files).length <= 1) return;
+            delete files[f];
+            if (current === f) current = Object.keys(files)[0];
+            editor.setValue(files[current]);
+            renderTabs();
+            save();
         }
 
-        e.target.value = "";
-    }
-});
+        /* =========================
+           MODAL CONTROL OVERLAYS
+        ========================= */
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function closeModalOnOuter(e, id) { if(e.target.id === id) closeModal(id); }
 
-/* =========================
-   TOPMOST FIX (REAL)
-========================= */
-let topmost = true;
+        /* =========================
+           CLI COMMAND COMPILER
+        ========================= */
+        document.getElementById("cli").addEventListener("keydown", e => {
+            if(e.key === "Enter"){
+                let cmd = e.target.value.trim().toLowerCase();
 
-function toggleTopMost(){
-    topmost = !topmost;
-    window.chrome?.webview.postMessage({
-        action:"topmost",
-        value: topmost
-    });
-}
+                if(cmd === "/run") getEditorBuffer();
+                if(cmd === "/inject") window.chrome?.webview.postMessage({ action: "inject" });
+                if(cmd === "/new") createNewTab();
+                if(cmd === "/topmost") toggleTopMost();
 
-/* =========================
-   WINDOW CONTROLS
-========================= */
-function minimize(){
-    window.chrome?.webview.postMessage({ action:"minimize" });
-}
+                e.target.value = "";
+            }
+        });
 
-function closeApp(){
-    window.chrome?.webview.postMessage({ action:"exit" });
-}
-</script>
+        /* =========================
+           BRIDGE COMMUNICATION HOOKS
+        ======================== */
+        function applyGlobalTheme(name) {
+            document.body.className = `theme-${name}`;
+            localStorage.setItem('obv_theme', name);
+            
+            setTimeout(() => {
+                const accent = getComputedStyle(document.body).getPropertyValue('--accent').trim();
+                const bg = getComputedStyle(document.body).getPropertyValue('--bg').trim();
 
+                if(window.monaco) {
+                    monaco.editor.defineTheme('obv-theme', {
+                        base: 'vs-dark', inherit: true, rules: [],
+                        colors: {
+                            'editor.background': bg,
+                            'editorCursor.foreground': accent,
+                            'editorLineNumber.activeForeground': accent
+                        }
+                    });
+                    monaco.editor.setTheme('obv-theme');
+                }
+            }, 50);
+
+            window.chrome?.webview.postMessage({ action: "theme", value: name });
+        }
+
+        function pushConfigUpdate() {
+            const isRpcOn = document.getElementById('cfg-discord').checked;
+            
+            document.getElementById('rpc-details-row').style.opacity = isRpcOn ? "1" : "0.4";
+            document.getElementById('rpc-details-row').style.pointerEvents = isRpcOn ? "all" : "none";
+            document.getElementById('rpc-state-row').style.opacity = isRpcOn ? "1" : "0.4";
+            document.getElementById('rpc-state-row').style.pointerEvents = isRpcOn ? "all" : "none";
+
+            const settings = {
+                discordRpc: isRpcOn,
+                autoAttach: document.getElementById('cfg-attach').checked,
+                autoExecute: document.getElementById('cfg-execute').checked,
+                alwaysOnTop: document.getElementById('cfg-topmost').checked
+            };
+            window.chrome?.webview.postMessage({ action: "update_config", settings });
+            pushRpcMessageUpdate();
+        }
+
+        function pushRpcMessageUpdate() {
+            const detailsText = document.getElementById('cfg-rpc-details').value;
+            const stateText = document.getElementById('cfg-rpc-state').value;
+            
+            localStorage.setItem('obv_rpc_details', detailsText);
+            localStorage.setItem('obv_rpc_state', stateText);
+
+            window.chrome?.webview.postMessage({ 
+                action: 'update_rpc_details', 
+                details: detailsText || "OblivionX Executor", 
+                state: stateText || "Idle" 
+            });
+        }
+
+        function loadExecutorSettings(cfg) {
+            document.getElementById('cfg-discord').checked = cfg.discordRpc;
+            document.getElementById('cfg-attach').checked = cfg.autoAttach;
+            document.getElementById('cfg-execute').checked = cfg.autoExecute;
+            document.getElementById('cfg-topmost').checked = cfg.alwaysOnTop;
+            topmost = cfg.alwaysOnTop;
+            
+            const isRpcOn = cfg.discordRpc;
+            document.getElementById('rpc-details-row').style.opacity = isRpcOn ? "1" : "0.4";
+            document.getElementById('rpc-details-row').style.pointerEvents = isRpcOn ? "all" : "none";
+            document.getElementById('rpc-state-row').style.opacity = isRpcOn ? "1" : "0.4";
+            document.getElementById('rpc-state-row').style.pointerEvents = isRpcOn ? "all" : "none";
+        }
+
+        function toggleTopMost(){
+            topmost = !topmost;
+            document.getElementById('cfg-topmost').checked = topmost;
+            window.chrome?.webview.postMessage({
+                action: "set_always_on_top",
+                value: topmost
+            });
+        }
+
+        function minimize(){ window.chrome?.webview.postMessage({ action: "minimize" }); }
+        function closeApp(){ window.chrome?.webview.postMessage({ action: "exit" }); }
+
+        window.chrome?.webview.addEventListener('message', event => {
+            const msg = event.data;
+            if(msg.action === "pid_update") updateStatusGlow('attached');
+            if(msg.action === "clear_pid") updateStatusGlow('idle');
+        });
+
+        function updateStatusGlow(state) {
+            const glow = document.getElementById('status-glow');
+            if(state === 'attached') {
+                glow.style.background = 'var(--accent)';
+                glow.style.boxShadow = '0 0 10px var(--accent)';
+            } else {
+                glow.style.background = '#222';
+                glow.style.boxShadow = 'none';
+            }
+        }
+
+        /* =========================
+           PROCEDURAL CANVAS WEATHER BACKGROUNDS
+        ========================= */
+        const canvas = document.getElementById('weather-canvas');
+        const ctx = canvas.getContext('2d');
+        let animationId;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        let matrixParticles = [];
+        let warpStars = [];
+        let environmentDrops = [];
+
+        function initWeather(mode) {
+            matrixParticles = []; warpStars = []; environmentDrops = [];
+            const columns = Math.floor(canvas.width / 14) + 1;
+            
+            if(mode === 'matrix') {
+                for(let i=0; i<columns; i++) matrixParticles.push({ x: i*14, y: Math.random() * -500, speed: 2 + Math.random() * 5 });
+            } else if(mode === 'hyperjump' || mode === 'stars') {
+                for(let i=0; i<150; i++) warpStars.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, z: Math.random()*canvas.width, color: Math.random() > 0.5 ? '#fff' : 'var(--accent)' });
+            } else if(mode === 'rain' || mode === 'snow') {
+                for(let i=0; i<120; i++) environmentDrops.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, speed: 4 + Math.random()*6, size: 1 + Math.random()*3 });
+            }
+        }
+
+        function setWeatherEffect(mode) {
+            weatherMode = mode;
+            localStorage.setItem('obv_weather', mode);
+            document.getElementById('cfg-weather').value = mode;
+            cancelAnimationFrame(animationId);
+            if(mode !== 'none') {
+                initWeather(mode);
+                renderWeatherLoop();
+            } else {
+                ctx.clearRect(0,0, canvas.width, canvas.height);
+            }
+            window.chrome?.webview.postMessage({ action: 'set_weather', weather: mode });
+        }
+
+        function renderWeatherLoop() {
+            const accentColor = getComputedStyle(document.body).getPropertyValue('--accent').trim();
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if(weatherMode === 'matrix') {
+                ctx.fillStyle = 'rgba(0,0,0,0.05)';
+                ctx.font = '11px monospace';
+                matrixParticles.forEach(p => {
+                    ctx.fillStyle = accentColor;
+                    const char = String.fromCharCode(0x30A0 + Math.random() * 96);
+                    ctx.fillText(char, p.x, p.y);
+                    p.y += p.speed;
+                    if(p.y > canvas.height) { p.y = -50; p.speed = 2 + Math.random() * 5; }
+                });
+            }
+            else if(weatherMode === 'cybergrid') {
+                ctx.strokeStyle = accentColor;
+                ctx.lineWidth = 0.4;
+                const step = 45;
+                const offset = (Date.now() / 30) % step;
+                for(let x = offset; x < canvas.width; x += step) {
+                    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+                }
+                for(let y = offset; y < canvas.height; y += step) {
+                    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+                }
+            }
+            else if(weatherMode === 'hyperjump') {
+                warpStars.forEach(s => {
+                    s.z -= 8;
+                    if(s.z <= 0) { s.z = canvas.width; s.x = Math.random()*canvas.width; s.y = Math.random()*canvas.height; }
+                    const cx = canvas.width / 2; const cy = canvas.height / 2;
+                    const px = (s.x - cx) * (canvas.width / s.z) + cx;
+                    const py = (s.y - cy) * (canvas.width / s.z) + cy;
+                    ctx.strokeStyle = s.color; ctx.lineWidth = 2;
+                    ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px + (px - cx)*0.09, py + (py - cy)*0.09); ctx.stroke();
+                });
+            }
+            else if(weatherMode === 'stars') {
+                warpStars.forEach(s => {
+                    ctx.fillStyle = s.color;
+                    ctx.fillRect(s.x, s.y, 1.5, 1.5);
+                    s.y += 0.2; if(s.y > canvas.height) s.y = 0;
+                });
+            }
+            else if(weatherMode === 'rain') {
+                ctx.strokeStyle = accentColor;
+                ctx.lineWidth = 1;
+                environmentDrops.forEach(d => {
+                    ctx.beginPath(); ctx.moveTo(d.x, d.y); ctx.lineTo(d.x + 1, d.y + 12); ctx.stroke();
+                    d.y += d.speed; d.x += 0.5;
+                    if(d.y > canvas.height) { d.y = -20; d.x = Math.random()*canvas.width; }
+                });
+            }
+            else if(weatherMode === 'snow') {
+                ctx.fillStyle = '#ffffff';
+                environmentDrops.forEach(d => {
+                    ctx.beginPath(); ctx.arc(d.x, d.y, d.size/2, 0, Math.PI*2); ctx.fill();
+                    d.y += d.speed * 0.25; d.x += Math.sin(d.y/30) * 0.5;
+                    if(d.y > canvas.height) { d.y = -10; d.x = Math.random()*canvas.width; }
+                });
+            }
+
+            animationId = requestAnimationFrame(renderWeatherLoop);
+        }
+    </script>
 </body>
 </html>
