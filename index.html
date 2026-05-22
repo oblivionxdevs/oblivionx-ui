@@ -79,8 +79,8 @@
             background: transparent; border: 1px solid var(--border); color: var(--text-dim);
             width: 28px; height: 28px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center;
         }
-        .window-control-btn:hover { color: var(--text-main); border-color: rgba(255,255,255,0.15); background: rgba(255,255,255,0.03); }
-        .window-control-btn.close-btn:hover { border-color: #ff4444; color: #ff4444; background: rgba(255,68,68,0.05); }
+        .window-control-btn:hover { color: var(--text-main); border-color: rgba(255, 255, 255, 0.15); background: rgba(255, 255, 255, 0.03); }
+        .window-control-btn.close-btn:hover { border-color: #ff4444; color: #ff4444; background: rgba(255, 68, 68, 0.05); }
 
         /* Workspace Grid Container */
         .workspace-grid { display: flex; flex: 1; overflow: hidden; background: transparent; }
@@ -157,6 +157,9 @@
         .setting-label { display: flex; flex-direction: column; gap: 2px; }
         .setting-desc { font-size: 10px; color: var(--text-dim); }
 
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-title { font-size: 14px; font-weight: 800; letter-spacing: 1px; color: #fff; text-transform: uppercase; }
+
         /* Form Components */
         .switch { position: relative; display: inline-block; width: 34px; height: 20px; flex-shrink: 0; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -213,7 +216,7 @@
         <div class="modal-card settings-card">
             <div class="modal-header">
                 <div class="modal-title">Preferences Matrix</div>
-                <span style="cursor:pointer; color:var(--text-dim);" onclick="closeModal('settings-modal')">×</span>
+                <span style="cursor:pointer; color:var(--text-dim); font-size: 20px;" onclick="closeModal('settings-modal')">×</span>
             </div>
             <div class="setting-row">
                 <div class="setting-label"><span>Discord Rich Presence</span><span class="setting-desc">Broadcast activity parameters</span></div>
@@ -295,6 +298,26 @@
         let current = "main.lua";
         let topmost = false;
 
+        /* Safe PostMessage wrapper pipeline targeting IPC safely */
+        function sendWebviewMessage(payload) {
+            if (window.chrome && window.chrome.webview && typeof window.chrome.webview.postMessage === 'function') {
+                window.chrome.webview.postMessage(payload);
+            } else {
+                console.warn("[IPC Bridge System Log Out]: WebView2 host channel object not yet linked.", payload);
+            }
+        }
+
+        /* Safe initialization listener setup hook */
+        function initNativeIPCListeners() {
+            if (window.chrome && window.chrome.webview && typeof window.chrome.webview.addEventListener === 'function') {
+                window.chrome.webview.addEventListener('message', handleBackendIPCMessage);
+                console.log("[IPC Bridge System Log Out]: Native link channel connected successfully.");
+            } else {
+                // If the object isn't constructed yet, retry after a slight frame tick delay.
+                setTimeout(initNativeIPCListeners, 100);
+            }
+        }
+
         /* =========================================
            MONACO CODE EDITOR CONFIGURATION LOADOUT
         ========================================= */
@@ -315,18 +338,26 @@
             editor.onDidChangeModelContent(() => { save(); });
 
             const savedTheme = localStorage.getItem('obv_theme') || 'purple';
-            document.getElementById('cfg-theme').value = savedTheme;
+            const themeSelect = document.getElementById('cfg-theme');
+            if (themeSelect) themeSelect.value = savedTheme;
             applyGlobalTheme(savedTheme);
 
             const savedWeather = localStorage.getItem('obv_weather') || 'matrix';
-            document.getElementById('cfg-weather').value = savedWeather;
+            const weatherSelect = document.getElementById('cfg-weather');
+            if (weatherSelect) weatherSelect.value = savedWeather;
             setWeatherEffect(savedWeather);
 
-            document.getElementById('cfg-rpc-details').value = localStorage.getItem('obv_rpc_details') || "OblivionX Executor";
-            document.getElementById('cfg-rpc-state').value = localStorage.getItem('obv_rpc_state') || "Idle";
+            const rpcDetailsInput = document.getElementById('cfg-rpc-details');
+            if (rpcDetailsInput) rpcDetailsInput.value = localStorage.getItem('obv_rpc_details') || "OblivionX Executor";
+            
+            const rpcStateInput = document.getElementById('cfg-rpc-state');
+            if (rpcStateInput) rpcStateInput.value = localStorage.getItem('obv_rpc_state') || "Idle";
 
             renderTabs();
-            window.chrome?.webview.postMessage({ action: "request_settings" });
+            
+            // Begin probing for WebView2 IPC bindings
+            initNativeIPCListeners();
+            sendWebviewMessage({ action: "request_settings" });
         });
 
         function save(){
@@ -338,7 +369,7 @@
 
         window.getEditorBuffer = function() {
             if(editor) {
-                window.chrome?.webview.postMessage({ action: "execute", code: editor.getValue() });
+                sendWebviewMessage({ action: "execute", code: editor.getValue() });
             }
         }
 
@@ -354,6 +385,7 @@
         ========================================= */
         function renderTabs(){
             const container = document.getElementById("tab-container");
+            if (!container) return;
             container.innerHTML = "";
 
             Object.keys(files).forEach(f => {
@@ -378,7 +410,7 @@
             files[n] = initialContent || "-- New Workbook Frame\n";
             current = n;
             renderTabs();
-            editor.setValue(files[n]);
+            if(editor) editor.setValue(files[n]);
             save();
         }
 
@@ -386,7 +418,7 @@
             if (Object.keys(files).length <= 1) return;
             delete files[f];
             if (current === f) current = Object.keys(files)[0];
-            editor.setValue(files[current]);
+            if(editor) editor.setValue(files[current]);
             renderTabs();
             save();
         }
@@ -401,17 +433,18 @@
 
         function loadTrendingScripts() {
             updateHubStatus("Fetching trending catalog array...");
-            window.chrome?.webview.postMessage({ action: "scriptblox_fetch_trending" });
+            sendWebviewMessage({ action: "scriptblox_fetch_trending" });
         }
 
         function triggerHubQuerySearch() {
-            const query = document.getElementById('hub-search-input').value.trim();
+            const searchInput = document.getElementById('hub-search-input');
+            const query = searchInput ? searchInput.value.trim() : "";
             if(!query) {
                 loadTrendingScripts();
                 return;
             }
             updateHubStatus(`Searching for: "${query}"...`);
-            window.chrome?.webview.postMessage({ action: "scriptblox_search", query: query });
+            sendWebviewMessage({ action: "scriptblox_search", query: query });
         }
 
         function handleHubSearchKey(e) {
@@ -419,12 +452,13 @@
         }
 
         function updateHubStatus(text) {
-            document.getElementById('hub-catalog-status').innerText = text;
+            const el = document.getElementById('hub-catalog-status');
+            if (el) el.innerText = text;
         }
 
-        // Triggered by Backend IPC pipeline events when API records return
         window.populateScriptHubCatalog = function(responseObj) {
             const listContainer = document.getElementById('hub-catalog-list');
+            if (!listContainer) return;
             listContainer.innerHTML = "";
             
             if(!responseObj || !responseObj.result || !responseObj.result.scripts || responseObj.result.scripts.length === 0) {
@@ -471,23 +505,27 @@
 
         function requestRawScript(scriptId, cleanTitle) {
             updateHubStatus(`Streaming raw string for: ${cleanTitle}...`);
-            window.chrome?.webview.postMessage({ action: "scriptblox_get_raw", id: scriptId, title: cleanTitle });
+            sendWebviewMessage({ action: "scriptblox_get_raw", id: scriptId, title: cleanTitle });
         }
 
         window.injectRawScriptIntoEditor = function(slugTitle, rawCode) {
             closeModal('script-hub-modal');
             let workspaceTitle = slugTitle.toLowerCase().replace(/\s+/g, '_') + ".lua";
-            // Ensure single extensions
             if(!workspaceTitle.endsWith(".lua")) workspaceTitle += ".lua";
-            
             createNewTab(workspaceTitle, rawCode);
         }
 
         /* =========================================
            MODAL CONTROL MATRIX WINDOW DRIVERS
         ========================================= */
-        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function openModal(id) { 
+            const el = document.getElementById(id);
+            if(el) el.style.display = 'flex'; 
+        }
+        function closeModal(id) { 
+            const el = document.getElementById(id);
+            if(el) el.style.display = 'none'; 
+        }
         function closeModalOnOuter(e, id) { if(e.target.id === id) closeModal(id); }
 
         /* =========================================
@@ -507,64 +545,111 @@
                     monaco.editor.setTheme('obv-theme');
                 }
             }, 50);
-            window.chrome?.webview.postMessage({ action: "theme", value: name });
+            sendWebviewMessage({ action: "theme", value: name });
         }
 
         function pushConfigUpdate() {
-            const isRpcOn = document.getElementById('cfg-discord').checked;
-            document.getElementById('rpc-details-row').style.opacity = isRpcOn ? "1" : "0.4";
-            document.getElementById('rpc-details-row').style.pointerEvents = isRpcOn ? "all" : "none";
-            document.getElementById('rpc-state-row').style.opacity = isRpcOn ? "1" : "0.4";
-            document.getElementById('rpc-state-row').style.pointerEvents = isRpcOn ? "all" : "none";
+            const cbDiscord = document.getElementById('cfg-discord');
+            const cbAttach = document.getElementById('cfg-attach');
+            const cbExecute = document.getElementById('cfg-execute');
+            const cbTopmost = document.getElementById('cfg-topmost');
+
+            const isRpcOn = cbDiscord ? cbDiscord.checked : true;
+            
+            const rowDetails = document.getElementById('rpc-details-row');
+            if (rowDetails) {
+                rowDetails.style.opacity = isRpcOn ? "1" : "0.4";
+                rowDetails.style.pointerEvents = isRpcOn ? "all" : "none";
+            }
+            const rowState = document.getElementById('rpc-state-row');
+            if (rowState) {
+                rowState.style.opacity = isRpcOn ? "1" : "0.4";
+                rowState.style.pointerEvents = isRpcOn ? "all" : "none";
+            }
 
             const settings = {
                 discordRpc: isRpcOn,
-                autoAttach: document.getElementById('cfg-attach').checked,
-                autoExecute: document.getElementById('cfg-execute').checked,
-                alwaysOnTop: document.getElementById('cfg-topmost').checked
+                autoAttach: cbAttach ? cbAttach.checked : false,
+                autoExecute: cbExecute ? cbExecute.checked : false,
+                alwaysOnTop: cbTopmost ? cbTopmost.checked : false
             };
-            window.chrome?.webview.postMessage({ action: "update_config", settings });
+            sendWebviewMessage({ action: "update_config", settings });
             pushRpcMessageUpdate();
         }
 
         function pushRpcMessageUpdate() {
-            const d = document.getElementById('cfg-rpc-details').value;
-            const s = document.getElementById('cfg-rpc-state').value;
+            const dInput = document.getElementById('cfg-rpc-details');
+            const sInput = document.getElementById('cfg-rpc-state');
+            const d = dInput ? dInput.value : "OblivionX Executor";
+            const s = sInput ? sInput.value : "Idle";
             localStorage.setItem('obv_rpc_details', d);
             localStorage.setItem('obv_rpc_state', s);
-            window.chrome?.webview.postMessage({ action: 'update_rpc_details', details: d || "OblivionX", state: s || "Idle" });
+            sendWebviewMessage({ action: 'update_rpc_details', details: d || "OblivionX", state: s || "Idle" });
+        }
+
+        function updateStatusUI(mode, pid = null) {
+            const dot = document.getElementById('top-attach-dot');
+            const txt = document.getElementById('status-text');
+            const glow = document.getElementById('status-glow');
+            if(!dot || !txt) return;
+
+            if(mode === 'attached') {
+                dot.className = "attach-indicator-dot active";
+                txt.innerText = `Attached (${pid})`;
+                if(glow) glow.style.background = "var(--accent)";
+            } else if (mode === 'failed') {
+                dot.className = "attach-indicator-dot failed";
+                txt.innerText = "Attachment Failed";
+                if(glow) glow.style.background = "#ef4444";
+            } else {
+                dot.className = "attach-indicator-dot";
+                txt.innerText = "Not Attached";
+                if(glow) glow.style.background = "#222";
+            }
         }
 
         function loadExecutorSettings(cfg) {
-            document.getElementById('cfg-discord').checked = cfg.discordRpc;
-            document.getElementById('cfg-attach').checked = cfg.autoAttach;
-            document.getElementById('cfg-execute').checked = cfg.autoExecute;
-            document.getElementById('cfg-topmost').checked = cfg.alwaysOnTop;
+            const cbDiscord = document.getElementById('cfg-discord');
+            const cbAttach = document.getElementById('cfg-attach');
+            const cbExecute = document.getElementById('cfg-execute');
+            const cbTopmost = document.getElementById('cfg-topmost');
+
+            if(cbDiscord) cbDiscord.checked = cfg.discordRpc;
+            if(cbAttach) cbAttach.checked = cfg.autoAttach;
+            if(cbExecute) cbExecute.checked = cfg.autoExecute;
+            if(cbTopmost) cbTopmost.checked = cfg.alwaysOnTop;
             topmost = cfg.alwaysOnTop;
             
             const isRpcOn = cfg.discordRpc;
-            document.getElementById('rpc-details-row').style.opacity = isRpcOn ? "1" : "0.4";
-            document.getElementById('rpc-details-row').style.pointerEvents = isRpcOn ? "all" : "none";
-            document.getElementById('rpc-state-row').style.opacity = isRpcOn ? "1" : "0.4";
-            document.getElementById('rpc-state-row').style.pointerEvents = isRpcOn ? "all" : "none";
+            const rowDetails = document.getElementById('rpc-details-row');
+            if (rowDetails) {
+                rowDetails.style.opacity = isRpcOn ? "1" : "0.4";
+                rowDetails.style.pointerEvents = isRpcOn ? "all" : "none";
+            }
+            const rowState = document.getElementById('rpc-state-row');
+            if (rowState) {
+                rowState.style.opacity = isRpcOn ? "1" : "0.4";
+                rowState.style.pointerEvents = isRpcOn ? "all" : "none";
+            }
         }
 
         function toggleTopMost(){
             topmost = !topmost;
-            document.getElementById('cfg-topmost').checked = topmost;
-            window.chrome?.webview.postMessage({ action: "set_always_on_top", value: topmost });
+            const cbTopmost = document.getElementById('cfg-topmost');
+            if(cbTopmost) cbTopmost.checked = topmost;
+            sendWebviewMessage({ action: "set_always_on_top", value: topmost });
         }
 
-        function minimize(){ window.chrome?.webview.postMessage({ action: "minimize" }); }
-        function closeApp(){ window.chrome?.webview.postMessage({ action: "exit" }); }
+        function minimize(){ sendWebviewMessage({ action: "minimize" }); }
+        function closeApp(){ sendWebviewMessage({ action: "exit" }); }
 
-        window.chrome?.webview.addEventListener('message', event => {
+        /* Unified central message handler hooked up after channel verification */
+        function handleBackendIPCMessage(event) {
             const msg = event.data;
-            if(msg.action === "pid_update") updateStatusGlow('attached', msg.pid);
-            if(msg.action === "clear_pid") updateStatusGlow('idle');
-            if(msg.action === "injection_failed") updateStatusGlow('failed');
+            if(msg.action === "pid_update") updateStatusUI('attached', msg.pid);
+            if(msg.action === "clear_pid") updateStatusUI('idle');
+            if(msg.action === "injection_failed") updateStatusUI('failed');
             
-            // Handle arriving asynchronous multi-threaded script catalog lookups from C#
             if(msg.action === "scriptblox_render_results") {
                 populateScriptHubCatalog(msg.data);
             }
@@ -574,13 +659,13 @@
             if(msg.action === "scriptblox_error") {
                 updateHubStatus("Engine sync error: " + msg.message);
             }
-        });
+        }
 
         document.getElementById("cli").addEventListener("keydown", e => {
             if(e.key === "Enter"){
                 let cmd = e.target.value.trim().toLowerCase();
                 if(cmd === "/run") getEditorBuffer();
-                if(cmd === "/inject") window.chrome?.webview.postMessage({ action: "inject" });
+                if(cmd === "/inject") sendWebviewMessage({ action: "inject" });
                 if(cmd === "/new") createNewTab();
                 if(cmd === "/topmost") toggleTopMost();
                 e.target.value = "";
@@ -612,10 +697,11 @@
         function setWeatherEffect(mode) {
             weatherMode = mode;
             localStorage.setItem('obv_weather', mode);
-            document.getElementById('cfg-weather').value = mode;
+            const weatherSelect = document.getElementById('cfg-weather');
+            if(weatherSelect) weatherSelect.value = mode;
             cancelAnimationFrame(animationId);
             if(mode !== 'none') { initWeather(mode); renderWeatherLoop(); } else { ctx.clearRect(0,0, canvas.width, canvas.height); }
-            window.chrome?.webview.postMessage({ action: 'set_weather', weather: mode });
+            sendWebviewMessage({ action: 'set_weather', weather: mode });
         }
 
         function renderWeatherLoop() {
