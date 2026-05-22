@@ -3,1117 +3,580 @@
 <head>
     <meta charset="UTF-8">
     <title>OblivionX Engine Elite</title>
-
     <style>
-        :root{
-            --accent:#8C5AFF;
-            --bg:#000000;
-            --panel:#050505;
-            --panel-sub:#0c0c0f;
-            --border:rgba(255,255,255,0.08);
-            --text-main:#ffffff;
-            --text-dim:#666666;
-            --tab-active:#111111;
-            --modal-bg:rgba(10,10,12,0.95);
-            --ease-out-expo:cubic-bezier(0.16,1,0.3,1);
-        }
-
-        .theme-purple{
-            --accent:#8C5AFF;
-            --bg:#060608;
-            --panel:#0b0b0e;
-            --panel-sub:#111116;
-        }
-
-        .theme-gold{
-            --accent:#FEE227;
-            --bg:#080805;
-            --panel:#0f0f0a;
-            --panel-sub:#181810;
-        }
-
-        .theme-vampire{
-            --accent:#FF3131;
-            --bg:#080303;
-            --panel:#120606;
-            --panel-sub:#1c0a0a;
-        }
-
-        .theme-ocean{
-            --accent:#00D1FF;
-            --bg:#03070a;
-            --panel:#060b12;
-            --panel-sub:#0a121e;
-        }
-
-        .theme-matrix{
-            --accent:#00FF41;
-            --bg:#020502;
-            --panel:#050a05;
-            --panel-sub:#0a140a;
-        }
-
-        *{
-            box-sizing:border-box;
-            margin:0;
-            padding:0;
-            outline:none;
-        }
-
-        body,html{
-            width:100%;
-            height:100%;
-            overflow:hidden;
-            background:var(--bg);
-            color:#fff;
-            font-family:Inter,sans-serif;
-        }
-
-        #weather-canvas{
-            position:absolute;
-            inset:0;
-            z-index:1;
-            pointer-events:none;
-            opacity:.25;
-        }
-
-        .app-shell{
-            position:relative;
-            z-index:2;
-            width:100%;
-            height:100%;
-            display:flex;
-            flex-direction:column;
-            border:1px solid var(--border);
-            backdrop-filter:blur(10px);
-        }
-
-        .topbar{
-            height:48px;
-            display:flex;
-            align-items:center;
-            justify-content:space-between;
-            padding:0 16px;
-            border-bottom:1px solid var(--border);
-            background:rgba(0,0,0,.55);
-        }
-
-        .brand-wrapper{
-            display:flex;
-            align-items:center;
-            gap:12px;
-        }
-
-        .logo{
-            font-size:11px;
-            font-weight:800;
-            letter-spacing:2px;
-            color:#777;
-        }
-
-        .logo span{
-            color:var(--accent);
-        }
-
-        .status-badge-container{
-            display:flex;
-            align-items:center;
-            gap:6px;
-            border:1px solid var(--border);
-            padding:4px 8px;
-            border-radius:6px;
-            font-size:9px;
-            text-transform:uppercase;
-            color:#999;
-            background:rgba(255,255,255,.02);
-        }
-
-        .attach-indicator-dot{
-            width:6px;
-            height:6px;
-            border-radius:50%;
-            background:#333;
-        }
-
-        .attach-indicator-dot.active{
-            background:var(--accent);
-            box-shadow:0 0 10px var(--accent);
-        }
-
-        .attach-indicator-dot.failed{
-            background:#ff4444;
-            box-shadow:0 0 10px #ff4444;
-        }
-
-        .header-actions{
-            display:flex;
-            gap:6px;
-            align-items:center;
-        }
-
-        .icon-btn{
-            background:transparent;
-            border:1px solid var(--border);
-            color:#999;
-            border-radius:6px;
-            padding:7px 12px;
-            cursor:pointer;
-            font-size:11px;
-            display:flex;
-            align-items:center;
-            gap:6px;
-            transition:.2s;
-        }
-
-        .icon-btn:hover{
-            border-color:var(--accent);
-            color:#fff;
-        }
-
-        .icon-btn svg{
-            width:12px;
-            height:12px;
-            stroke:currentColor;
-            fill:none;
-            stroke-width:2;
-        }
-
-        .window-control-btn{
-            width:28px;
-            height:28px;
-            border-radius:6px;
-            border:1px solid var(--border);
-            background:transparent;
-            color:#999;
-            cursor:pointer;
-        }
-
-        .window-control-btn:hover{
-            color:#fff;
-        }
-
-        .workspace-grid{
-            flex:1;
-            display:flex;
-            overflow:hidden;
-        }
-
-        .editor-container{
-            flex:1;
-            display:flex;
-            flex-direction:column;
-            overflow:hidden;
-        }
-
-        .tab-bar{
-            height:38px;
-            background:var(--panel-sub);
-            border-bottom:1px solid var(--border);
-            display:flex;
-            align-items:center;
-            padding:0 8px;
-        }
-
-        #tab-container{
-            display:flex;
-            gap:4px;
-        }
-
-        .tab{
-            padding:5px 12px;
-            border-radius:6px;
-            font-size:11px;
-            cursor:pointer;
-            color:#888;
-            display:flex;
-            align-items:center;
-            gap:8px;
-            border:1px solid transparent;
-        }
-
-        .tab.active{
-            background:var(--tab-active);
-            color:#fff;
-            border-color:var(--border);
-        }
-
-        .close-x{
-            opacity:.4;
-        }
-
-        .close-x:hover{
-            color:#ff4444;
-            opacity:1;
-        }
-
-        main{
-            flex:1;
-            position:relative;
-        }
-
-        #editor{
-            width:100%;
-            height:100%;
-        }
-
-        .cli-bar{
-            height:42px;
-            display:flex;
-            align-items:center;
-            gap:10px;
-            border-top:1px solid var(--border);
-            padding:0 16px;
-            background:#050505;
-        }
-
-        .cli-input{
-            flex:1;
-            background:transparent;
-            border:none;
-            color:#fff;
-            font-size:12px;
-            font-family:monospace;
-        }
-
-        #status-glow{
-            width:6px;
-            height:6px;
-            border-radius:50%;
-            background:#333;
-        }
-
-        .modal-overlay{
-            position:absolute;
-            inset:0;
-            display:none;
-            align-items:center;
-            justify-content:center;
-            background:rgba(0,0,0,.7);
-            backdrop-filter:blur(12px);
-            z-index:100;
-        }
-
-        .modal-card{
-            background:var(--modal-bg);
-            border:1px solid var(--border);
-            border-radius:16px;
-            box-shadow:0 25px 60px rgba(0,0,0,.6);
-        }
-
-        .settings-card{
-            width:460px;
-            padding:24px;
-        }
-
-        .scripthub-card{
-            width:700px;
-            padding:24px;
-            display:flex;
-            flex-direction:column;
-            gap:16px;
-            max-height:85vh;
-        }
-
-        .hub-search-bar{
-            display:flex;
-            gap:8px;
-        }
-
-        .hub-search-input{
-            flex:1;
-            background:#09090b;
-            border:1px solid var(--border);
-            color:#fff;
-            padding:10px 14px;
-            border-radius:8px;
-            font-size:12px;
-        }
-
-        .hub-catalog-list{
-            display:flex;
-            flex-direction:column;
-            gap:10px;
-            overflow-y:auto;
-            max-height:55vh;
-            padding-right:4px;
-        }
-
-        .hub-catalog-list::-webkit-scrollbar{
-            width:4px;
-        }
-
-        .hub-catalog-list::-webkit-scrollbar-thumb{
-            background:var(--accent);
-            border-radius:2px;
-        }
-
-        .script-card-item{
-            border:1px solid var(--border);
-            border-radius:10px;
-            padding:14px;
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            gap:14px;
-            background:rgba(255,255,255,.015);
-        }
-
-        .script-card-item:hover{
-            border-color:rgba(255,255,255,.16);
-        }
-
-        .script-info{
-            display:flex;
-            flex-direction:column;
-            gap:4px;
-        }
-
-        .script-title-row{
-            display:flex;
-            align-items:center;
-            gap:6px;
-            flex-wrap:wrap;
-        }
-
-        .script-title{
-            font-size:13px;
-            font-weight:700;
-        }
-
-        .script-badge{
-            font-size:9px;
-            padding:2px 6px;
-            border-radius:4px;
-            background:rgba(255,255,255,.05);
-            color:#bbb;
-            font-weight:700;
-            text-transform:uppercase;
-        }
-
-        .script-badge.universal{
-            background:rgba(140,90,255,.15);
-            color:#b392ff;
-        }
-
-        .script-badge.verified{
-            background:rgba(0,209,255,.15);
-            color:#66e3ff;
-        }
-
-        .script-badge.patched{
-            background:rgba(255,49,49,.15);
-            color:#ff7e7e;
-        }
-
-        .script-desc{
-            color:#888;
-            font-size:11px;
-            max-width:450px;
-            line-height:15px;
-        }
-
-        .script-meta-metrics{
-            display:flex;
-            gap:14px;
-            font-size:10px;
-            color:#555;
-        }
-
-        .script-meta-metrics span span{
-            color:#ddd;
-        }
-
-        .setting-row{
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            margin-bottom:14px;
-            gap:14px;
-            font-size:12px;
-        }
-
-        .setting-desc{
-            color:#777;
-            font-size:10px;
-        }
-
-        .modal-header{
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            margin-bottom:20px;
-        }
-
-        .modal-title{
-            font-size:14px;
-            font-weight:800;
-            letter-spacing:1px;
-        }
-
-        .switch{
-            position:relative;
-            width:34px;
-            height:20px;
-        }
-
-        .switch input{
-            opacity:0;
-            width:0;
-            height:0;
-        }
-
-        .slider{
-            position:absolute;
-            inset:0;
-            background:#222;
-            border:1px solid var(--border);
-            border-radius:20px;
-            cursor:pointer;
-        }
-
-        .slider:before{
-            content:"";
-            position:absolute;
-            width:12px;
-            height:12px;
-            border-radius:50%;
-            background:#fff;
-            left:3px;
-            bottom:3px;
-            transition:.2s;
-        }
-
-        input:checked + .slider{
-            background:var(--accent);
-        }
-
-        input:checked + .slider:before{
-            transform:translateX(14px);
-        }
-
-        .form-select,
-        .form-input{
-            width:160px;
-            padding:6px 10px;
-            border-radius:6px;
-            border:1px solid var(--border);
-            background:#09090b;
-            color:#fff;
-            font-size:11px;
-        }
+        :root {
+            --accent: #8C5AFF;
+            --bg: #000000;
+            --panel: #050505;
+            --panel-sub: #0c0c0f;
+            --border: rgba(255, 255, 255, 0.08);
+            --text-main: #ffffff;
+            --text-dim: #666666;
+            --tab-active: #111111;
+            --modal-bg: rgba(10, 10, 12, 0.95);
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Active System Color Palette Theme Maps */
+        .theme-purple   { --accent: #8C5AFF; --bg: #060608; --panel: #0b0b0e; --panel-sub: #111116; }
+        .theme-gold     { --accent: #FEE227; --bg: #080805; --panel: #0f0f0a; --panel-sub: #181810; }
+        .theme-vampire  { --accent: #FF3131; --bg: #080303; --panel: #120606; --panel-sub: #1c0a0a; }
+        .theme-ocean    { --accent: #00D1FF; --bg: #03070a; --panel: #060b12; --panel-sub: #0a121e; }
+        .theme-matrix   { --accent: #00FF41; --bg: #020502; --panel: #050a05; --panel-sub: #0a140a; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.97) translateY(4px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        @keyframes tabSpawn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes dotPulse { 0% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.15); opacity: 1; box-shadow: 0 0 12px var(--accent); } 100% { transform: scale(1); opacity: 0.8; } }
+
+        * { box-sizing: border-box; outline: none; transition: background 0.2s var(--ease-out-expo), border 0.2s var(--ease-out-expo), color 0.2s var(--ease-out-expo); }
+        
+        body, html { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            background: var(--bg); color: var(--text-main); 
+            font-family: 'Geist', 'Inter', sans-serif; overflow: hidden; 
+        }
+
+        #weather-canvas {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 1; opacity: 0.25;
+        }
+
+        .app-shell { 
+            position: relative; display: flex; flex-direction: column; 
+            height: 100vh; border: 1px solid var(--border); z-index: 2; 
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        /* Top Title Bar */
+        .topbar { 
+            height: 48px; display: flex; align-items: center; justify-content: space-between; 
+            padding: 0 16px; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(12px); -webkit-app-region: drag;
+        }
+        .brand-wrapper { display: flex; align-items: center; gap: 12px; -webkit-app-region: drag; }
+        .logo { font-weight: 800; font-size: 11px; letter-spacing: 2px; color: var(--text-dim); }
+        .logo span { color: var(--accent); }
+
+        .status-badge-container {
+            display: flex; align-items: center; gap: 6px; background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border); padding: 4px 8px; border-radius: 6px; font-size: 9px;
+            font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .attach-indicator-dot { width: 6px; height: 6px; border-radius: 50%; background: #3f3f46; }
+        .attach-indicator-dot.active { background: var(--accent); box-shadow: 0 0 10px var(--accent); animation: dotPulse 2s infinite ease-in-out; }
+        .attach-indicator-dot.failed { background: #ef4444; box-shadow: 0 0 10px #ef4444; }
+
+        .header-actions { display: flex; align-items: center; gap: 6px; -webkit-app-region: no-drag; }
+        .icon-btn {
+            background: transparent; border: 1px solid var(--border); border-radius: 6px;
+            color: var(--text-dim); padding: 6px 12px; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 6px;
+        }
+        .icon-btn:hover { color: var(--text-main); border-color: var(--accent); background: rgba(255,255,255,0.02); }
+        .icon-btn svg { width: 12px; height: 12px; stroke: currentColor; stroke-width: 2; fill: none; }
+
+        .window-control-btn {
+            background: transparent; border: 1px solid var(--border); color: var(--text-dim);
+            width: 28px; height: 28px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+        .window-control-btn:hover { color: var(--text-main); border-color: rgba(255, 255, 255, 0.15); background: rgba(255, 255, 255, 0.03); }
+        .window-control-btn.close-btn:hover { border-color: #ff4444; color: #ff4444; background: rgba(255, 68, 68, 0.05); }
+
+        /* Workspace Grid Container */
+        .workspace-grid { display: flex; flex: 1; overflow: hidden; background: transparent; }
+
+        /* Full Height Center Workspace Editor Container */
+        .editor-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        
+        .tab-bar { 
+            height: 38px; background: var(--panel-sub); display: flex; align-items: center; 
+            padding: 0 8px; gap: 4px; border-bottom: 1px solid var(--border);
+        }
+        .tab { 
+            display: flex; align-items: center; padding: 4px 12px; font-size: 11px; 
+            cursor: pointer; border-radius: 6px; color: var(--text-dim);
+            border: 1px solid transparent; animation: tabSpawn 0.2s var(--ease-out-expo);
+        }
+        .tab.active { color: var(--text-main); background: var(--tab-active); border-color: var(--border); }
+        .tab .close-x { margin-left: 6px; font-size: 13px; opacity: 0.3; }
+        .tab .close-x:hover { opacity: 1; color: #ff4444; }
+
+        main { flex: 1; position: relative; background: transparent; }
+        #editor { width: 100%; height: 100%; }
+
+        /* CLI Terminal Zone */
+        .cli-bar { 
+            height: 42px; background: var(--bg); border-top: 1px solid var(--border); 
+            display: flex; align-items: center; padding: 0 16px; gap: 12px;
+        }
+        .cli-input { flex: 1; background: transparent; border: none; color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+        #status-glow { width: 6px; height: 6px; border-radius: 50%; background: #222; transition: all 0.4s var(--ease-out-expo); }
+
+        /* Configuration Modal Shell Layouts */
+        .modal-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(14px);
+            display: none; align-items: center; justify-content: center; z-index: 100;
+        }
+        .modal-card {
+            background: var(--modal-bg); border: 1px solid var(--border);
+            border-radius: 16px; box-shadow: 0 24px 50px rgba(0,0,0,0.6);
+            animation: fadeIn 0.4s var(--ease-out-expo) forwards;
+        }
+        .settings-card { width: 460px; padding: 24px; max-height: 85vh; overflow-y: auto; }
+        
+        /* Expanded Script Hub Catalog Card Layout */
+        .scripthub-card { width: 680px; padding: 24px; max-height: 85vh; display: flex; flex-direction: column; gap: 16px; }
+        .hub-search-bar { display: flex; gap: 8px; width: 100%; }
+        .hub-search-input { flex: 1; background: #09090b; border: 1px solid var(--border); border-radius: 8px; color: #fff; padding: 10px 14px; font-size: 12px; }
+        .hub-catalog-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 4px; max-height: 50vh; }
+        
+        /* Custom Scrollbar for Hub Catalog List */
+        .hub-catalog-list::-webkit-scrollbar { width: 4px; }
+        .hub-catalog-list::-webkit-scrollbar-track { background: transparent; }
+        .hub-catalog-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+        .hub-catalog-list::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+        .script-card-item {
+            background: rgba(255, 255, 255, 0.01); border: 1px solid var(--border);
+            border-radius: 10px; padding: 14px; display: flex; align-items: center; justify-content: space-between; gap: 16px;
+        }
+        .script-card-item:hover { border-color: rgba(255, 255, 255, 0.15); background: rgba(255, 255, 255, 0.02); }
+        .script-info { display: flex; flex-direction: column; gap: 4px; }
+        .script-title-row { display: flex; align-items: center; gap: 8px; }
+        .script-title { font-size: 13px; font-weight: 700; color: #fff; }
+        .script-badge { font-size: 9px; font-weight: 800; text-transform: uppercase; padding: 2px 6px; border-radius: 4px; background: rgba(255,255,255,0.05); color: var(--text-dim); }
+        .script-badge.universal { background: rgba(140, 90, 255, 0.15); color: #b392ff; }
+        .script-badge.verified { background: rgba(0, 209, 255, 0.15); color: #66e3ff; }
+        .script-badge.patched { background: rgba(255, 49, 49, 0.15); color: #ff7e7e; }
+        .script-desc { font-size: 11px; color: var(--text-dim); line-height: 14px; max-width: 440px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+        .script-meta-metrics { display: flex; gap: 12px; font-size: 10px; color: #444; font-weight: 600; }
+        .script-meta-metrics span span { color: var(--text-dim); }
+
+        .setting-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; font-size: 12px; color: #aaa; gap: 16px; }
+        .setting-label { display: flex; flex-direction: column; gap: 2px; }
+        .setting-desc { font-size: 10px; color: var(--text-dim); }
+
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-title { font-size: 14px; font-weight: 800; letter-spacing: 1px; color: #fff; text-transform: uppercase; }
+
+        /* Form Components */
+        .switch { position: relative; display: inline-block; width: 34px; height: 20px; flex-shrink: 0; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #222; border: 1px solid var(--border); border-radius: 20px; }
+        .slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 3px; bottom: 3px; background-color: #fff; border-radius: 50%; transition: .2s; }
+        input:checked + .slider { background-color: var(--accent); }
+        input:checked + .slider:before { transform: translateX(14px); }
+        .form-select, .form-input { background: #09090b; color: #fff; border: 1px solid var(--border); padding: 6px 10px; border-radius: 6px; font-size: 11px; width: 160px; }
     </style>
 </head>
-
 <body class="theme-purple">
 
-<canvas id="weather-canvas"></canvas>
+    <canvas id="weather-canvas"></canvas>
 
-<div class="app-shell">
-
-    <div class="topbar">
-
-        <div class="brand-wrapper">
-            <div class="logo">
-                OBLIVION<span>//</span>PRO
-            </div>
-
-            <div class="status-badge-container">
-                <div id="top-attach-dot" class="attach-indicator-dot"></div>
-                <span id="status-text">Not Attached</span>
-            </div>
-        </div>
-
-        <div class="header-actions">
-
-            <button class="icon-btn" onclick="openScriptHub()">
-                <svg viewBox="0 0 24 24">
-                    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                </svg>
-                Script Hub
-            </button>
-
-            <button class="icon-btn" onclick="openModal('settings-modal')">
-                <svg viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="3"/>
-                </svg>
-                Settings
-            </button>
-
-        </div>
-    </div>
-
-    <div class="workspace-grid">
-        <div class="editor-container">
-
-            <div class="tab-bar">
-                <div id="tab-container"></div>
-            </div>
-
-            <main>
-                <div id="editor"></div>
-            </main>
-
-        </div>
-    </div>
-
-    <div class="cli-bar">
-        <span style="color:var(--accent);font-weight:bold;">></span>
-
-        <input
-            id="cli"
-            class="cli-input"
-            type="text"
-            placeholder="Type /run, /inject, /new..."
-        >
-
-        <div id="status-glow"></div>
-    </div>
-
-</div>
-
-<!-- SETTINGS -->
-
-<div
-    id="settings-modal"
-    class="modal-overlay"
-    onclick="closeModalOnOuter(event,'settings-modal')"
->
-    <div class="modal-card settings-card">
-
-        <div class="modal-header">
-            <div class="modal-title">Preferences Matrix</div>
-
-            <span
-                style="cursor:pointer;font-size:20px;color:#777;"
-                onclick="closeModal('settings-modal')"
-            >
-                ×
-            </span>
-        </div>
-
-        <div class="setting-row">
-            <div>
-                <div>Visual System Theme</div>
-                <div class="setting-desc">
-                    Interface canvas accent profiles
+    <div class="app-shell">
+        <div class="topbar">
+            <div class="brand-wrapper">
+                <div class="logo">OBLIVION<span>//</span>PRO</div>
+                <div class="status-badge-container">
+                    <div id="top-attach-dot" class="attach-indicator-dot"></div>
+                    <span id="status-text">Not Attached</span>
                 </div>
             </div>
-
-            <select
-                id="cfg-theme"
-                class="form-select"
-                onchange="applyGlobalTheme(this.value)"
-            >
-                <option value="purple">Infinity Purple</option>
-                <option value="gold">Midas Gold</option>
-                <option value="vampire">Vampire Red</option>
-                <option value="ocean">Abyssal Ocean</option>
-                <option value="matrix">Matrix Emerald</option>
-            </select>
+            
+            <div class="header-actions">
+                <button class="icon-btn" onclick="openScriptHub()">
+                    <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>Script Hub
+                </button>
+                <button class="icon-btn" onclick="openModal('settings-modal')">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings
+                </button>
+                <button class="window-control-btn" onclick="minimize()"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+                <button class="window-control-btn close-btn" onclick="closeApp()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+            </div>
         </div>
 
+        <div class="workspace-grid">
+            <div class="editor-container">
+                <div class="tab-bar">
+                    <div id="tab-container" style="display:flex; gap:4px;"></div>
+                </div>
+                <main><div id="editor"></div></main>
+            </div>
+        </div>
+
+        <div class="cli-bar">
+            <span style="color: var(--accent); font-weight: bold;">></span>
+            <input type="text" id="cli" class="cli-input" placeholder="Type /run, /inject, /new, /clear, /topmost..." autocomplete="off">
+            <div id="status-glow"></div>
+        </div>
     </div>
-</div>
 
-<!-- SCRIPT HUB -->
+    <div id="settings-modal" class="modal-overlay" onclick="closeModalOnOuter(event, 'settings-modal')">
+        <div class="modal-card settings-card">
+            <div class="modal-header">
+                <div class="modal-title">Preferences Matrix</div>
+                <span style="cursor:pointer; color:var(--text-dim); font-size: 20px;" onclick="closeModal('settings-modal')">×</span>
+            </div>
+            <div class="setting-row">
+                <div class="setting-label"><span>Discord Rich Presence</span><span class="setting-desc">Broadcast activity parameters</span></div>
+                <label class="switch"><input type="checkbox" id="cfg-discord" onchange="pushConfigUpdate()"><span class="slider"></span></label>
+            </div>
+            <div class="setting-row" id="rpc-details-row">
+                <div class="setting-label"><span>RPC Title Summary</span><span class="setting-desc">Primary description line string</span></div>
+                <input type="text" id="cfg-rpc-details" class="form-input" oninput="pushRpcMessageUpdate()">
+            </div>
+            <div class="setting-row" id="rpc-state-row">
+                <div class="setting-label"><span>RPC Sub-State Status</span><span class="setting-desc">Secondary status validation tracking append</span></div>
+                <input type="text" id="cfg-rpc-state" class="form-input" oninput="pushRpcMessageUpdate()">
+            </div>
+            <div class="setting-row">
+                <div class="setting-label"><span>Auto Attach Engine</span><span class="setting-desc">Inject immediately when found</span></div>
+                <label class="switch"><input type="checkbox" id="cfg-attach" onchange="pushConfigUpdate()"><span class="slider"></span></label>
+            </div>
+            <div class="setting-row">
+                <div class="setting-label"><span>Auto Execute Stream</span><span class="setting-desc">Deploy loaded buffer contents upon link-up</span></div>
+                <label class="switch"><input type="checkbox" id="cfg-execute" onchange="pushConfigUpdate()"><span class="slider"></span></label>
+            </div>
+            <div class="setting-row">
+                <div class="setting-label"><span>Always On Top View</span><span class="setting-desc">Pin frame viewport window priority layer</span></div>
+                <label class="switch"><input type="checkbox" id="cfg-topmost" onchange="pushConfigUpdate()"><span class="slider"></span></label>
+            </div>
+            <div class="setting-row">
+                <div class="setting-label"><span>Visual System Theme</span><span class="setting-desc">Interface canvas accent profiles</span></div>
+                <select id="cfg-theme" class="form-select" onchange="applyGlobalTheme(this.value)">
+                    <option value="purple">Infinity Purple</option>
+                    <option value="gold">Midas Gold</option>
+                    <option value="vampire">Vampire Red</option>
+                    <option value="ocean">Abyssal Ocean</option>
+                    <option value="matrix">Matrix Emerald</option>
+                </select>
+            </div>
+            <div class="setting-row">
+                <div class="setting-label"><span>Ambient Atmosphere Rig</span><span class="setting-desc">Background procedural rendering effects canvas</span></div>
+                <select id="cfg-weather" class="form-select" onchange="setWeatherEffect(this.value)">
+                    <option value="matrix">Matrix Cascade</option>
+                    <option value="cybergrid">Cyberpunk Grid</option>
+                    <option value="hyperjump">Hyper Jump Warp</option>
+                    <option value="snow">Blizzard Snow</option>
+                    <option value="rain">Downpours Rain</option>
+                    <option value="stars">Starfield Horizon</option>
+                    <option value="none">Static Darkness</option>
+                </select>
+            </div>
+        </div>
+    </div>
 
-<div
-    id="script-hub-modal"
-    class="modal-overlay"
-    onclick="closeModalOnOuter(event,'script-hub-modal')"
->
-    <div class="modal-card scripthub-card">
-
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-            <div style="font-size:14px;font-weight:800;">
-                SCRIPTBLOX HUB ENGINE
+    <div id="script-hub-modal" class="modal-overlay" onclick="closeModalOnOuter(event, 'script-hub-modal')">
+        <div class="modal-card scripthub-card">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div style="font-size:14px; font-weight:800; letter-spacing:1px; color:#fff;">SCRIPTBLOX HUB ENGINE</div>
+                <span style="cursor:pointer; color:var(--text-dim); font-size:20px;" onclick="closeModal('script-hub-modal')">×</span>
+            </div>
+            
+            <div class="hub-search-bar">
+                <input type="text" id="hub-search-input" class="hub-search-input" placeholder="Search across millions of global scripts..." onkeydown="handleHubSearchKey(event)">
+                <button class="icon-btn" style="padding:0 20px; border-color:var(--accent); color:#fff; font-weight:700;" onclick="triggerHubQuerySearch()">Search</button>
+                <button class="icon-btn" style="padding:0 14px;" onclick="loadTrendingScripts()" title="Refresh Trending">
+                    <svg viewBox="0 0 24 24"><path d="M23 6l-9.5 9.5-5-5L1 18"/><path d="M17 6h6v6"/></svg>
+                </button>
             </div>
 
-            <span
-                style="cursor:pointer;font-size:20px;color:#777;"
-                onclick="closeModal('script-hub-modal')"
-            >
-                ×
-            </span>
+            <div id="hub-catalog-status" style="font-size:11px; color:var(--accent); font-weight:600;">Loading live matrix assets...</div>
+            <div id="hub-catalog-list" class="hub-catalog-list"></div>
+            
+            <div style="font-size:9px; color:#333; text-transform:uppercase; font-weight:700; letter-spacing:0.5px; text-align:center;">
+                Powered by ScriptBlox.com
+            </div>
         </div>
-
-        <div class="hub-search-bar">
-
-            <input
-                id="hub-search-input"
-                class="hub-search-input"
-                type="text"
-                placeholder="Search scripts..."
-                onkeydown="handleHubSearchKey(event)"
-            >
-
-            <button
-                class="icon-btn"
-                style="border-color:var(--accent);color:#fff;font-weight:700;"
-                onclick="triggerHubQuerySearch()"
-            >
-                Search
-            </button>
-
-            <button
-                class="icon-btn"
-                onclick="loadTrendingScripts()"
-            >
-                Refresh
-            </button>
-
-        </div>
-
-        <div
-            id="hub-catalog-status"
-            style="font-size:11px;color:var(--accent);font-weight:600;"
-        >
-            Loading...
-        </div>
-
-        <div
-            id="hub-catalog-list"
-            class="hub-catalog-list"
-        ></div>
-
     </div>
-</div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.0/min/vs/loader.min.js"></script>
-
-<script>
-
-let editor;
-
-let files = JSON.parse(localStorage.getItem('obv_fs')) || {
-    "main.lua":"print('OblivionX Ready')"
-};
-
-let current = "main.lua";
-
-function sendWebviewMessage(payload){
-
-    if(
-        window.chrome &&
-        window.chrome.webview &&
-        typeof window.chrome.webview.postMessage === 'function'
-    ){
-        window.chrome.webview.postMessage(payload);
-    }
-    else{
-        console.log("[MOCK SEND]",payload);
-
-        mockBackend(payload);
-    }
-}
-
-/* =========================================
-   MOCK BACKEND
-========================================= */
-
-function mockBackend(payload){
-
-    if(payload.action === "scriptblox_fetch_trending"){
-
-        setTimeout(()=>{
-
-            populateScriptHubCatalog({
-                result:[
-                    {
-                        _id:"1",
-                        title:"Infinite Yield",
-                        features:"Universal admin commands script.",
-                        views:400000,
-                        likeCount:12000,
-                        verified:true,
-                        universal:true,
-                        game:{name:"Universal"}
-                    },
-                    {
-                        _id:"2",
-                        title:"BedWars OP GUI",
-                        features:"Auto farm, kill aura, teleport.",
-                        views:210000,
-                        likeCount:7600,
-                        patched:false,
-                        verified:true,
-                        game:{name:"BedWars"}
-                    },
-                    {
-                        _id:"3",
-                        title:"Doors Script",
-                        features:"ESP, auto rooms, anti seek.",
-                        views:95000,
-                        likeCount:4100,
-                        game:{name:"Doors"}
-                    }
-                ]
-            });
-
-        },600);
-    }
-
-    if(payload.action === "scriptblox_search"){
-
-        setTimeout(()=>{
-
-            populateScriptHubCatalog({
-                result:[
-                    {
-                        _id:"99",
-                        title:payload.query + " Script",
-                        features:"Search result for " + payload.query,
-                        views:12345,
-                        likeCount:555,
-                        verified:true,
-                        game:{name:"Universal"}
-                    }
-                ]
-            });
-
-        },500);
-    }
-
-    if(payload.action === "scriptblox_get_raw"){
-
-        setTimeout(()=>{
-
-            injectRawScriptIntoEditor(
-                payload.title,
-`-- ${payload.title}
-print("Loaded from Script Hub")
-
-while true do
-    wait(1)
-    print("Running...")
-end`
-            );
-
-        },400);
-    }
-}
-
-/* =========================================
-   MONACO
-========================================= */
-
-require.config({
-    paths:{
-        vs:"https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.0/min/vs"
-    }
-});
-
-require(["vs/editor/editor.main"],function(){
-
-    editor = monaco.editor.create(
-        document.getElementById("editor"),
-        {
-            value:files[current],
-            language:"lua",
-            theme:"vs-dark",
-            automaticLayout:true,
-            minimap:{enabled:false},
-            fontSize:13,
-            fontFamily:'JetBrains Mono, monospace'
-        }
-    );
-
-    editor.onDidChangeModelContent(save);
-
-    renderTabs();
-});
-
-/* =========================================
-   FILES
-========================================= */
-
-function save(){
-
-    if(!editor) return;
-
-    files[current] = editor.getValue();
-
-    localStorage.setItem(
-        'obv_fs',
-        JSON.stringify(files)
-    );
-}
-
-function renderTabs(){
-
-    const container = document.getElementById("tab-container");
-
-    container.innerHTML = "";
-
-    Object.keys(files).forEach(f=>{
-
-        const tab = document.createElement("div");
-
-        tab.className =
-            "tab" + (f === current ? " active" : "");
-
-        tab.innerHTML =
-            `<span>${f}</span>
-             <span class="close-x">×</span>`;
-
-        tab.onclick = ()=>switchActiveBuffer(f);
-
-        tab.querySelector(".close-x").onclick = (e)=>{
-            e.stopPropagation();
-            closeTab(f);
-        };
-
-        container.appendChild(tab);
-    });
-}
-
-function switchActiveBuffer(file){
-
-    save();
-
-    current = file;
-
-    editor.setValue(files[file]);
-
-    renderTabs();
-}
-
-function createNewTab(title,content){
-
-    files[title] = content;
-
-    current = title;
-
-    renderTabs();
-
-    editor.setValue(content);
-
-    save();
-}
-
-function closeTab(file){
-
-    if(Object.keys(files).length <= 1) return;
-
-    delete files[file];
-
-    current = Object.keys(files)[0];
-
-    editor.setValue(files[current]);
-
-    renderTabs();
-
-    save();
-}
-
-/* =========================================
-   MODALS
-========================================= */
-
-function openModal(id){
-    document.getElementById(id).style.display = 'flex';
-}
-
-function closeModal(id){
-    document.getElementById(id).style.display = 'none';
-}
-
-function closeModalOnOuter(e,id){
-
-    if(e.target.id === id){
-        closeModal(id);
-    }
-}
-
-/* =========================================
-   THEME
-========================================= */
-
-function applyGlobalTheme(name){
-
-    document.body.className = `theme-${name}`;
-
-    localStorage.setItem('obv_theme',name);
-
-    if(window.monaco){
-
-        const accent =
-            getComputedStyle(document.body)
-            .getPropertyValue('--accent')
-            .trim();
-
-        const bg =
-            getComputedStyle(document.body)
-            .getPropertyValue('--bg')
-            .trim();
-
-        monaco.editor.defineTheme('obv-theme',{
-            base:'vs-dark',
-            inherit:true,
-            rules:[],
-            colors:{
-                'editor.background':bg,
-                'editorCursor.foreground':accent
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.0/min/vs/loader.min.js"></script>
+    <script>
+        let editor;
+        let files = JSON.parse(localStorage.getItem('obv_fs')) || { "main.lua": "-- Workspace Active\nprint('OblivionX Engine Pro Ready.')" };
+        let current = "main.lua";
+        let topmost = false;
+
+        /* Safe PostMessage wrapper pipeline targeting IPC safely */
+        function sendWebviewMessage(payload) {
+            if (window.chrome && window.chrome.webview && typeof window.chrome.webview.postMessage === 'function') {
+                window.chrome.webview.postMessage(payload);
+            } else {
+                console.warn("[IPC Bridge System Log Out]: WebView2 host channel object not yet linked.", payload);
             }
+        }
+
+        /* Safe initialization listener setup hook */
+        function initNativeIPCListeners() {
+            if (window.chrome && window.chrome.webview && typeof window.chrome.webview.addEventListener === 'function') {
+                window.chrome.webview.addEventListener('message', handleBackendIPCMessage);
+                console.log("[IPC Bridge System Log Out]: Native link channel connected successfully.");
+            } else {
+                setTimeout(initNativeIPCListeners, 100);
+            }
+        }
+
+        /* =========================================
+           MONACO CODE EDITOR CONFIGURATION LOADOUT
+        ========================================= */
+        require.config({ paths: { vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.0/min/vs" }});
+        require(["vs/editor/editor.main"], function () {
+            editor = monaco.editor.create(document.getElementById("editor"), {
+                value: files[current],
+                language: "lua",
+                theme: "vs-dark",
+                automaticLayout: true,
+                minimap: { enabled: false },
+                fontSize: 13,
+                fontFamily: 'JetBrains Mono, monospace',
+                lineHeight: 22,
+                cursorSmoothCaretAnimation: true,
+            });
+
+            editor.onDidChangeModelContent(() => { save(); });
+
+            const savedTheme = localStorage.getItem('obv_theme') || 'purple';
+            const themeSelect = document.getElementById('cfg-theme');
+            if (themeSelect) themeSelect.value = savedTheme;
+            applyGlobalTheme(savedTheme);
+
+            const savedWeather = localStorage.getItem('obv_weather') || 'matrix';
+            const weatherSelect = document.getElementById('cfg-weather');
+            if (weatherSelect) weatherSelect.value = savedWeather;
+            setWeatherEffect(savedWeather);
+
+            const rpcDetailsInput = document.getElementById('cfg-rpc-details');
+            if (rpcDetailsInput) rpcDetailsInput.value = localStorage.getItem('obv_rpc_details') || "OblivionX Executor";
+            
+            const rpcStateInput = document.getElementById('cfg-rpc-state');
+            if (rpcStateInput) rpcStateInput.value = localStorage.getItem('obv_rpc_state') || "Idle";
+
+            renderTabs();
+            initNativeIPCListeners();
+            sendWebviewMessage({ action: "request_settings" });
         });
 
-        monaco.editor.setTheme('obv-theme');
-    }
-}
+        function save(){
+            if(editor){
+                files[current] = editor.getValue();
+                localStorage.setItem('obv_fs', JSON.stringify(files));
+            }
+        }
 
-/* =========================================
-   STATUS UI
-========================================= */
+        window.getEditorBuffer = function() {
+            if(editor) {
+                sendWebviewMessage({ action: "execute", code: editor.getValue() });
+            }
+        }
 
-function updateStatusUI(mode,pid=null){
+        function SetText(text) {
+            if(editor) {
+                editor.setValue(text);
+                save();
+            }
+        }
 
-    const dot =
-        document.getElementById('top-attach-dot');
+        /* =========================================
+           WORKSPACE TABS REGISTRY MANAGEMENT
+        ========================================= */
+        function renderTabs(){
+            const container = document.getElementById("tab-container");
+            if (!container) return;
+            container.innerHTML = "";
 
-    const txt =
-        document.getElementById('status-text');
+            Object.keys(files).forEach(f => {
+                let tab = document.createElement("div");
+                tab.className = "tab" + (f === current ? " active" : "");
+                tab.innerHTML = `<span>${f}</span><span class="close-x" onclick="event.stopPropagation(); closeTab('${f}')">×</span>`;
+                tab.onclick = () => switchActiveBuffer(f);
+                container.appendChild(tab);
+            });
+        }
 
-    if(mode === "attached"){
+        function switchActiveBuffer(fileName) {
+            save();
+            current = fileName;
+            editor.setValue(files[fileName]);
+            renderTabs();
+        }
 
-        dot.className =
-            "attach-indicator-dot active";
+        function createNewTab(title = null, initialContent = "") {
+            save();
+            let n = title || "script_" + (Object.keys(files).length + 1) + ".lua";
+            files[n] = initialContent || "-- New Workbook Frame\n";
+            current = n;
+            renderTabs();
+            if(editor) editor.setValue(files[n]);
+            save();
+        }
 
-        txt.innerText =
-            `Attached (${pid})`;
-    }
-    else if(mode === "failed"){
+        function closeTab(f) {
+            if (Object.keys(files).length <= 1) return;
+            delete files[f];
+            if (current === f) current = Object.keys(files)[0];
+            if(editor) editor.setValue(files[current]);
+            renderTabs();
+            save();
+        }
 
-        dot.className =
-            "attach-indicator-dot failed";
-
-        txt.innerText =
-            "Injection Failed";
-    }
-    else{
-
-        dot.className =
-            "attach-indicator-dot";
-
-        txt.innerText =
-            "Not Attached";
-    }
-}
-
-/* =========================================
-   SCRIPT HUB
+        /* =========================================
+   SCRIPTBLOX ENGINE API ARCHITECTURE INTERACTOR
 ========================================= */
 
 let lastHubQuery = "";
 
-function openScriptHub(){
-
+function openScriptHub() {
     openModal('script-hub-modal');
-
     loadTrendingScripts();
 }
 
-function loadTrendingScripts(){
-
-    updateHubStatus(
-        "Fetching trending scripts..."
-    );
+function loadTrendingScripts() {
+    updateHubStatus("Fetching trending catalog array...");
 
     sendWebviewMessage({
-        action:"scriptblox_fetch_trending"
+        action: "scriptblox_fetch_trending"
     });
 }
 
-function triggerHubQuerySearch(){
+function triggerHubQuerySearch() {
 
-    const input =
+    const searchInput =
         document.getElementById('hub-search-input');
 
     const query =
-        input.value.trim();
+        searchInput
+        ? searchInput.value.trim()
+        : "";
 
-    if(!query.length){
-
+    if (!query.length) {
         loadTrendingScripts();
-
         return;
     }
 
-    if(query === lastHubQuery) return;
+    if (query === lastHubQuery) return;
 
     lastHubQuery = query;
 
-    updateHubStatus(
-        `Searching for "${query}"...`
-    );
+    updateHubStatus(`Searching for "${query}"...`);
 
     sendWebviewMessage({
-        action:"scriptblox_search",
-        query:query
+        action: "scriptblox_search",
+        query: query
     });
 }
 
-function handleHubSearchKey(e){
-
-    if(e.key === "Enter"){
+function handleHubSearchKey(e) {
+    if (e.key === "Enter") {
         triggerHubQuerySearch();
     }
 }
 
-function updateHubStatus(text){
+function updateHubStatus(text) {
 
-    const status =
-        document.getElementById('hub-catalog-status');
+    const el =
+        document.getElementById(
+            'hub-catalog-status'
+        );
 
-    status.innerText = text;
+    if (el) {
+        el.innerText = text;
+    }
 }
 
-function escapeHtml(str=""){
+/* =========================================
+   HELPERS
+========================================= */
 
-    return str
-        .replace(/&/g,"&amp;")
-        .replace(/</g,"&lt;")
-        .replace(/>/g,"&gt;")
-        .replace(/"/g,"&quot;")
-        .replace(/'/g,"&#039;");
-}
-
-function sanitizeText(str=""){
+function escapeHtml(str = "") {
 
     return String(str)
-        .replace(/<[^>]*>/g,'');
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
 
+function sanitizeText(str = "") {
+
+    return String(str)
+        .replace(/<[^>]*>/g, '');
+}
+
+/* =========================================
+   POPULATE HUB
+========================================= */
+
 window.populateScriptHubCatalog =
-function(responseObj){
+function(responseObj) {
 
     const listContainer =
         document.getElementById(
             'hub-catalog-list'
         );
 
+    if (!listContainer) return;
+
     listContainer.innerHTML = "";
+
+    console.log(
+        "[ScriptHub Response]",
+        responseObj
+    );
 
     let scriptsArray = [];
 
-    if(Array.isArray(responseObj)){
+    /* Support all ScriptBlox structures */
+
+    if (Array.isArray(responseObj)) {
+
         scriptsArray = responseObj;
     }
-    else if(Array.isArray(responseObj.result)){
+
+    else if (
+        Array.isArray(responseObj.result)
+    ) {
+
         scriptsArray = responseObj.result;
     }
-    else if(responseObj.result?.scripts){
+
+    else if (
+        responseObj.result &&
+        Array.isArray(
+            responseObj.result.scripts
+        )
+    ) {
+
         scriptsArray =
             responseObj.result.scripts;
     }
-    else if(responseObj.scripts){
+
+    else if (
+        responseObj.scripts &&
+        Array.isArray(responseObj.scripts)
+    ) {
+
         scriptsArray =
             responseObj.scripts;
     }
 
-    if(!scriptsArray.length){
+    else if (
+        responseObj.result &&
+        responseObj.result.result &&
+        Array.isArray(
+            responseObj.result.result
+        )
+    ) {
+
+        scriptsArray =
+            responseObj.result.result;
+    }
+
+    if (!scriptsArray.length) {
 
         updateHubStatus(
-            "No scripts found."
+            "No matching script profiles found."
         );
 
         return;
@@ -1123,7 +586,7 @@ function(responseObj){
         `Loaded ${scriptsArray.length} scripts.`
     );
 
-    scriptsArray.forEach(item=>{
+    scriptsArray.forEach(item => {
 
         const title =
             sanitizeText(
@@ -1136,20 +599,26 @@ function(responseObj){
             sanitizeText(
                 item.features ||
                 item.description ||
-                "No description available."
+                item.slug ||
+                "No additional parameters provided."
             );
 
-        const game =
+        const gameName =
             sanitizeText(
                 item.game?.name ||
+                item.gameName ||
                 "Universal"
             );
 
         const views =
-            item.views || 0;
+            item.views ||
+            item.viewCount ||
+            0;
 
         const likes =
-            item.likeCount || 0;
+            item.likeCount ||
+            item.likes ||
+            0;
 
         const verified =
             item.verified === true;
@@ -1163,33 +632,37 @@ function(responseObj){
         const scriptId =
             item._id ||
             item.id ||
+            item.scriptId ||
             "";
 
-        let badges = "";
+        let badgesHtml = "";
 
-        if(universal){
-            badges +=
-                `<span class="script-badge universal">
+        if (universal) {
+            badgesHtml += `
+                <span class="script-badge universal">
                     Universal
-                 </span>`;
+                </span>
+            `;
         }
 
-        if(verified){
-            badges +=
-                `<span class="script-badge verified">
+        if (verified) {
+            badgesHtml += `
+                <span class="script-badge verified">
                     Verified
-                 </span>`;
+                </span>
+            `;
         }
 
-        if(patched){
-            badges +=
-                `<span class="script-badge patched">
+        if (patched) {
+            badgesHtml += `
+                <span class="script-badge patched">
                     Patched
-                 </span>`;
+                </span>
+            `;
         }
 
         const card =
-            document.createElement("div");
+            document.createElement('div');
 
         card.className =
             "script-card-item";
@@ -1203,7 +676,7 @@ function(responseObj){
                         ${escapeHtml(title)}
                     </span>
 
-                    ${badges}
+                    ${badgesHtml}
 
                 </div>
 
@@ -1215,7 +688,9 @@ function(responseObj){
 
                     <span>
                         Game:
-                        <span>${escapeHtml(game)}</span>
+                        <span style="color:#fff;">
+                            ${escapeHtml(gameName)}
+                        </span>
                     </span>
 
                     <span>
@@ -1236,8 +711,8 @@ function(responseObj){
                 class="icon-btn"
                 style="
                     border-color:var(--accent);
-                    color:#fff;
                     font-weight:700;
+                    color:#fff;
                 "
             >
                 Load Code
@@ -1247,43 +722,107 @@ function(responseObj){
         const btn =
             card.querySelector("button");
 
-        btn.onclick = ()=>{
+        btn.addEventListener(
+            "click",
+            () => {
 
-            requestRawScript(
-                scriptId,
-                title
-            );
-        };
+                requestRawScript(
+                    scriptId,
+                    title
+                );
+            }
+        );
 
         listContainer.appendChild(card);
     });
 };
 
-function requestRawScript(scriptId,title){
+/* =========================================
+   REQUEST RAW SCRIPT
+========================================= */
+
+function requestRawScript(
+    scriptId,
+    cleanTitle
+) {
+
+    if (!scriptId) {
+
+        updateHubStatus(
+            "Invalid script ID."
+        );
+
+        return;
+    }
 
     updateHubStatus(
-        `Loading "${title}"...`
+        `Streaming raw string for: ${cleanTitle}...`
     );
 
     sendWebviewMessage({
-        action:"scriptblox_get_raw",
-        id:scriptId,
-        title:title
+        action: "scriptblox_get_raw",
+        id: scriptId,
+        title: cleanTitle
     });
 }
 
+/* =========================================
+   RAW SCRIPT LOADER
+========================================= */
+
 window.injectRawScriptIntoEditor =
-function(title,rawCode){
+function(title, rawData) {
 
     closeModal('script-hub-modal');
+
+    let rawCode = "";
+
+    /* Support all response structures */
+
+    if (typeof rawData === "string") {
+
+        rawCode = rawData;
+    }
+
+    else if (rawData?.script) {
+
+        rawCode = rawData.script;
+    }
+
+    else if (rawData?.rawScript) {
+
+        rawCode = rawData.rawScript;
+    }
+
+    else if (rawData?.code) {
+
+        rawCode = rawData.code;
+    }
+
+    else if (
+        rawData?.result?.script
+    ) {
+
+        rawCode =
+            rawData.result.script;
+    }
+
+    else {
+
+        rawCode =
+            "-- Failed to parse script.";
+    }
 
     let workspaceTitle =
         title
         .toLowerCase()
-        .replace(/[^a-z0-9]/gi,'_')
-        .replace(/_+/g,'_');
+        .replace(/[^a-z0-9]/gi, "_")
+        .replace(/_+/g, "_");
 
-    if(!workspaceTitle.endsWith(".lua")){
+    if (
+        !workspaceTitle.endsWith(".lua")
+    ) {
+
         workspaceTitle += ".lua";
     }
 
@@ -1294,134 +833,321 @@ function(title,rawCode){
 };
 
 /* =========================================
-   CLI
+   IPC BACKEND MESSAGE HANDLER
 ========================================= */
 
-document
-.getElementById("cli")
-.addEventListener("keydown",e=>{
+function handleBackendIPCMessage(event) {
 
-    if(e.key !== "Enter") return;
+    const msg = event.data;
 
-    const cmd =
-        e.target.value
-        .trim()
-        .toLowerCase();
+    console.log(
+        "[IPC MESSAGE]",
+        msg
+    );
 
-    if(cmd === "/run"){
-
-        sendWebviewMessage({
-            action:"execute",
-            code:editor.getValue()
-        });
-    }
-
-    if(cmd === "/inject"){
-
-        sendWebviewMessage({
-            action:"inject"
-        });
+    if (
+        msg.action === "pid_update"
+    ) {
 
         updateStatusUI(
             'attached',
-            Math.floor(Math.random()*9999)
+            msg.pid
         );
     }
 
-    if(cmd === "/new"){
+    else if (
+        msg.action === "clear_pid"
+    ) {
 
-        createNewTab(
-            "script_" +
-            Date.now() +
-            ".lua",
+        updateStatusUI('idle');
+    }
 
-            "-- New Script"
+    else if (
+        msg.action === "injection_failed"
+    ) {
+
+        updateStatusUI('failed');
+    }
+
+    else if (
+        msg.action ===
+        "scriptblox_render_results"
+    ) {
+
+        populateScriptHubCatalog(
+            msg.data
         );
     }
 
-    e.target.value = "";
-});
+    else if (
+        msg.action ===
+        "scriptblox_deliver_raw"
+    ) {
 
-/* =========================================
-   WEATHER
-========================================= */
+        injectRawScriptIntoEditor(
+            msg.title || "script",
 
-const canvas =
-    document.getElementById(
-        'weather-canvas'
-    );
+            msg.rawCode ||
+            msg.data ||
+            msg.script
+        );
+    }
 
-const ctx =
-    canvas.getContext('2d');
+    else if (
+        msg.action ===
+        "scriptblox_error"
+    ) {
 
-function resizeCanvas(){
-
-    canvas.width = innerWidth;
-    canvas.height = innerHeight;
-}
-
-window.addEventListener(
-    'resize',
-    resizeCanvas
-);
-
-resizeCanvas();
-
-let particles = [];
-
-for(let i=0;i<120;i++){
-
-    particles.push({
-        x:Math.random()*canvas.width,
-        y:Math.random()*canvas.height,
-        speed:2+Math.random()*5
-    });
-}
-
-function renderWeather(){
-
-    const accent =
-        getComputedStyle(document.body)
-        .getPropertyValue('--accent')
-        .trim();
-
-    ctx.clearRect(
-        0,
-        0,
-        canvas.width,
-        canvas.height
-    );
-
-    ctx.fillStyle = accent;
-
-    ctx.font = "12px monospace";
-
-    particles.forEach(p=>{
-
-        ctx.fillText(
-            String.fromCharCode(
-                0x30A0 +
-                Math.random()*96
-            ),
-            p.x,
-            p.y
+        console.error(
+            "[ScriptHub Error]",
+            msg.message
         );
 
-        p.y += p.speed;
+        updateHubStatus(
+            "Engine sync error: " +
+            (
+                msg.message ||
+                "Unknown error."
+            )
+        );
+    }
+}
 
-        if(p.y > canvas.height){
-            p.y = -20;
+        /* =========================================
+           MODAL CONTROL MATRIX WINDOW DRIVERS
+        ========================================= */
+        function openModal(id) { 
+            const el = document.getElementById(id);
+            if(el) el.style.display = 'flex'; 
         }
-    });
+        function closeModal(id) { 
+            const el = document.getElementById(id);
+            if(el) el.style.display = 'none'; 
+        }
+        function closeModalOnOuter(e, id) { if(e.target.id === id) closeModal(id); }
 
-    requestAnimationFrame(
-        renderWeather
-    );
-}
+        /* =========================================
+            BRIDGE WEBVIEW CHANNEL PROTOCOLS
+        ========================================= */
+        function applyGlobalTheme(name) {
+            document.body.className = `theme-${name}`;
+            localStorage.setItem('obv_theme', name);
+            setTimeout(() => {
+                const accent = getComputedStyle(document.body).getPropertyValue('--accent').trim();
+                const bg = getComputedStyle(document.body).getPropertyValue('--bg').trim();
+                if(window.monaco) {
+                    monaco.editor.defineTheme('obv-theme', {
+                        base: 'vs-dark', inherit: true, rules: [],
+                        colors: { 'editor.background': bg, 'editorCursor.foreground': accent, 'editorLineNumber.activeForeground': accent }
+                    });
+                    monaco.editor.setTheme('obv-theme');
+                }
+            }, 50);
+            sendWebviewMessage({ action: "theme", value: name });
+        }
 
-renderWeather();
+        function pushConfigUpdate() {
+            const cbDiscord = document.getElementById('cfg-discord');
+            const cbAttach = document.getElementById('cfg-attach');
+            const cbExecute = document.getElementById('cfg-execute');
+            const cbTopmost = document.getElementById('cfg-topmost');
 
-</script>
+            const isRpcOn = cbDiscord ? cbDiscord.checked : true;
+            
+            const rowDetails = document.getElementById('rpc-details-row');
+            if (rowDetails) {
+                rowDetails.style.opacity = isRpcOn ? "1" : "0.4";
+                rowDetails.style.pointerEvents = isRpcOn ? "all" : "none";
+            }
+            const rowState = document.getElementById('rpc-state-row');
+            if (rowState) {
+                rowState.style.opacity = isRpcOn ? "1" : "0.4";
+                rowState.style.pointerEvents = isRpcOn ? "all" : "none";
+            }
 
+            const settings = {
+                discordRpc: isRpcOn,
+                autoAttach: cbAttach ? cbAttach.checked : false,
+                autoExecute: cbExecute ? cbExecute.checked : false,
+                alwaysOnTop: cbTopmost ? cbTopmost.checked : false
+            };
+            sendWebviewMessage({ action: "update_config", settings });
+            pushRpcMessageUpdate();
+        }
+
+        function pushRpcMessageUpdate() {
+            const dInput = document.getElementById('cfg-rpc-details');
+            const sInput = document.getElementById('cfg-rpc-state');
+            const d = dInput ? dInput.value : "OblivionX Executor";
+            const s = sInput ? sInput.value : "Idle";
+            localStorage.setItem('obv_rpc_details', d);
+            localStorage.setItem('obv_rpc_state', s);
+            sendWebviewMessage({ action: 'update_rpc_details', details: d || "OblivionX", state: s || "Idle" });
+        }
+
+        function updateStatusUI(mode, pid = null) {
+            const dot = document.getElementById('top-attach-dot');
+            const txt = document.getElementById('status-text');
+            const glow = document.getElementById('status-glow');
+            if(!dot || !txt) return;
+
+            if(mode === 'attached') {
+                dot.className = "attach-indicator-dot active";
+                txt.innerText = `Attached (${pid})`;
+                if(glow) glow.style.background = "var(--accent)";
+            } else if (mode === 'failed') {
+                dot.className = "attach-indicator-dot failed";
+                txt.innerText = "Attachment Failed";
+                if(glow) glow.style.background = "#ef4444";
+            } else {
+                dot.className = "attach-indicator-dot";
+                txt.innerText = "Not Attached";
+                if(glow) glow.style.background = "#222";
+            }
+        }
+
+        function loadExecutorSettings(cfg) {
+            const cbDiscord = document.getElementById('cfg-discord');
+            const cbAttach = document.getElementById('cfg-attach');
+            const cbExecute = document.getElementById('cfg-execute');
+            const cbTopmost = document.getElementById('cfg-topmost');
+
+            if(cbDiscord) cbDiscord.checked = cfg.discordRpc;
+            if(cbAttach) cbAttach.checked = cfg.autoAttach;
+            if(cbExecute) cbExecute.checked = cfg.autoExecute;
+            if(cbTopmost) cbTopmost.checked = cfg.alwaysOnTop;
+            topmost = cfg.alwaysOnTop;
+            
+            const isRpcOn = cfg.discordRpc;
+            const rowDetails = document.getElementById('rpc-details-row');
+            if (rowDetails) {
+                rowDetails.style.opacity = isRpcOn ? "1" : "0.4";
+                rowDetails.style.pointerEvents = isRpcOn ? "all" : "none";
+            }
+            const rowState = document.getElementById('rpc-state-row');
+            if (rowState) {
+                rowState.style.opacity = isRpcOn ? "1" : "0.4";
+                rowState.style.pointerEvents = isRpcOn ? "all" : "none";
+            }
+        }
+
+        function toggleTopMost(){
+            topmost = !topmost;
+            const cbTopmost = document.getElementById('cfg-topmost');
+            if(cbTopmost) cbTopmost.checked = topmost;
+            sendWebviewMessage({ action: "set_always_on_top", value: topmost });
+        }
+
+        function minimize(){ sendWebviewMessage({ action: "minimize" }); }
+        function closeApp(){ sendWebviewMessage({ action: "exit" }); }
+
+        /* Unified central message handler hooked up after channel verification */
+        function handleBackendIPCMessage(event) {
+            const msg = event.data;
+            if(msg.action === "pid_update") updateStatusUI('attached', msg.pid);
+            if(msg.action === "clear_pid") updateStatusUI('idle');
+            if(msg.action === "injection_failed") updateStatusUI('failed');
+            
+            if(msg.action === "scriptblox_render_results") {
+                populateScriptHubCatalog(msg.data);
+            }
+            if(msg.action === "scriptblox_deliver_raw") {
+                injectRawScriptIntoEditor(msg.title, msg.rawCode);
+            }
+            if(msg.action === "scriptblox_error") {
+                updateHubStatus("Engine sync error: " + msg.message);
+            }
+        }
+
+        document.getElementById("cli").addEventListener("keydown", e => {
+            if(e.key === "Enter"){
+                let cmd = e.target.value.trim().toLowerCase();
+                if(cmd === "/run") getEditorBuffer();
+                if(cmd === "/inject") sendWebviewMessage({ action: "inject" });
+                if(cmd === "/new") createNewTab();
+                if(cmd === "/topmost") toggleTopMost();
+                e.target.value = "";
+            }
+        });
+
+        /* =========================================
+           PROCEDURAL VISUAL BACKGROUND ATMOSPHERE CANVAS
+        ========================================= */
+        const canvas = document.getElementById('weather-canvas');
+        const ctx = canvas.getContext('2d');
+        let animationId;
+        let weatherMode = 'matrix';
+
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        let matrixParticles = [], warpStars = [], environmentDrops = [];
+
+        function initWeather(mode) {
+            matrixParticles = []; warpStars = []; environmentDrops = [];
+            const cols = Math.floor(canvas.width / 14) + 1;
+            if(mode === 'matrix') { for(let i=0; i<cols; i++) matrixParticles.push({ x: i*14, y: Math.random() * -500, speed: 2 + Math.random() * 5 }); }
+            else if(mode === 'hyperjump' || mode === 'stars') { for(let i=0; i<150; i++) warpStars.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, z: Math.random()*canvas.width, color: Math.random() > 0.5 ? '#fff' : 'var(--accent)' }); }
+            else if(mode === 'rain' || mode === 'snow') { for(let i=0; i<120; i++) environmentDrops.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, speed: 4 + Math.random()*6, size: 1 + Math.random()*3 }); }
+        }
+
+        function setWeatherEffect(mode) {
+            weatherMode = mode;
+            localStorage.setItem('obv_weather', mode);
+            const weatherSelect = document.getElementById('cfg-weather');
+            if(weatherSelect) weatherSelect.value = mode;
+            cancelAnimationFrame(animationId);
+            if(mode !== 'none') { initWeather(mode); renderWeatherLoop(); } else { ctx.clearRect(0,0, canvas.width, canvas.height); }
+            sendWebviewMessage({ action: 'set_weather', weather: mode });
+        }
+
+        function renderWeatherLoop() {
+            const accentColor = getComputedStyle(document.body).getPropertyValue('--accent').trim();
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if(weatherMode === 'matrix') {
+                ctx.fillStyle = 'rgba(0,0,0,0.05)'; ctx.font = '11px monospace';
+                matrixParticles.forEach(p => {
+                    ctx.fillStyle = accentColor;
+                    ctx.fillText(String.fromCharCode(0x30A0 + Math.random() * 96), p.x, p.y);
+                    p.y += p.speed; if(p.y > canvas.height) { p.y = -50; p.speed = 2 + Math.random() * 5; }
+                });
+            }
+            else if(weatherMode === 'cybergrid') {
+                ctx.strokeStyle = accentColor; ctx.lineWidth = 0.4;
+                const step = 45; const offset = (Date.now() / 30) % step;
+                for(let x = offset; x < canvas.width; x += step) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke(); }
+                for(let y = offset; y < canvas.height; y += step) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke(); }
+            }
+            else if(weatherMode === 'hyperjump') {
+                warpStars.forEach(s => {
+                    s.z -= 8; if(s.z <= 0) { s.z = canvas.width; s.x = Math.random()*canvas.width; s.y = Math.random()*canvas.height; }
+                    const cx = canvas.width / 2, cy = canvas.height / 2;
+                    const px = (s.x - cx) * (canvas.width / s.z) + cx, py = (s.y - cy) * (canvas.width / s.z) + cy;
+                    ctx.strokeStyle = s.color; ctx.lineWidth = 2;
+                    ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px + (px - cx)*0.09, py + (py - cy)*0.09); ctx.stroke();
+                });
+            }
+            else if(weatherMode === 'stars') {
+                warpStars.forEach(s => { ctx.fillStyle = s.color; ctx.fillRect(s.x, s.y, 1.5, 1.5); s.y += 0.2; if(s.y > canvas.height) s.y = 0; });
+            }
+            else if(weatherMode === 'rain') {
+                ctx.strokeStyle = accentColor; ctx.lineWidth = 1;
+                environmentDrops.forEach(d => {
+                    ctx.beginPath(); ctx.moveTo(d.x, d.y); ctx.lineTo(d.x + 1, d.y + 12); ctx.stroke();
+                    d.y += d.speed; d.x += 0.5; if(d.y > canvas.height) { d.y = -20; d.x = Math.random()*canvas.width; }
+                });
+            }
+            else if(weatherMode === 'snow') {
+                ctx.fillStyle = '#ffffff';
+                environmentDrops.forEach(d => {
+                    ctx.beginPath(); ctx.arc(d.x, d.y, d.size/2, 0, Math.PI*2); ctx.fill();
+                    d.y += d.speed * 0.25; d.x += Math.sin(d.y/30) * 0.5; if(d.y > canvas.height) { d.y = -10; d.x = Math.random()*canvas.width; }
+                });
+            }
+            animationId = requestAnimationFrame(renderWeatherLoop);
+        }
+    </script>
 </body>
 </html>
