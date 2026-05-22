@@ -313,7 +313,6 @@
                 window.chrome.webview.addEventListener('message', handleBackendIPCMessage);
                 console.log("[IPC Bridge System Log Out]: Native link channel connected successfully.");
             } else {
-                // If the object isn't constructed yet, retry after a slight frame tick delay.
                 setTimeout(initNativeIPCListeners, 100);
             }
         }
@@ -354,8 +353,6 @@
             if (rpcStateInput) rpcStateInput.value = localStorage.getItem('obv_rpc_state') || "Idle";
 
             renderTabs();
-            
-            // Begin probing for WebView2 IPC bindings
             initNativeIPCListeners();
             sendWebviewMessage({ action: "request_settings" });
         });
@@ -461,15 +458,26 @@
             if (!listContainer) return;
             listContainer.innerHTML = "";
             
-            if(!responseObj || !responseObj.result || !responseObj.result.scripts || responseObj.result.scripts.length === 0) {
+            // ScriptBlox wrapper structures can vary depending on proxies/direct queries
+            let scriptsArray = null;
+            if (responseObj) {
+                if (responseObj.scripts && Array.isArray(responseObj.scripts)) {
+                    scriptsArray = responseObj.scripts;
+                } else if (responseObj.result && Array.isArray(responseObj.result)) {
+                    scriptsArray = responseObj.result;
+                } else if (responseObj.result && responseObj.result.scripts && Array.isArray(responseObj.result.scripts)) {
+                    scriptsArray = responseObj.result.scripts;
+                }
+            }
+
+            if(!scriptsArray || scriptsArray.length === 0) {
                 updateHubStatus("No matching script profiles found.");
                 return;
             }
 
-            const total = responseObj.result.scripts.length;
-            updateHubStatus(`Populated ${total} script structures.`);
+            updateHubStatus(`Populated ${scriptsArray.length} script structures.`);
 
-            responseObj.result.scripts.forEach(item => {
+            scriptsArray.forEach(item => {
                 let card = document.createElement('div');
                 card.className = "script-card-item";
 
