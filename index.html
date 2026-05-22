@@ -421,497 +421,107 @@
         }
 
         /* =========================================
-   SCRIPTBLOX ENGINE API ARCHITECTURE INTERACTOR
-========================================= */
-
-let lastHubQuery = "";
-
-function openScriptHub() {
-    openModal('script-hub-modal');
-    loadTrendingScripts();
-}
-
-function loadTrendingScripts() {
-    updateHubStatus("Fetching trending catalog array...");
-
-    sendWebviewMessage({
-        action: "scriptblox_fetch_trending"
-    });
-}
-
-function triggerHubQuerySearch() {
-
-    const searchInput =
-        document.getElementById('hub-search-input');
-
-    const query =
-        searchInput
-        ? searchInput.value.trim()
-        : "";
-
-    if (!query.length) {
-        loadTrendingScripts();
-        return;
-    }
-
-    if (query === lastHubQuery) return;
-
-    lastHubQuery = query;
-
-    updateHubStatus(`Searching for "${query}"...`);
-
-    sendWebviewMessage({
-        action: "scriptblox_search",
-        query: query
-    });
-}
-
-function handleHubSearchKey(e) {
-    if (e.key === "Enter") {
-        triggerHubQuerySearch();
-    }
-}
-
-function updateHubStatus(text) {
-
-    const el =
-        document.getElementById(
-            'hub-catalog-status'
-        );
-
-    if (el) {
-        el.innerText = text;
-    }
-}
-
-/* =========================================
-   HELPERS
-========================================= */
-
-function escapeHtml(str = "") {
-
-    return String(str)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
-
-function sanitizeText(str = "") {
-
-    return String(str)
-        .replace(/<[^>]*>/g, '');
-}
-
-/* =========================================
-   POPULATE HUB
-========================================= */
-
-window.populateScriptHubCatalog =
-function(responseObj) {
-
-    const listContainer =
-        document.getElementById(
-            'hub-catalog-list'
-        );
-
-    if (!listContainer) return;
-
-    listContainer.innerHTML = "";
-
-    console.log(
-        "[ScriptHub Response]",
-        responseObj
-    );
-
-    let scriptsArray = [];
-
-    /* Support all ScriptBlox structures */
-
-    if (Array.isArray(responseObj)) {
-
-        scriptsArray = responseObj;
-    }
-
-    else if (
-        Array.isArray(responseObj.result)
-    ) {
-
-        scriptsArray = responseObj.result;
-    }
-
-    else if (
-        responseObj.result &&
-        Array.isArray(
-            responseObj.result.scripts
-        )
-    ) {
-
-        scriptsArray =
-            responseObj.result.scripts;
-    }
-
-    else if (
-        responseObj.scripts &&
-        Array.isArray(responseObj.scripts)
-    ) {
-
-        scriptsArray =
-            responseObj.scripts;
-    }
-
-    else if (
-        responseObj.result &&
-        responseObj.result.result &&
-        Array.isArray(
-            responseObj.result.result
-        )
-    ) {
-
-        scriptsArray =
-            responseObj.result.result;
-    }
-
-    if (!scriptsArray.length) {
-
-        updateHubStatus(
-            "No matching script profiles found."
-        );
-
-        return;
-    }
-
-    updateHubStatus(
-        `Loaded ${scriptsArray.length} scripts.`
-    );
-
-    scriptsArray.forEach(item => {
-
-        const title =
-            sanitizeText(
-                item.title ||
-                item.name ||
-                "Unnamed Script"
-            );
-
-        const description =
-            sanitizeText(
-                item.features ||
-                item.description ||
-                item.slug ||
-                "No additional parameters provided."
-            );
-
-        const gameName =
-            sanitizeText(
-                item.game?.name ||
-                item.gameName ||
-                "Universal"
-            );
-
-        const views =
-            item.views ||
-            item.viewCount ||
-            0;
-
-        const likes =
-            item.likeCount ||
-            item.likes ||
-            0;
-
-        const verified =
-            item.verified === true;
-
-        const universal =
-            item.universal === true;
-
-        const patched =
-            item.patched === true;
-
-        const scriptId =
-            item._id ||
-            item.id ||
-            item.scriptId ||
-            "";
-
-        let badgesHtml = "";
-
-        if (universal) {
-            badgesHtml += `
-                <span class="script-badge universal">
-                    Universal
-                </span>
-            `;
+           SCRIPTBLOX ENGINE API ARCHITECTURE INTERACTOR
+        ========================================= */
+        function openScriptHub() {
+            openModal('script-hub-modal');
+            loadTrendingScripts();
         }
 
-        if (verified) {
-            badgesHtml += `
-                <span class="script-badge verified">
-                    Verified
-                </span>
-            `;
+        function loadTrendingScripts() {
+            updateHubStatus("Fetching trending catalog array...");
+            sendWebviewMessage({ action: "scriptblox_fetch_trending" });
         }
 
-        if (patched) {
-            badgesHtml += `
-                <span class="script-badge patched">
-                    Patched
-                </span>
-            `;
-        }
-
-        const card =
-            document.createElement('div');
-
-        card.className =
-            "script-card-item";
-
-        card.innerHTML = `
-            <div class="script-info">
-
-                <div class="script-title-row">
-
-                    <span class="script-title">
-                        ${escapeHtml(title)}
-                    </span>
-
-                    ${badgesHtml}
-
-                </div>
-
-                <div class="script-desc">
-                    ${escapeHtml(description)}
-                </div>
-
-                <div class="script-meta-metrics">
-
-                    <span>
-                        Game:
-                        <span style="color:#fff;">
-                            ${escapeHtml(gameName)}
-                        </span>
-                    </span>
-
-                    <span>
-                        Views:
-                        <span>${views}</span>
-                    </span>
-
-                    <span>
-                        Likes:
-                        <span>${likes}</span>
-                    </span>
-
-                </div>
-
-            </div>
-
-            <button
-                class="icon-btn"
-                style="
-                    border-color:var(--accent);
-                    font-weight:700;
-                    color:#fff;
-                "
-            >
-                Load Code
-            </button>
-        `;
-
-        const btn =
-            card.querySelector("button");
-
-        btn.addEventListener(
-            "click",
-            () => {
-
-                requestRawScript(
-                    scriptId,
-                    title
-                );
+        function triggerHubQuerySearch() {
+            const searchInput = document.getElementById('hub-search-input');
+            const query = searchInput ? searchInput.value.trim() : "";
+            if(!query) {
+                loadTrendingScripts();
+                return;
             }
-        );
+            updateHubStatus(`Searching for: "${query}"...`);
+            sendWebviewMessage({ action: "scriptblox_search", query: query });
+        }
 
-        listContainer.appendChild(card);
-    });
-};
+        function handleHubSearchKey(e) {
+            if(e.key === "Enter") triggerHubQuerySearch();
+        }
 
-/* =========================================
-   REQUEST RAW SCRIPT
-========================================= */
+        function updateHubStatus(text) {
+            const el = document.getElementById('hub-catalog-status');
+            if (el) el.innerText = text;
+        }
 
-function requestRawScript(
-    scriptId,
-    cleanTitle
-) {
+        window.populateScriptHubCatalog = function(responseObj) {
+            const listContainer = document.getElementById('hub-catalog-list');
+            if (!listContainer) return;
+            listContainer.innerHTML = "";
+            
+            // ScriptBlox wrapper structures can vary depending on proxies/direct queries
+            let scriptsArray = null;
+            if (responseObj) {
+                if (responseObj.scripts && Array.isArray(responseObj.scripts)) {
+                    scriptsArray = responseObj.scripts;
+                } else if (responseObj.result && Array.isArray(responseObj.result)) {
+                    scriptsArray = responseObj.result;
+                } else if (responseObj.result && responseObj.result.scripts && Array.isArray(responseObj.result.scripts)) {
+                    scriptsArray = responseObj.result.scripts;
+                }
+            }
 
-    if (!scriptId) {
+            if(!scriptsArray || scriptsArray.length === 0) {
+                updateHubStatus("No matching script profiles found.");
+                return;
+            }
 
-        updateHubStatus(
-            "Invalid script ID."
-        );
+            updateHubStatus(`Populated ${scriptsArray.length} script structures.`);
 
-        return;
-    }
+            scriptsArray.forEach(item => {
+                let card = document.createElement('div');
+                card.className = "script-card-item";
 
-    updateHubStatus(
-        `Streaming raw string for: ${cleanTitle}...`
-    );
+                let badgesHtml = "";
+                if(item.universal) badgesHtml += `<span class="script-badge universal">Universal</span> `;
+                if(item.verified) badgesHtml += `<span class="script-badge verified">Verified</span> `;
+                if(item.patched) badgesHtml += `<span class="script-badge patched">Patched</span> `;
+                if(item.mode === 'paid') badgesHtml += `<span class="script-badge" style="background:rgba(254,226,39,0.1); color:#fee227;">Paid</span> `;
 
-    sendWebviewMessage({
-        action: "scriptblox_get_raw",
-        id: scriptId,
-        title: cleanTitle
-    });
-}
+                let views = item.views || 0;
+                let likes = item.likeCount || 0;
+                let scriptId = item._id || item.id;
+                let cleanTitle = (item.title || "Unnamed Script").replace(/['"]/g, '`');
 
-/* =========================================
-   RAW SCRIPT LOADER
-========================================= */
+                card.innerHTML = `
+                    <div class="script-info">
+                        <div class="script-title-row">
+                            <span class="script-title">${item.title || 'Unnamed Script'}</span>
+                            ${badgesHtml}
+                        </div>
+                        <div class="script-desc">${item.features || 'No additional parameters provided.'}</div>
+                        <div class="script-meta-metrics">
+                            <span>Game: <span style="color:#fff;">${item.game ? item.game.name : 'Universal'}</span></span>
+                            <span>Views: <span>${views}</span></span>
+                            <span>Likes: <span>${likes}</span></span>
+                        </div>
+                    </div>
+                    <button class="icon-btn" style="border-color:var(--accent); font-weight:700; color:#fff;" onclick="requestRawScript('${scriptId}', '${cleanTitle}')">Load Code</button>
+                `;
+                listContainer.appendChild(card);
+            });
+        }
 
-window.injectRawScriptIntoEditor =
-function(title, rawData) {
+        function requestRawScript(scriptId, cleanTitle) {
+            updateHubStatus(`Streaming raw string for: ${cleanTitle}...`);
+            sendWebviewMessage({ action: "scriptblox_get_raw", id: scriptId, title: cleanTitle });
+        }
 
-    closeModal('script-hub-modal');
-
-    let rawCode = "";
-
-    /* Support all response structures */
-
-    if (typeof rawData === "string") {
-
-        rawCode = rawData;
-    }
-
-    else if (rawData?.script) {
-
-        rawCode = rawData.script;
-    }
-
-    else if (rawData?.rawScript) {
-
-        rawCode = rawData.rawScript;
-    }
-
-    else if (rawData?.code) {
-
-        rawCode = rawData.code;
-    }
-
-    else if (
-        rawData?.result?.script
-    ) {
-
-        rawCode =
-            rawData.result.script;
-    }
-
-    else {
-
-        rawCode =
-            "-- Failed to parse script.";
-    }
-
-    let workspaceTitle =
-        title
-        .toLowerCase()
-        .replace(/[^a-z0-9]/gi, "_")
-        .replace(/_+/g, "_");
-
-    if (
-        !workspaceTitle.endsWith(".lua")
-    ) {
-
-        workspaceTitle += ".lua";
-    }
-
-    createNewTab(
-        workspaceTitle,
-        rawCode
-    );
-};
-
-/* =========================================
-   IPC BACKEND MESSAGE HANDLER
-========================================= */
-
-function handleBackendIPCMessage(event) {
-
-    const msg = event.data;
-
-    console.log(
-        "[IPC MESSAGE]",
-        msg
-    );
-
-    if (
-        msg.action === "pid_update"
-    ) {
-
-        updateStatusUI(
-            'attached',
-            msg.pid
-        );
-    }
-
-    else if (
-        msg.action === "clear_pid"
-    ) {
-
-        updateStatusUI('idle');
-    }
-
-    else if (
-        msg.action === "injection_failed"
-    ) {
-
-        updateStatusUI('failed');
-    }
-
-    else if (
-        msg.action ===
-        "scriptblox_render_results"
-    ) {
-
-        populateScriptHubCatalog(
-            msg.data
-        );
-    }
-
-    else if (
-        msg.action ===
-        "scriptblox_deliver_raw"
-    ) {
-
-        injectRawScriptIntoEditor(
-            msg.title || "script",
-
-            msg.rawCode ||
-            msg.data ||
-            msg.script
-        );
-    }
-
-    else if (
-        msg.action ===
-        "scriptblox_error"
-    ) {
-
-        console.error(
-            "[ScriptHub Error]",
-            msg.message
-        );
-
-        updateHubStatus(
-            "Engine sync error: " +
-            (
-                msg.message ||
-                "Unknown error."
-            )
-        );
-    }
-}
+        window.injectRawScriptIntoEditor = function(slugTitle, rawCode) {
+            closeModal('script-hub-modal');
+            let workspaceTitle = slugTitle.toLowerCase().replace(/\s+/g, '_') + ".lua";
+            if(!workspaceTitle.endsWith(".lua")) workspaceTitle += ".lua";
+            createNewTab(workspaceTitle, rawCode);
+        }
 
         /* =========================================
            MODAL CONTROL MATRIX WINDOW DRIVERS
