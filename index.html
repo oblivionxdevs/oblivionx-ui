@@ -25,6 +25,7 @@
             --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        /* Active System Color Palette Theme Maps */
         .theme-purple   { --accent: #8C5AFF; --accent-glow: rgba(140, 90, 255, 0.15); --bg: #060608; --panel: #0b0b0e; --panel-sub: #111116; }
         .theme-gold     { --accent: #FEE227; --accent-glow: rgba(254, 226, 39, 0.1);  --bg: #080805; --panel: #0f0f0a; --panel-sub: #181810; }
         .theme-vampire  { --accent: #FF3131; --accent-glow: rgba(255, 49, 49, 0.12);  --bg: #080303; --panel: #120606; --panel-sub: #1c0a0a; }
@@ -54,6 +55,7 @@
             background: rgba(0, 0, 0, 0.1);
         }
 
+        /* Top Title Bar */
         .topbar { 
             height: 48px; display: flex; align-items: center; justify-content: space-between; 
             padding: 0 16px; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.6);
@@ -88,7 +90,10 @@
         .window-control-btn:hover { color: var(--text-main); border-color: rgba(255, 255, 255, 0.15); background: rgba(255, 255, 255, 0.03); }
         .window-control-btn.close-btn:hover { border-color: #ff4444; color: #ff4444; background: rgba(255, 68, 68, 0.05); }
 
+        /* Workspace Grid Container */
         .workspace-grid { display: flex; flex: 1; overflow: hidden; background: transparent; }
+
+        /* Full Height Center Workspace Editor Container */
         .editor-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
         
         .tab-bar { 
@@ -107,6 +112,7 @@
         main { flex: 1; position: relative; background: transparent; }
         #editor { width: 100%; height: 100%; }
 
+        /* CLI Terminal Zone */
         .cli-bar { 
             height: 42px; background: var(--bg); border-top: 1px solid var(--border); 
             display: flex; align-items: center; padding: 0 16px; gap: 12px;
@@ -114,6 +120,7 @@
         .cli-input { flex: 1; background: transparent; border: none; color: #fff; font-family: var(--font-mono); font-size: 12px; }
         #status-glow { width: 6px; height: 6px; border-radius: 50%; background: #222; transition: all 0.4s var(--ease-out-expo); }
 
+        /* General Modal Overlays */
         .modal-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(14px);
@@ -126,13 +133,16 @@
         }
         .settings-card { width: 460px; padding: 24px; max-height: 85vh; overflow-y: auto; }
         
-        /* Script Hub Vercel Aesthetics */
+        /* =======================================================
+           NEXT.JS / VERCEL STYLE SCRIPT HUB INTERFACE CODES
+        ======================================================= */
         .scripthub-card { 
             width: 780px; height: 80vh; max-height: 680px; 
             padding: 28px; display: flex; flex-direction: column; gap: 20px; 
             position: relative; overflow: hidden;
         }
         
+        /* Subtle vector mesh glow map simulation inside the modal wrapper */
         .scripthub-card::before {
             content: ""; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
             width: 100%; height: 250px; background: radial-gradient(circle 200px at 50% -30px, var(--accent-glow), transparent 80%);
@@ -188,12 +198,14 @@
         .script-meta-metrics { display: flex; gap: 10px; font-size: 10px; font-family: var(--font-mono); color: #444; }
         .script-meta-metrics span span { color: #888; }
 
+        /* Preferences Configuration Elements */
         .setting-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; font-size: 12px; color: #aaa; gap: 16px; }
         .setting-label { display: flex; flex-direction: column; gap: 2px; }
         .setting-desc { font-size: 10px; color: var(--text-dim); }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .modal-title { font-size: 12px; font-weight: 800; letter-spacing: 1px; color: #fff; text-transform: uppercase; }
 
+        /* Form Components */
         .switch { position: relative; display: inline-block; width: 34px; height: 20px; flex-shrink: 0; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #222; border: 1px solid var(--border); border-radius: 20px; }
@@ -339,24 +351,28 @@
         let topmost = false;
         let activeHubFilter = "trending";
 
-        // Globalized message passing bridge
+        /* Safe PostMessage wrapper pipeline targeting IPC safely */
         function sendWebviewMessage(payload) {
             if (window.chrome && window.chrome.webview && typeof window.chrome.webview.postMessage === 'function') {
                 window.chrome.webview.postMessage(payload);
             } else {
-                console.warn("[IPC Bridge]: WebView2 pipeline not initialized yet.", payload);
+                console.warn("[IPC Bridge System Log Out]: WebView2 host channel object not yet linked.", payload);
             }
         }
 
+        /* Safe initialization listener setup hook */
         function initNativeIPCListeners() {
             if (window.chrome && window.chrome.webview && typeof window.chrome.webview.addEventListener === 'function') {
                 window.chrome.webview.addEventListener('message', handleBackendIPCMessage);
-                console.log("[IPC Bridge]: Event listener linked successfully.");
+                console.log("[IPC Bridge System Log Out]: Native link channel connected successfully.");
             } else {
-                setTimeout(initNativeIPCListeners, 50);
+                setTimeout(initNativeIPCListeners, 100);
             }
         }
 
+        /* =========================================
+           MONACO CODE EDITOR CONFIGURATION LOADOUT
+        ========================================= */
         require.config({ paths: { vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.0/min/vs" }});
         require(["vs/editor/editor.main"], function () {
             editor = monaco.editor.create(document.getElementById("editor"), {
@@ -374,13 +390,20 @@
             editor.onDidChangeModelContent(() => { save(); });
 
             const savedTheme = localStorage.getItem('obv_theme') || 'purple';
+            const themeSelect = document.getElementById('cfg-theme');
+            if (themeSelect) themeSelect.value = savedTheme;
             applyGlobalTheme(savedTheme);
 
             const savedWeather = localStorage.getItem('obv_weather') || 'matrix';
+            const weatherSelect = document.getElementById('cfg-weather');
+            if (weatherSelect) weatherSelect.value = savedWeather;
             setWeatherEffect(savedWeather);
 
-            if (document.getElementById('cfg-rpc-details')) document.getElementById('cfg-rpc-details').value = localStorage.getItem('obv_rpc_details') || "OblivionX Executor";
-            if (document.getElementById('cfg-rpc-state')) document.getElementById('cfg-rpc-state').value = localStorage.getItem('obv_rpc_state') || "Idle";
+            const rpcDetailsInput = document.getElementById('cfg-rpc-details');
+            if (rpcDetailsInput) rpcDetailsInput.value = localStorage.getItem('obv_rpc_details') || "OblivionX Executor";
+            
+            const rpcStateInput = document.getElementById('cfg-rpc-state');
+            if (rpcStateInput) rpcStateInput.value = localStorage.getItem('obv_rpc_state') || "Idle";
 
             renderTabs();
             initNativeIPCListeners();
@@ -400,13 +423,16 @@
             }
         }
 
-        window.SetText = function(text) {
+        function SetText(text) {
             if(editor) {
                 editor.setValue(text);
                 save();
             }
         }
 
+        /* =========================================
+           WORKSPACE TABS REGISTRY MANAGEMENT
+        ========================================= */
         function renderTabs(){
             const container = document.getElementById("tab-container");
             if (!container) return;
@@ -447,13 +473,15 @@
             save();
         }
 
-        /* Explicitly globalized actions for topbar access */
-        window.openScriptHub = function() {
+        /* =========================================
+           INTEGRATED NEXT-GEN SCRIPTBLOX HUD ENGINE
+        ========================================= */
+        function openScriptHub() {
             openModal('script-hub-modal');
             switchHubFilter('trending');
         }
 
-        window.switchHubFilter = function(mode) {
+        function switchHubFilter(mode) {
             activeHubFilter = mode;
             document.getElementById("hub-tab-trending").classList.toggle("active", mode === 'trending');
             document.getElementById("hub-tab-latest").classList.toggle("active", mode === 'latest');
@@ -463,8 +491,9 @@
             sendWebviewMessage({ action: "scriptblox_fetch_trending", filter: mode });
         }
 
-        window.triggerHubQuerySearch = function() {
-            const query = document.getElementById('hub-search-input').value.trim();
+        function triggerHubQuerySearch() {
+            const searchInput = document.getElementById('hub-search-input');
+            const query = searchInput ? searchInput.value.trim() : "";
             if(!query) {
                 switchHubFilter(activeHubFilter);
                 return;
@@ -476,7 +505,7 @@
             sendWebviewMessage({ action: "scriptblox_search", query: query });
         }
 
-        window.handleHubSearchKey = function(e) {
+        function handleHubSearchKey(e) {
             if(e.key === "Enter") triggerHubQuerySearch();
         }
 
@@ -492,9 +521,13 @@
             
             let scriptsArray = null;
             if (responseObj) {
-                if (responseObj.scripts && Array.isArray(responseObj.scripts)) scriptsArray = responseObj.scripts;
-                else if (responseObj.result && Array.isArray(responseObj.result)) scriptsArray = responseObj.result;
-                else if (responseObj.result && responseObj.result.scripts && Array.isArray(responseObj.result.scripts)) scriptsArray = responseObj.result.scripts;
+                if (responseObj.scripts && Array.isArray(responseObj.scripts)) {
+                    scriptsArray = responseObj.scripts;
+                } else if (responseObj.result && Array.isArray(responseObj.result)) {
+                    scriptsArray = responseObj.result;
+                } else if (responseObj.result && responseObj.result.scripts && Array.isArray(responseObj.result.scripts)) {
+                    scriptsArray = responseObj.result.scripts;
+                }
             }
 
             if(!scriptsArray || scriptsArray.length === 0) {
@@ -515,6 +548,7 @@
                 if(item.patched) badgesHtml += `<span class="script-badge patched">Patched</span>`;
 
                 let views = item.views || 0;
+                let likes = item.likeCount || 0;
                 let scriptId = item._id || item.id;
                 let cleanTitle = (item.title || "Unnamed Script").replace(/['"]/g, '`');
                 let gameName = item.game ? item.game.name : 'Universal';
@@ -527,9 +561,9 @@
                         </div>
                         <div class="script-desc">${item.features || 'No parameters attached to this node.'}</div>
                     </div>
-                    <div class="script-card-footer">
+                    <div class="script-card-item-footer script-card-footer">
                         <div class="script-meta-metrics">
-                            <span>G//<span>${gameName.substring(0,14)}${gameName.length > 14 ? '...' : ''}</span></span>
+                            <span>G//<span>${gameName.substring(0,18)}${gameName.length > 18 ? '...' : ''}</span></span>
                             <span>V//<span>${views}</span></span>
                         </div>
                         <button class="icon-btn" style="border-color:var(--border); font-size:11px; padding:4px 10px; color:#fff;" onclick="requestRawScript('${scriptId}', '${cleanTitle}')">Load Code</button>
@@ -539,7 +573,7 @@
             });
         }
 
-        window.requestRawScript = function(scriptId, cleanTitle) {
+        function requestRawScript(scriptId, cleanTitle) {
             updateHubStatus(`STREAM_CODE`);
             sendWebviewMessage({ action: "scriptblox_get_raw", id: scriptId, title: cleanTitle });
         }
@@ -551,17 +585,23 @@
             createNewTab(workspaceTitle, rawCode);
         }
 
-        window.openModal = function(id) { 
+        /* =========================================
+           MODAL CONTROL MATRIX WINDOW DRIVERS
+        ========================================= */
+        function openModal(id) { 
             const el = document.getElementById(id);
             if(el) el.style.display = 'flex'; 
         }
-        window.closeModal = function(id) { 
+        function closeModal(id) { 
             const el = document.getElementById(id);
             if(el) el.style.display = 'none'; 
         }
-        window.closeModalOnOuter = function(e, id) { if(e.target.id === id) closeModal(id); }
+        function closeModalOnOuter(e, id) { if(e.target.id === id) closeModal(id); }
 
-        window.applyGlobalTheme = function(name) {
+        /* =========================================
+            BRIDGE WEBVIEW CHANNEL PROTOCOLS
+        ========================================= */
+        function applyGlobalTheme(name) {
             document.body.className = `theme-${name}`;
             localStorage.setItem('obv_theme', name);
             setTimeout(() => {
@@ -578,44 +618,43 @@
             sendWebviewMessage({ action: "theme", value: name });
         }
 
-        window.pushConfigUpdate = function() {
+        function pushConfigUpdate() {
             const cbDiscord = document.getElementById('cfg-discord');
             const cbAttach = document.getElementById('cfg-attach');
             const cbExecute = document.getElementById('cfg-execute');
             const cbTopmost = document.getElementById('cfg-topmost');
+
             const isRpcOn = cbDiscord ? cbDiscord.checked : true;
             
-            if (document.getElementById('rpc-details-row')) document.getElementById('rpc-details-row').style.opacity = isRpcOn ? "1" : "0.4";
-            if (document.getElementById('rpc-state-row')) document.getElementById('rpc-state-row').style.opacity = isRpcOn ? "1" : "0.4";
+            const rowDetails = document.getElementById('rpc-details-row');
+            if (rowDetails) {
+                rowDetails.style.opacity = isRpcOn ? "1" : "0.4";
+                rowDetails.style.pointerEvents = isRpcOn ? "all" : "none";
+            }
+            const rowState = document.getElementById('rpc-state-row');
+            if (rowState) {
+                rowState.style.opacity = isRpcOn ? "1" : "0.4";
+                rowState.style.pointerEvents = isRpcOn ? "all" : "none";
+            }
 
-            sendWebviewMessage({
-                action: "update_config",
-                settings: {
-                    discordRpc: isRpcOn,
-                    autoAttach: cbAttach ? cbAttach.checked : false,
-                    autoExecute: cbExecute ? cbExecute.checked : false,
-                    alwaysOnTop: cbTopmost ? cbTopmost.checked : false
-                }
-            });
+            const settings = {
+                discordRpc: isRpcOn,
+                autoAttach: cbAttach ? cbAttach.checked : false,
+                autoExecute: cbExecute ? cbExecute.checked : false,
+                alwaysOnTop: cbTopmost ? cbTopmost.checked : false
+            };
+            sendWebviewMessage({ action: "update_config", settings });
             pushRpcMessageUpdate();
         }
 
-        window.pushRpcMessageUpdate = function() {
-            const d = document.getElementById('cfg-rpc-details')?.value || "OblivionX Executor";
-            const s = document.getElementById('cfg-rpc-state')?.value || "Idle";
+        function pushRpcMessageUpdate() {
+            const dInput = document.getElementById('cfg-rpc-details');
+            const sInput = document.getElementById('cfg-rpc-state');
+            const d = dInput ? dInput.value : "OblivionX Executor";
+            const s = sInput ? sInput.value : "Idle";
             localStorage.setItem('obv_rpc_details', d);
             localStorage.setItem('obv_rpc_state', s);
-            sendWebviewMessage({ action: 'update_rpc_details', details: d, state: s });
-        }
-
-        window.loadExecutorSettings = function(cfg) {
-            if(document.getElementById('cfg-discord')) document.getElementById('cfg-discord').checked = cfg.discordRpc;
-            if(document.getElementById('cfg-attach')) document.getElementById('cfg-attach').checked = cfg.autoAttach;
-            if(document.getElementById('cfg-execute')) document.getElementById('cfg-execute').checked = cfg.autoExecute;
-            if(document.getElementById('cfg-topmost')) document.getElementById('cfg-topmost').checked = cfg.alwaysOnTop;
-            topmost = cfg.alwaysOnTop;
-            if (document.getElementById('rpc-details-row')) document.getElementById('rpc-details-row').style.opacity = cfg.discordRpc ? "1" : "0.4";
-            if (document.getElementById('rpc-state-row')) document.getElementById('rpc-state-row').style.opacity = cfg.discordRpc ? "1" : "0.4";
+            sendWebviewMessage({ action: 'update_rpc_details', details: d || "OblivionX", state: s || "Idle" });
         }
 
         function updateStatusUI(mode, pid = null) {
@@ -639,26 +678,56 @@
             }
         }
 
-        window.toggleTopMost = function(){
+        function loadExecutorSettings(cfg) {
+            const cbDiscord = document.getElementById('cfg-discord');
+            const cbAttach = document.getElementById('cfg-attach');
+            const cbExecute = document.getElementById('cfg-execute');
+            const cbTopmost = document.getElementById('cfg-topmost');
+
+            if(cbDiscord) cbDiscord.checked = cfg.discordRpc;
+            if(cbAttach) cbAttach.checked = cfg.autoAttach;
+            if(cbExecute) cbExecute.checked = cfg.autoExecute;
+            if(cbTopmost) cbTopmost.checked = cfg.alwaysOnTop;
+            topmost = cfg.alwaysOnTop;
+            
+            const isRpcOn = cfg.discordRpc;
+            const rowDetails = document.getElementById('rpc-details-row');
+            if (rowDetails) {
+                rowDetails.style.opacity = isRpcOn ? "1" : "0.4";
+                rowDetails.style.pointerEvents = isRpcOn ? "all" : "none";
+            }
+            const rowState = document.getElementById('rpc-state-row');
+            if (rowState) {
+                rowState.style.opacity = isRpcOn ? "1" : "0.4";
+                rowState.style.pointerEvents = isRpcOn ? "all" : "none";
+            }
+        }
+
+        function toggleTopMost(){
             topmost = !topmost;
-            if(document.getElementById('cfg-topmost')) document.getElementById('cfg-topmost').checked = topmost;
+            const cbTopmost = document.getElementById('cfg-topmost');
+            if(cbTopmost) cbTopmost.checked = topmost;
             sendWebviewMessage({ action: "set_always_on_top", value: topmost });
         }
 
-        window.minimize = function(){ sendWebviewMessage({ action: "minimize" }); }
-        window.closeApp = function(){ sendWebviewMessage({ action: "exit" }); }
+        function minimize(){ sendWebviewMessage({ action: "minimize" }); }
+        function closeApp(){ sendWebviewMessage({ action: "exit" }); }
 
+        /* Unified central message handler hooked up after channel verification */
         function handleBackendIPCMessage(event) {
-            try {
-                const msg = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
-                if(msg.action === "pid_update") updateStatusUI('attached', msg.pid);
-                if(msg.action === "clear_pid") updateStatusUI('idle');
-                if(msg.action === "injection_failed") updateStatusUI('failed');
-                if(msg.action === "scriptblox_render_results") populateScriptHubCatalog(msg.data);
-                if(msg.action === "scriptblox_deliver_raw") injectRawScriptIntoEditor(msg.title, msg.rawCode);
-                if(msg.action === "scriptblox_error") updateHubStatus("STREAM_FAULT");
-            } catch(e) {
-                console.error("[IPC Parse Error]", e);
+            const msg = event.data;
+            if(msg.action === "pid_update") updateStatusUI('attached', msg.pid);
+            if(msg.action === "clear_pid") updateStatusUI('idle');
+            if(msg.action === "injection_failed") updateStatusUI('failed');
+            
+            if(msg.action === "scriptblox_render_results") {
+                populateScriptHubCatalog(msg.data);
+            }
+            if(msg.action === "scriptblox_deliver_raw") {
+                injectRawScriptIntoEditor(msg.title, msg.rawCode);
+            }
+            if(msg.action === "scriptblox_error") {
+                updateHubStatus("STREAM_FAULT");
             }
         }
 
@@ -673,9 +742,13 @@
             }
         });
 
+        /* =========================================
+           PROCEDURAL VISUAL BACKGROUND ATMOSPHERE CANVAS
+        ========================================= */
         const canvas = document.getElementById('weather-canvas');
         const ctx = canvas.getContext('2d');
-        let animationId, weatherMode = 'matrix';
+        let animationId;
+        let weatherMode = 'matrix';
 
         function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
         window.addEventListener('resize', resizeCanvas);
@@ -691,10 +764,11 @@
             else if(mode === 'rain' || mode === 'snow') { for(let i=0; i<120; i++) environmentDrops.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, speed: 4 + Math.random()*6, size: 1 + Math.random()*3 }); }
         }
 
-        window.setWeatherEffect = function(mode) {
+        function setWeatherEffect(mode) {
             weatherMode = mode;
             localStorage.setItem('obv_weather', mode);
-            if(document.getElementById('cfg-weather')) document.getElementById('cfg-weather').value = mode;
+            const weatherSelect = document.getElementById('cfg-weather');
+            if(weatherSelect) weatherSelect.value = mode;
             cancelAnimationFrame(animationId);
             if(mode !== 'none') { initWeather(mode); renderWeatherLoop(); } else { ctx.clearRect(0,0, canvas.width, canvas.height); }
             sendWebviewMessage({ action: 'set_weather', weather: mode });
