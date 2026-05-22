@@ -13,7 +13,7 @@
             --text-main: #ffffff;
             --text-dim: #666666;
             --tab-active: #111111;
-            --modal-bg: rgba(10, 10, 12, 0.93);
+            --modal-bg: rgba(10, 10, 12, 0.95);
             --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
             --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -124,6 +124,35 @@
             animation: fadeIn 0.4s var(--ease-out-expo) forwards;
         }
         .settings-card { width: 460px; padding: 24px; max-height: 85vh; overflow-y: auto; }
+        
+        /* Expanded Script Hub Catalog Card Layout */
+        .scripthub-card { width: 680px; padding: 24px; max-height: 85vh; display: flex; flex-direction: column; gap: 16px; }
+        .hub-search-bar { display: flex; gap: 8px; width: 100%; }
+        .hub-search-input { flex: 1; background: #09090b; border: 1px solid var(--border); border-radius: 8px; color: #fff; padding: 10px 14px; font-size: 12px; }
+        .hub-catalog-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 4px; max-height: 50vh; }
+        
+        /* Custom Scrollbar for Hub Catalog List */
+        .hub-catalog-list::-webkit-scrollbar { width: 4px; }
+        .hub-catalog-list::-webkit-scrollbar-track { background: transparent; }
+        .hub-catalog-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+        .hub-catalog-list::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+        .script-card-item {
+            background: rgba(255, 255, 255, 0.01); border: 1px solid var(--border);
+            border-radius: 10px; padding: 14px; display: flex; align-items: center; justify-content: space-between; gap: 16px;
+        }
+        .script-card-item:hover { border-color: rgba(255, 255, 255, 0.15); background: rgba(255, 255, 255, 0.02); }
+        .script-info { display: flex; flex-direction: column; gap: 4px; }
+        .script-title-row { display: flex; align-items: center; gap: 8px; }
+        .script-title { font-size: 13px; font-weight: 700; color: #fff; }
+        .script-badge { font-size: 9px; font-weight: 800; text-transform: uppercase; padding: 2px 6px; border-radius: 4px; background: rgba(255,255,255,0.05); color: var(--text-dim); }
+        .script-badge.universal { background: rgba(140, 90, 255, 0.15); color: #b392ff; }
+        .script-badge.verified { background: rgba(0, 209, 255, 0.15); color: #66e3ff; }
+        .script-badge.patched { background: rgba(255, 49, 49, 0.15); color: #ff7e7e; }
+        .script-desc { font-size: 11px; color: var(--text-dim); line-height: 14px; max-width: 440px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+        .script-meta-metrics { display: flex; gap: 12px; font-size: 10px; color: #444; font-weight: 600; }
+        .script-meta-metrics span span { color: var(--text-dim); }
+
         .setting-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; font-size: 12px; color: #aaa; gap: 16px; }
         .setting-label { display: flex; flex-direction: column; gap: 2px; }
         .setting-desc { font-size: 10px; color: var(--text-dim); }
@@ -153,7 +182,7 @@
             </div>
             
             <div class="header-actions">
-                <button class="icon-btn" onclick="openModal('script-hub-modal')">
+                <button class="icon-btn" onclick="openScriptHub()">
                     <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>Script Hub
                 </button>
                 <button class="icon-btn" onclick="openModal('settings-modal')">
@@ -236,22 +265,25 @@
     </div>
 
     <div id="script-hub-modal" class="modal-overlay" onclick="closeModalOnOuter(event, 'script-hub-modal')">
-        <div class="modal-card settings-card">
-            <div class="modal-header">
-                <div class="modal-title">Cloud Script Catalog</div>
-                <span style="cursor:pointer; color:var(--text-dim);" onclick="closeModal('script-hub-modal')">×</span>
+        <div class="modal-card scripthub-card">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div style="font-size:14px; font-weight:800; letter-spacing:1px; color:#fff;">SCRIPTBLOX HUB ENGINE</div>
+                <span style="cursor:pointer; color:var(--text-dim); font-size:20px;" onclick="closeModal('script-hub-modal')">×</span>
             </div>
-            <div class="setting-row" style="border-bottom:1px solid var(--border); padding-bottom:10px;">
-                <div class="setting-label"><span>Dex Explorer v4</span><span class="setting-desc">Advanced runtime workspace instance tree mapping tool</span></div>
-                <button class="icon-btn" onclick="loadCloudScript('Dex')">Load Suite</button>
+            
+            <div class="hub-search-bar">
+                <input type="text" id="hub-search-input" class="hub-search-input" placeholder="Search across millions of global scripts..." onkeydown="handleHubSearchKey(event)">
+                <button class="icon-btn" style="padding:0 20px; border-color:var(--accent); color:#fff; font-weight:700;" onclick="triggerHubQuerySearch()">Search</button>
+                <button class="icon-btn" style="padding:0 14px;" onclick="loadTrendingScripts()" title="Refresh Trending">
+                    <svg viewBox="0 0 24 24"><path d="M23 6l-9.5 9.5-5-5L1 18"/><path d="M17 6h6v6"/></svg>
+                </button>
             </div>
-            <div class="setting-row" style="border-bottom:1px solid var(--border); padding-bottom:10px;">
-                <div class="setting-label"><span>Infinite Yield Live</span><span class="setting-desc">The ultimate command administration terminal utility</span></div>
-                <button class="icon-btn" onclick="loadCloudScript('InfYield')">Load Suite</button>
-            </div>
-            <div class="setting-row">
-                <div class="setting-label"><span>Remote Spy Pro</span><span class="setting-desc">Intercept and track active network security pipeline RemoteEvents</span></div>
-                <button class="icon-btn" onclick="loadCloudScript('RSpy')">Load Suite</button>
+
+            <div id="hub-catalog-status" style="font-size:11px; color:var(--accent); font-weight:600;">Loading live matrix assets...</div>
+            <div id="hub-catalog-list" class="hub-catalog-list"></div>
+            
+            <div style="font-size:9px; color:#333; text-transform:uppercase; font-weight:700; letter-spacing:0.5px; text-align:center;">
+                Powered by ScriptBlox.com
             </div>
         </div>
     </div>
@@ -340,10 +372,10 @@
             renderTabs();
         }
 
-        function createNewTab() {
+        function createNewTab(title = null, initialContent = "") {
             save();
-            let n = "script_" + (Object.keys(files).length + 1) + ".lua";
-            files[n] = "-- New Workbook Frame\n";
+            let n = title || "script_" + (Object.keys(files).length + 1) + ".lua";
+            files[n] = initialContent || "-- New Workbook Frame\n";
             current = n;
             renderTabs();
             editor.setValue(files[n]);
@@ -359,11 +391,96 @@
             save();
         }
 
-        function loadCloudScript(scriptId) {
+        /* =========================================
+           SCRIPTBLOX ENGINE API ARCHITECTURE INTERACTOR
+        ========================================= */
+        function openScriptHub() {
+            openModal('script-hub-modal');
+            loadTrendingScripts();
+        }
+
+        function loadTrendingScripts() {
+            updateHubStatus("Fetching trending catalog array...");
+            window.chrome?.webview.postMessage({ action: "scriptblox_fetch_trending" });
+        }
+
+        function triggerHubQuerySearch() {
+            const query = document.getElementById('hub-search-input').value.trim();
+            if(!query) {
+                loadTrendingScripts();
+                return;
+            }
+            updateHubStatus(`Searching for: "${query}"...`);
+            window.chrome?.webview.postMessage({ action: "scriptblox_search", query: query });
+        }
+
+        function handleHubSearchKey(e) {
+            if(e.key === "Enter") triggerHubQuerySearch();
+        }
+
+        function updateHubStatus(text) {
+            document.getElementById('hub-catalog-status').innerText = text;
+        }
+
+        // Triggered by Backend IPC pipeline events when API records return
+        window.populateScriptHubCatalog = function(responseObj) {
+            const listContainer = document.getElementById('hub-catalog-list');
+            listContainer.innerHTML = "";
+            
+            if(!responseObj || !responseObj.result || !responseObj.result.scripts || responseObj.result.scripts.length === 0) {
+                updateHubStatus("No matching script profiles found.");
+                return;
+            }
+
+            const total = responseObj.result.scripts.length;
+            updateHubStatus(`Populated ${total} script structures.`);
+
+            responseObj.result.scripts.forEach(item => {
+                let card = document.createElement('div');
+                card.className = "script-card-item";
+
+                let badgesHtml = "";
+                if(item.universal) badgesHtml += `<span class="script-badge universal">Universal</span> `;
+                if(item.verified) badgesHtml += `<span class="script-badge verified">Verified</span> `;
+                if(item.patched) badgesHtml += `<span class="script-badge patched">Patched</span> `;
+                if(item.mode === 'paid') badgesHtml += `<span class="script-badge" style="background:rgba(254,226,39,0.1); color:#fee227;">Paid</span> `;
+
+                let views = item.views || 0;
+                let likes = item.likeCount || 0;
+                let scriptId = item._id || item.id;
+                let cleanTitle = (item.title || "Unnamed Script").replace(/['"]/g, '`');
+
+                card.innerHTML = `
+                    <div class="script-info">
+                        <div class="script-title-row">
+                            <span class="script-title">${item.title || 'Unnamed Script'}</span>
+                            ${badgesHtml}
+                        </div>
+                        <div class="script-desc">${item.features || 'No additional parameters provided.'}</div>
+                        <div class="script-meta-metrics">
+                            <span>Game: <span style="color:#fff;">${item.game ? item.game.name : 'Universal'}</span></span>
+                            <span>Views: <span>${views}</span></span>
+                            <span>Likes: <span>${likes}</span></span>
+                        </div>
+                    </div>
+                    <button class="icon-btn" style="border-color:var(--accent); font-weight:700; color:#fff;" onclick="requestRawScript('${scriptId}', '${cleanTitle}')">Load Code</button>
+                `;
+                listContainer.appendChild(card);
+            });
+        }
+
+        function requestRawScript(scriptId, cleanTitle) {
+            updateHubStatus(`Streaming raw string for: ${cleanTitle}...`);
+            window.chrome?.webview.postMessage({ action: "scriptblox_get_raw", id: scriptId, title: cleanTitle });
+        }
+
+        window.injectRawScriptIntoEditor = function(slugTitle, rawCode) {
             closeModal('script-hub-modal');
-            if(scriptId === 'Dex') SetText(`-- Asset Load: Dex Explorer v4\nloadstring(game:HttpGet("https://raw.githubusercontent.com/infyield/Dex/master/main.lua"))()`);
-            if(scriptId === 'InfYield') SetText(`-- Asset Load: Infinite Yield Live\nloadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()`);
-            if(scriptId === 'RSpy') SetText(`-- Asset Load: Remote Spy Pro\nloadstring(game:HttpGet("https://raw.githubusercontent.com/ex-7/RemoteSpy/main/source.lua"))()`);
+            let workspaceTitle = slugTitle.toLowerCase().replace(/\s+/g, '_') + ".lua";
+            // Ensure single extensions
+            if(!workspaceTitle.endsWith(".lua")) workspaceTitle += ".lua";
+            
+            createNewTab(workspaceTitle, rawCode);
         }
 
         /* =========================================
@@ -446,36 +563,18 @@
             if(msg.action === "pid_update") updateStatusGlow('attached', msg.pid);
             if(msg.action === "clear_pid") updateStatusGlow('idle');
             if(msg.action === "injection_failed") updateStatusGlow('failed');
-        });
-
-        function updateStatusGlow(state, info = null) {
-            const bottomGlow = document.getElementById('status-glow');
-            const topDot = document.getElementById('top-attach-dot');
-            const textLabel = document.getElementById('status-text');
             
-            topDot.classList.remove('active', 'failed');
-            textLabel.classList.remove('active', 'failed');
-
-            if(state === 'attached') {
-                bottomGlow.style.background = 'var(--accent)';
-                bottomGlow.style.boxShadow = '0 0 10px var(--accent)';
-                topDot.classList.add('active');
-                textLabel.classList.add('active');
-                textLabel.innerText = info ? `Attached (PID: ${info})` : "Attached";
-            } 
-            else if(state === 'failed') {
-                bottomGlow.style.background = '#ef4444';
-                bottomGlow.style.boxShadow = '0 0 10px #ef4444';
-                topDot.classList.add('failed');
-                textLabel.classList.add('failed');
-                textLabel.innerText = "Attach Error";
+            // Handle arriving asynchronous multi-threaded script catalog lookups from C#
+            if(msg.action === "scriptblox_render_results") {
+                populateScriptHubCatalog(msg.data);
             }
-            else {
-                bottomGlow.style.background = '#222';
-                bottomGlow.style.boxShadow = 'none';
-                textLabel.innerText = "Not Attached";
+            if(msg.action === "scriptblox_deliver_raw") {
+                injectRawScriptIntoEditor(msg.title, msg.rawCode);
             }
-        }
+            if(msg.action === "scriptblox_error") {
+                updateHubStatus("Engine sync error: " + msg.message);
+            }
+        });
 
         document.getElementById("cli").addEventListener("keydown", e => {
             if(e.key === "Enter"){
