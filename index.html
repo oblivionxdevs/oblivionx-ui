@@ -81,11 +81,17 @@
         }
         .icon-btn:hover { color: var(--text-main); border-color: var(--accent); background: rgba(255,255,255,0.02); }
         
-        /* Forces standard geometric rendering constraints on all lucide svgs */
-        .icon-btn .lucide, .icon-btn svg, .window-control-btn .lucide, .window-control-btn svg { 
+        /* Layout configuration for all compiled icon svgs */
+        .icon-btn svg, .window-control-btn svg, .modal-close-trigger svg { 
             width: 14px !important; 
             height: 14px !important; 
             display: inline-block;
+            vertical-align: middle;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
         }
 
         .window-control-btn {
@@ -206,7 +212,7 @@
             background: transparent; border: none; padding: 4px; border-radius: 6px;
         }
         .modal-close-trigger:hover { color: var(--text-main); background: rgba(255, 255, 255, 0.04); }
-        .modal-close-trigger .lucide { width: 16px !important; height: 16px !important; }
+        .modal-close-trigger svg { width: 16px !important; height: 16px !important; }
 
         .switch { position: relative; display: inline-block; width: 34px; height: 20px; flex-shrink: 0; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -233,16 +239,16 @@
             
             <div class="header-actions">
                 <button class="icon-btn" onclick="openScriptHub()">
-                    <i data-lucide="layers"></i>Script Hub
+                    <span class="custom-icon" data-icon="layers"></span>Script Hub
                 </button>
                 <button class="icon-btn" onclick="openModal('settings-modal')">
-                    <i data-lucide="settings"></i>Settings
+                    <span class="custom-icon" data-icon="settings"></span>Settings
                 </button>
                 <button class="window-control-btn" onclick="minimize()">
-                    <i data-lucide="minus"></i>
+                    <span class="custom-icon" data-icon="minus"></span>
                 </button>
                 <button class="window-control-btn close-btn" onclick="closeApp()">
-                    <i data-lucide="x"></i>
+                    <span class="custom-icon" data-icon="x"></span>
                 </button>
             </div>
         </div>
@@ -268,7 +274,7 @@
             <div class="modal-header">
                 <div class="modal-title">Preferences Matrix</div>
                 <button class="modal-close-trigger" onclick="closeModal('settings-modal')">
-                    <i data-lucide="x"></i>
+                    <span class="custom-icon" data-icon="x"></span>
                 </button>
             </div>
             <div class="setting-row">
@@ -326,7 +332,7 @@
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                     <div class="hub-title">OBLIVIONX // SCRIPTHUB</div>
                     <button class="modal-close-trigger" onclick="closeModal('script-hub-modal')">
-                        <i data-lucide="x"></i>
+                        <span class="custom-icon" data-icon="x"></span>
                     </button>
                 </div>
                 <div class="hub-subtitle">Access millions of globally pooled game assets directly synced through network pipelines.</div>
@@ -354,8 +360,24 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.0/min/vs/loader.min.js"></script>
-    <script src="https://unpkg.com/lucide"></script>
     <script>
+        // Inline Embedded Offline Vector Dictionary Map (Replaces external Lucide dependencies)
+        const VectorDictionary = {
+            minus: `<svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line></svg>`,
+            x: `<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`,
+            settings: `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>`,
+            layers: `<svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`
+        };
+
+        function renderApplicationIcons() {
+            document.querySelectorAll('[data-icon]').forEach(element => {
+                const iconName = element.getAttribute('data-icon');
+                if (VectorDictionary[iconName]) {
+                    element.innerHTML = VectorDictionary[iconName];
+                }
+            });
+        }
+
         let editor;
         let files = JSON.parse(localStorage.getItem('obv_fs')) || { "main.lua": "-- Workspace Active\nprint('OblivionX Engine Pro Ready.')" };
         let current = "main.lua";
@@ -408,8 +430,8 @@
             initNativeIPCListeners();
             sendWebviewMessage({ action: "request_settings" });
             
-            // Render visible icons on load
-            if (window.lucide) lucide.createIcons();
+            // Build visual elements instantly
+            renderApplicationIcons();
         });
 
         function save(){
@@ -577,11 +599,7 @@
 
         window.openModal = function(id) { 
             const el = document.getElementById(id);
-            if(el) {
-                el.style.display = 'flex';
-                // Force a DOM parse directly when the structural box opens
-                if (window.lucide) lucide.createIcons();
-            }
+            if(el) el.style.display = 'flex';
         }
         window.closeModal = function(id) { 
             const el = document.getElementById(id);
