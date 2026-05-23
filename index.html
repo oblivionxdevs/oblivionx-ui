@@ -81,7 +81,6 @@
         }
         .icon-btn:hover { color: var(--text-main); border-color: var(--accent); background: rgba(255,255,255,0.02); }
         
-        /* Layout configuration for all compiled icon svgs */
         .icon-btn svg, .window-control-btn svg, .modal-close-trigger svg { 
             width: 14px !important; 
             height: 14px !important; 
@@ -367,7 +366,6 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.0/min/vs/loader.min.js"></script>
     <script>
-        // Inline Embedded Offline Vector Dictionary Map (Replaces external Lucide dependencies)
         const VectorDictionary = {
             minus: `<svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line></svg>`,
             x: `<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`,
@@ -423,20 +421,32 @@
 
             editor.onDidChangeModelContent(() => { save(); });
 
+            // Restore persistent structural settings
             const savedTheme = localStorage.getItem('obv_theme') || 'purple';
             applyGlobalTheme(savedTheme);
 
             const savedWeather = localStorage.getItem('obv_weather') || 'matrix';
             setWeatherEffect(savedWeather);
 
+            // Synchronize and restore setting checkboxes directly from localStorage mapping layer
+            if (document.getElementById('cfg-discord')) document.getElementById('cfg-discord').checked = (localStorage.getItem('obv_cfg_discord') !== 'false');
+            if (document.getElementById('cfg-attach')) document.getElementById('cfg-attach').checked = (localStorage.getItem('obv_cfg_attach') === 'true');
+            if (document.getElementById('cfg-execute')) document.getElementById('cfg-execute').checked = (localStorage.getItem('obv_cfg_execute') === 'true');
+            if (document.getElementById('cfg-topmost')) {
+                const isTopmost = (localStorage.getItem('obv_cfg_topmost') === 'true');
+                document.getElementById('cfg-topmost').checked = isTopmost;
+                topmost = isTopmost;
+            }
+
             if (document.getElementById('cfg-rpc-details')) document.getElementById('cfg-rpc-details').value = localStorage.getItem('obv_rpc_details') || "OblivionX Executor";
             if (document.getElementById('cfg-rpc-state')) document.getElementById('cfg-rpc-state').value = localStorage.getItem('obv_rpc_state') || "Idle";
 
             renderTabs();
             initNativeIPCListeners();
-            sendWebviewMessage({ action: "request_settings" });
             
-            // Build visual elements instantly
+            // Push active cached settings down to C# CefSharp/WebView2 layer handlers instantly
+            setTimeout(() => { pushConfigUpdate(); }, 200);
+            
             renderApplicationIcons();
         });
 
@@ -502,7 +512,7 @@
 
         window.openScriptHub = function() {
             openModal('script-hub-modal');
-            switchHubFilter('trending');
+            switchHubFilter(activeHubFilter || 'trending');
         }
 
         window.switchHubFilter = function(mode) {
@@ -542,11 +552,15 @@
             if (!listContainer) return;
             listContainer.innerHTML = "";
             
+            // Comprehensive structural payload unpacking matching nested json arrays
             let scriptsArray = null;
             if (responseObj) {
-                if (responseObj.scripts && Array.isArray(responseObj.scripts)) scriptsArray = responseObj.scripts;
+                if (Array.isArray(responseObj)) scriptsArray = responseObj;
+                else if (responseObj.scripts && Array.isArray(responseObj.scripts)) scriptsArray = responseObj.scripts;
                 else if (responseObj.result && Array.isArray(responseObj.result)) scriptsArray = responseObj.result;
                 else if (responseObj.result && responseObj.result.scripts && Array.isArray(responseObj.result.scripts)) scriptsArray = responseObj.result.scripts;
+                else if (responseObj.data && Array.isArray(responseObj.data)) scriptsArray = responseObj.data;
+                else if (responseObj.data && responseObj.data.scripts && Array.isArray(responseObj.data.scripts)) scriptsArray = responseObj.data.scripts;
             }
 
             if(!scriptsArray || scriptsArray.length === 0) {
@@ -558,6 +572,7 @@
             updateHubStatus(`RENDERED_${scriptsArray.length}_ASSETS`);
 
             scriptsArray.forEach(item => {
+                if (!item) return;
                 let card = document.createElement('div');
                 card.className = "script-card-item";
 
@@ -567,17 +582,22 @@
                 if(item.patched) badgesHtml += `<span class="script-badge patched">Patched</span>`;
 
                 let views = item.views || 0;
-                let scriptId = item._id || item.id;
-                let cleanTitle = (item.title || "Unnamed Script").replace(/['"]/g, '`');
-                let gameName = item.game ? item.game.name : 'Universal';
+                let scriptId = item._id || item.id || "";
+                
+                // Safe string cleaning layer prevents template injection breaking Javascript layout engine loops
+                let rawTitle = item.title || "Unnamed Script";
+                let cleanTitle = rawTitle.replace(/['"`\\]/g, ' ');
+                let gameName = item.game ? (item.game.name || 'Universal') : 'Universal';
+                let featuresText = item.features || item.description || 'No parameters attached to this node.';
+                let cleanFeatures = featuresText.replace(/['"`\\]/g, ' ');
 
                 card.innerHTML = `
                     <div class="script-info">
                         <div class="script-title-row">
-                            <span class="script-title">${item.title || 'Unnamed Script'}</span>
+                            <span class="script-title">${rawTitle}</span>
                             <div class="badge-layout-row">${badgesHtml}</div>
                         </div>
-                        <div class="script-desc">${item.features || 'No parameters attached to this node.'}</div>
+                        <div class="script-desc">${cleanFeatures}</div>
                     </div>
                     <div class="script-card-footer">
                         <div class="script-meta-metrics">
@@ -616,6 +636,7 @@
         window.applyGlobalTheme = function(name) {
             document.body.className = `theme-${name}`;
             localStorage.setItem('obv_theme', name);
+            if (document.getElementById('cfg-theme')) document.getElementById('cfg-theme').value = name;
             setTimeout(() => {
                 const accent = getComputedStyle(document.body).getPropertyValue('--accent').trim();
                 const bg = getComputedStyle(document.body).getPropertyValue('--bg').trim();
@@ -635,7 +656,18 @@
             const cbAttach = document.getElementById('cfg-attach');
             const cbExecute = document.getElementById('cfg-execute');
             const cbTopmost = document.getElementById('cfg-topmost');
+            
             const isRpcOn = cbDiscord ? cbDiscord.checked : true;
+            const isAttachOn = cbAttach ? cbAttach.checked : false;
+            const isExecuteOn = cbExecute ? cbExecute.checked : false;
+            const isTopmostOn = cbTopmost ? cbTopmost.checked : false;
+            
+            // Force save settings into local persistent key values
+            localStorage.setItem('obv_cfg_discord', isRpcOn);
+            localStorage.setItem('obv_cfg_attach', isAttachOn);
+            localStorage.setItem('obv_cfg_execute', isExecuteOn);
+            localStorage.setItem('obv_cfg_topmost', isTopmostOn);
+            topmost = isTopmostOn;
             
             if (document.getElementById('rpc-details-row')) document.getElementById('rpc-details-row').style.opacity = isRpcOn ? "1" : "0.4";
             if (document.getElementById('rpc-state-row')) document.getElementById('rpc-state-row').style.opacity = isRpcOn ? "1" : "0.4";
@@ -644,9 +676,9 @@
                 action: "update_config",
                 settings: {
                     discordRpc: isRpcOn,
-                    autoAttach: cbAttach ? cbAttach.checked : false,
-                    autoExecute: cbExecute ? cbExecute.checked : false,
-                    alwaysOnTop: cbTopmost ? cbTopmost.checked : false
+                    autoAttach: isAttachOn,
+                    autoExecute: isExecuteOn,
+                    alwaysOnTop: isTopmostOn
                 }
             });
             pushRpcMessageUpdate();
@@ -661,13 +693,15 @@
         }
 
         window.loadExecutorSettings = function(cfg) {
-            if(document.getElementById('cfg-discord')) document.getElementById('cfg-discord').checked = cfg.discordRpc;
-            if(document.getElementById('cfg-attach')) document.getElementById('cfg-attach').checked = cfg.autoAttach;
-            if(document.getElementById('cfg-execute')) document.getElementById('cfg-execute').checked = cfg.autoExecute;
-            if(document.getElementById('cfg-topmost')) document.getElementById('cfg-topmost').checked = cfg.alwaysOnTop;
-            topmost = cfg.alwaysOnTop;
-            if (document.getElementById('rpc-details-row')) document.getElementById('rpc-details-row').style.opacity = cfg.discordRpc ? "1" : "0.4";
-            if (document.getElementById('rpc-state-row')) document.getElementById('rpc-state-row').style.opacity = cfg.discordRpc ? "1" : "0.4";
+            // Backup validation mapping logic for handling incoming C# configuration overrides directly
+            if (cfg) {
+                if(document.getElementById('cfg-discord')) document.getElementById('cfg-discord').checked = cfg.discordRpc;
+                if(document.getElementById('cfg-attach')) document.getElementById('cfg-attach').checked = cfg.autoAttach;
+                if(document.getElementById('cfg-execute')) document.getElementById('cfg-execute').checked = cfg.autoExecute;
+                if(document.getElementById('cfg-topmost')) document.getElementById('cfg-topmost').checked = cfg.alwaysOnTop;
+                topmost = cfg.alwaysOnTop;
+                pushConfigUpdate();
+            }
         }
 
         function updateStatusUI(mode, pid = null) {
@@ -694,7 +728,7 @@
         window.toggleTopMost = function(){
             topmost = !topmost;
             if(document.getElementById('cfg-topmost')) document.getElementById('cfg-topmost').checked = topmost;
-            sendWebviewMessage({ action: "set_always_on_top", value: topmost });
+            pushConfigUpdate();
         }
 
         window.minimize = function(){ sendWebviewMessage({ action: "minimize" }); }
@@ -703,6 +737,8 @@
         function handleBackendIPCMessage(event) {
             try {
                 const msg = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+                if(!msg) return;
+                
                 if(msg.action === "pid_update") updateStatusUI('attached', msg.pid);
                 if(msg.action === "clear_pid") updateStatusUI('idle');
                 if(msg.action === "injection_failed") updateStatusUI('failed');
