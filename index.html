@@ -80,7 +80,7 @@
             font-family: var(--font-sans); font-weight: 600;
         }
         .icon-btn:hover { color: var(--text-main); border-color: var(--accent); background: rgba(255,255,255,0.02); }
-        .icon-btn .lucide { width: 13px; height: 13px; }
+        .icon-btn .lucide, .icon-btn svg { width: 13px; height: 13px; }
 
         .window-control-btn {
             background: transparent; border: 1px solid var(--border); color: #666;
@@ -88,7 +88,7 @@
         }
         .window-control-btn:hover { color: var(--text-main); border-color: rgba(255, 255, 255, 0.15); background: rgba(255, 255, 255, 0.03); }
         .window-control-btn.close-btn:hover { border-color: #ff4444; color: #ff4444; background: rgba(255, 68, 68, 0.05); }
-        .window-control-btn .lucide { width: 14px; height: 14px; }
+        .window-control-btn .lucide, .window-control-btn svg { width: 14px; height: 14px; }
 
         .workspace-grid { display: flex; flex: 1; overflow: hidden; background: transparent; }
         .editor-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
@@ -192,8 +192,16 @@
         .setting-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; font-size: 12px; color: #aaa; gap: 16px; }
         .setting-label { display: flex; flex-direction: column; gap: 2px; }
         .setting-desc { font-size: 10px; color: var(--text-dim); }
+        
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .modal-title { font-size: 12px; font-weight: 800; letter-spacing: 1px; color: #fff; text-transform: uppercase; }
+        
+        .modal-close-trigger {
+            cursor: pointer; color: #666; display: flex; align-items: center; justify-content: center;
+            background: transparent; border: none; padding: 4px; border-radius: 6px;
+        }
+        .modal-close-trigger:hover { color: var(--text-main); background: rgba(255, 255, 255, 0.04); }
+        .modal-close-trigger .lucide { width: 16px; height: 16px; }
 
         .switch { position: relative; display: inline-block; width: 34px; height: 20px; flex-shrink: 0; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -254,9 +262,9 @@
         <div class="modal-card settings-card">
             <div class="modal-header">
                 <div class="modal-title">Preferences Matrix</div>
-                <span style="cursor:pointer; color:#666; display: flex; align-items: center;" onclick="closeModal('settings-modal')">
-                    <i data-lucide="x" style="width: 18px; height: 18px;"></i>
-                </span>
+                <button class="modal-close-trigger" onclick="closeModal('settings-modal')">
+                    <i data-lucide="x"></i>
+                </button>
             </div>
             <div class="setting-row">
                 <div class="setting-label"><span>Discord Rich Presence</span><span class="setting-desc">Broadcast activity parameters</span></div>
@@ -312,9 +320,9 @@
             <div class="hub-header-zone">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                     <div class="hub-title">OBLIVIONX // SCRIPTHUB</div>
-                    <span style="cursor:pointer; color:#666; display: flex; align-items: center;" onclick="closeModal('script-hub-modal')">
-                        <i data-lucide="x" style="width: 20px; height: 20px;"></i>
-                    </span>
+                    <button class="modal-close-trigger" onclick="closeModal('script-hub-modal')">
+                        <i data-lucide="x"></i>
+                    </button>
                 </div>
                 <div class="hub-subtitle">Access millions of globally pooled game assets directly synced through network pipelines.</div>
             </div>
@@ -564,7 +572,11 @@
 
         window.openModal = function(id) { 
             const el = document.getElementById(id);
-            if(el) el.style.display = 'flex'; 
+            if(el) {
+                el.style.display = 'flex';
+                // CRITICAL: Force Lucide to scan and render inside newly exposed elements
+                if (window.lucide) lucide.createIcons();
+            }
         }
         window.closeModal = function(id) { 
             const el = document.getElementById(id);
