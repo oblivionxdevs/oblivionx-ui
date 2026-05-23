@@ -25,11 +25,11 @@
             --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .theme-purple   { --accent: #8C5AFF; --accent-glow: rgba(140, 90, 255, 0.15); --bg: #060608; --panel: #0b0b0e; --panel-sub: #111116; }
-        .theme-gold     { --accent: #FEE227; --accent-glow: rgba(254, 226, 39, 0.1);  --bg: #080805; --panel: #0f0f0a; --panel-sub: #181810; }
-        .theme-vampire  { --accent: #FF3131; --accent-glow: rgba(255, 49, 49, 0.12);  --bg: #080303; --panel: #120606; --panel-sub: #1c0a0a; }
-        .theme-ocean    { --accent: #00D1FF; --accent-glow: rgba(0, 209, 255, 0.12);  --bg: #03070a; --panel: #060b12; --panel-sub: #0a121e; }
-        .theme-matrix   { --accent: #00FF41; --accent-glow: rgba(0, 255, 65, 0.12);   --bg: #020502; --panel: #050a05; --panel-sub: #0a140a; }
+        .theme-purple   { --accent: #8C5AFF; --accent-glow: rgba(140, 90, 255, 0.15); --bg: #060608; --panel: #0b0b0e; --panel-sub: #111116; --tab-active: #16161d; --modal-bg: rgba(11, 11, 14, 0.98); }
+        .theme-gold     { --accent: #FEE227; --accent-glow: rgba(254, 226, 39, 0.1);  --bg: #080805; --panel: #0f0f0a; --panel-sub: #181810; --tab-active: #222216; --modal-bg: rgba(15, 15, 10, 0.98); }
+        .theme-vampire  { --accent: #FF3131; --accent-glow: rgba(255, 49, 49, 0.12);  --bg: #080303; --panel: #120606; --panel-sub: #1c0a0a; --tab-active: #2a0e0e; --modal-bg: rgba(18, 6, 6, 0.98); }
+        .theme-ocean    { --accent: #00D1FF; --accent-glow: rgba(0, 209, 255, 0.12);  --bg: #03070a; --panel: #060b12; --panel-sub: #0a121e; --tab-active: #0e1a2b; --modal-bg: rgba(6, 11, 18, 0.98); }
+        .theme-matrix   { --accent: #00FF41; --accent-glow: rgba(0, 255, 65, 0.12);   --bg: #020502; --panel: #050a05; --panel-sub: #0a140a; --tab-active: #0f1f0f; --modal-bg: rgba(5, 10, 5, 0.98); }
 
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.97) translateY(4px); } to { opacity: 1; transform: scale(1) translateY(0); } }
         @keyframes tabSpawn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
@@ -51,12 +51,12 @@
         .app-shell { 
             position: relative; display: flex; flex-direction: column; 
             height: 100vh; border: 1px solid var(--border); z-index: 2; 
-            background: rgba(0, 0, 0, 0.1);
+            background: rgba(0, 0, 0, 0.2);
         }
 
         .topbar { 
             height: 48px; display: flex; align-items: center; justify-content: space-between; 
-            padding: 0 16px; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.6);
+            padding: 0 16px; border-bottom: 1px solid var(--border); background: var(--panel);
             backdrop-filter: blur(12px); -webkit-app-region: drag;
         }
         .brand-wrapper { display: flex; align-items: center; gap: 12px; -webkit-app-region: drag; }
@@ -75,11 +75,11 @@
         .header-actions { display: flex; align-items: center; gap: 6px; -webkit-app-region: no-drag; }
         
         .icon-btn {
-            background: transparent; border: 1px solid var(--border); border-radius: 6px;
+            background: var(--panel-sub); border: 1px solid var(--border); border-radius: 6px;
             color: #aaa; padding: 6px 12px; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 6px;
             font-family: var(--font-sans); font-weight: 600;
         }
-        .icon-btn:hover { color: var(--text-main); border-color: var(--accent); background: rgba(255,255,255,0.02); }
+        .icon-btn:hover { color: var(--text-main); border-color: var(--accent); background: var(--panel); }
         
         .icon-btn svg, .window-control-btn svg, .modal-close-trigger svg { 
             width: 14px !important; 
@@ -97,30 +97,37 @@
             background: transparent; border: 1px solid var(--border); color: #666;
             width: 28px; height: 28px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center;
         }
-        .window-control-btn:hover { color: var(--text-main); border-color: rgba(255, 255, 255, 0.15); background: rgba(255, 255, 255, 0.03); }
+        .window-control-btn:hover { color: var(--text-main); border-color: var(--border-hover); background: rgba(255, 255, 255, 0.03); }
         .window-control-btn.close-btn:hover { border-color: #ff4444; color: #ff4444; background: rgba(255, 68, 68, 0.05); }
 
         .workspace-grid { display: flex; flex: 1; overflow: hidden; background: transparent; }
-        .editor-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .editor-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg); }
         
         .tab-bar { 
             height: 38px; background: var(--panel-sub); display: flex; align-items: center; 
-            padding: 0 8px; gap: 4px; border-bottom: 1px solid var(--border);
+            padding: 0 8px; gap: 4px; border-bottom: 1px solid var(--border); justify-content: space-between;
         }
         .tab { 
             display: flex; align-items: center; padding: 4px 12px; font-size: 11px; 
             cursor: pointer; border-radius: 6px; color: #888; font-weight: 500;
             border: 1px solid transparent; animation: tabSpawn 0.2s var(--ease-out-expo);
+            background: transparent;
         }
         .tab.active { color: var(--text-main); background: var(--tab-active); border-color: var(--border); }
         .tab .close-x { margin-left: 6px; font-size: 13px; opacity: 0.3; }
         .tab .close-x:hover { opacity: 1; color: #ff4444; }
 
-        main { flex: 1; position: relative; background: transparent; }
+        .add-tab-btn {
+            background: transparent; border: none; color: #666; font-size: 16px; cursor: pointer;
+            padding: 4px 8px; border-radius: 4px; display: flex; align-items: center; justify-content: center;
+        }
+        .add-tab-btn:hover { color: var(--accent); background: rgba(255,255,255,0.02); }
+
+        main { flex: 1; position: relative; background: var(--bg); }
         #editor { width: 100%; height: 100%; }
 
         .cli-bar { 
-            height: 42px; background: var(--bg); border-top: 1px solid var(--border); 
+            height: 42px; background: var(--panel); border-top: 1px solid var(--border); 
             display: flex; align-items: center; padding: 0 16px; gap: 12px;
         }
         .cli-input { flex: 1; background: transparent; border: none; color: #fff; font-family: var(--font-mono); font-size: 12px; }
@@ -156,19 +163,19 @@
 
         .hub-search-bar { position: relative; z-index: 1; display: flex; gap: 8px; width: 100%; }
         .hub-search-input { 
-            flex: 1; background: rgba(0,0,0,0.4); border: 1px solid var(--border); 
+            flex: 1; background: var(--panel-sub); border: 1px solid var(--border); 
             border-radius: 8px; color: #fff; padding: 10px 14px; font-size: 12px; font-family: var(--font-sans);
         }
-        .hub-search-input:focus { border-color: var(--accent); background: rgba(0,0,0,0.6); }
+        .hub-search-input:focus { border-color: var(--accent); background: var(--panel); }
 
-        .hub-filter-row { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.04); padding-bottom: 10px; }
+        .hub-filter-row { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
         .hub-tabs { display: flex; gap: 4px; }
         .hub-tab { 
             background: transparent; border: 1px solid transparent; color: #666; 
             padding: 5px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; 
         }
         .hub-tab:hover { color: var(--text-main); }
-        .hub-tab.active { background: rgba(255,255,255,0.04); border-color: var(--border); color: #fff; }
+        .hub-tab.active { background: var(--tab-active); border-color: var(--border); color: #fff; }
 
         .hub-catalog-list { 
             position: relative; z-index: 1; flex: 1; overflow-y: auto; 
@@ -179,10 +186,10 @@
         .hub-catalog-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
         .script-card-item {
-            background: rgba(255, 255, 255, 0.01); border: 1px solid var(--border);
+            background: var(--panel-sub); border: 1px solid var(--border);
             border-radius: 10px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; gap: 14px;
         }
-        .script-card-item:hover { border-color: var(--border-hover); background: rgba(255, 255, 255, 0.02); transform: translateY(-1px); }
+        .script-card-item:hover { border-color: var(--accent); background: var(--panel); transform: translateY(-1px); }
         .script-info { display: flex; flex-direction: column; gap: 6px; }
         .script-title-row { display: flex; flex-direction: column; gap: 4px; }
         .script-title { font-size: 13px; font-weight: 700; color: #fff; line-height: 1.3; }
@@ -195,7 +202,7 @@
         
         .script-desc { font-size: 11px; color: #888; line-height: 14px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; min-height: 28px; }
         
-        .script-card-footer { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.03); padding-top: 10px; }
+        .script-card-footer { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border); padding-top: 10px; }
         .script-meta-metrics { display: flex; gap: 10px; font-size: 10px; font-family: var(--font-mono); color: #444; }
         .script-meta-metrics span span { color: #888; }
 
@@ -219,13 +226,14 @@
         .slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 3px; bottom: 3px; background-color: #fff; border-radius: 50%; transition: .2s; }
         input:checked + .slider { background-color: var(--accent); }
         input:checked + .slider:before { transform: translateX(14px); }
-        .form-select, .form-input { background: #09090b; color: #fff; border: 1px solid var(--border); padding: 6px 10px; border-radius: 6px; font-size: 11px; width: 160px; }
+        .form-select, .form-input { background: var(--panel-sub); color: #fff; border: 1px solid var(--border); padding: 6px 10px; border-radius: 6px; font-size: 11px; width: 160px; }
+        .form-select:focus, .form-input:focus { border-color: var(--accent); }
         
         .catalog-action-btn {
             background: transparent; border: 1px solid var(--border); border-radius: 6px;
             color: #fff; padding: 4px 10px; font-size: 11px; cursor: pointer; font-family: var(--font-sans); font-weight: 600;
         }
-        .catalog-action-btn:hover { border-color: var(--accent); background: rgba(255,255,255,0.02); }
+        .catalog-action-btn:hover { border-color: var(--accent); background: var(--tab-active); }
     </style>
 </head>
 <body class="theme-purple">
@@ -261,7 +269,8 @@
         <div class="workspace-grid">
             <div class="editor-container">
                 <div class="tab-bar">
-                    <div id="tab-container" style="display:flex; gap:4px;"></div>
+                    <div id="tab-container" style="display:flex; gap:4px; align-items:center;"></div>
+                    <button class="add-tab-btn" onclick="createNewTab()">+</button>
                 </div>
                 <main><div id="editor"></div></main>
             </div>
@@ -345,7 +354,7 @@
             
             <div class="hub-search-bar">
                 <input type="text" id="hub-search-input" class="hub-search-input" placeholder="Search across global index layers (e.g., Blox Fruits, Infinite Yield)..." onkeydown="handleHubSearchKey(event)">
-                <button class="icon-btn" style="padding:0 20px; background:#fff; color:#000; border:none; font-weight:700; border-radius:8px;" onclick="triggerHubQuerySearch()">Search Matrix</button>
+                <button class="icon-btn" style="padding:0 20px; background:var(--accent); color:#000; border:none; font-weight:700; border-radius:8px;" onclick="triggerHubQuerySearch()">Search Matrix</button>
             </div>
 
             <div class="hub-filter-row">
@@ -358,7 +367,7 @@
 
             <div id="hub-catalog-list" class="hub-catalog-list"></div>
             
-            <div style="font-size:9px; color:#222; text-transform:uppercase; font-weight:700; letter-spacing:0.5px; text-align:center; position:relative; z-index:1;">
+            <div style="font-size:9px; color:var(--text-dim); text-transform:uppercase; font-weight:700; letter-spacing:0.5px; text-align:center; position:relative; z-index:1;">
                 Powered by ScriptBlox Systems
             </div>
         </div>
@@ -383,8 +392,9 @@
         }
 
         let editor;
+        let tabModels = {}; // Stores Monaco TextModels mapping for clean tab switching
         let files = JSON.parse(localStorage.getItem('obv_fs')) || { "main.lua": "-- Workspace Active\nprint('OblivionX Engine Pro Ready.')" };
-        let current = "main.lua";
+        let current = Object.keys(files)[0] || "main.lua";
         let topmost = false;
         let activeHubFilter = "trending";
 
@@ -407,9 +417,21 @@
 
         require.config({ paths: { vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.0/min/vs" }});
         require(["vs/editor/editor.main"], function () {
+            
+            // Build text models for each file recovered from storage layers
+            Object.keys(files).forEach(f => {
+                tabModels[f] = monaco.editor.createModel(files[f], "lua");
+            });
+
+            // Fallback initialization check
+            if (!tabModels[current]) {
+                current = "main.lua";
+                files[current] = "-- Workspace Active\n";
+                tabModels[current] = monaco.editor.createModel(files[current], "lua");
+            }
+
             editor = monaco.editor.create(document.getElementById("editor"), {
-                value: files[current],
-                language: "lua",
+                model: tabModels[current],
                 theme: "vs-dark",
                 automaticLayout: true,
                 minimap: { enabled: false },
@@ -451,8 +473,8 @@
         });
 
         function save(){
-            if(editor){
-                files[current] = editor.getValue();
+            if(editor && tabModels[current]){
+                files[current] = tabModels[current].getValue();
                 localStorage.setItem('obv_fs', JSON.stringify(files));
             }
         }
@@ -464,8 +486,8 @@
         }
 
         window.SetText = function(text) {
-            if(editor) {
-                editor.setValue(text);
+            if(editor && tabModels[current]) {
+                tabModels[current].setValue(text);
                 save();
             }
         }
@@ -485,27 +507,46 @@
         }
 
         function switchActiveBuffer(fileName) {
+            if (!tabModels[fileName]) return;
             save();
             current = fileName;
-            editor.setValue(files[fileName]);
+            editor.setModel(tabModels[fileName]);
             renderTabs();
         }
 
         function createNewTab(title = null, initialContent = "") {
             save();
             let n = title || "script_" + (Object.keys(files).length + 1) + ".lua";
+            
+            // Deduplicate names if multiple files are loaded with the same title sequence
+            if(files[n]) {
+                n = "script_" + Math.floor(Math.random() * 1000) + "_" + n;
+            }
+
             files[n] = initialContent || "-- New Workbook Frame\n";
+            tabModels[n] = monaco.editor.createModel(files[n], "lua");
+            
             current = n;
             renderTabs();
-            if(editor) editor.setValue(files[n]);
+            if(editor) editor.setModel(tabModels[n]);
             save();
         }
 
         function closeTab(f) {
             if (Object.keys(files).length <= 1) return;
+            
+            // Dispose of the text model cleanly to save browser memory resources
+            if (tabModels[f]) {
+                tabModels[f].dispose();
+                delete tabModels[f];
+            }
             delete files[f];
-            if (current === f) current = Object.keys(files)[0];
-            if(editor) editor.setValue(files[current]);
+            
+            if (current === f) {
+                current = Object.keys(files)[0];
+            }
+            
+            if(editor) editor.setModel(tabModels[current]);
             renderTabs();
             save();
         }
@@ -552,7 +593,6 @@
             if (!listContainer) return;
             listContainer.innerHTML = "";
             
-            // Comprehensive structural payload unpacking matching nested json arrays
             let scriptsArray = null;
             if (responseObj) {
                 if (Array.isArray(responseObj)) scriptsArray = responseObj;
@@ -565,7 +605,7 @@
 
             if(!scriptsArray || scriptsArray.length === 0) {
                 updateHubStatus("NULL_MATRIX");
-                listContainer.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; color:#444; font-family:var(--font-mono); font-size:12px;">No asset records found matching criteria.</div>`;
+                listContainer.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--text-dim); font-family:var(--font-mono); font-size:12px;">No asset records found matching criteria.</div>`;
                 return;
             }
 
@@ -584,7 +624,6 @@
                 let views = item.views || 0;
                 let scriptId = item._id || item.id || "";
                 
-                // Safe string cleaning layer prevents template injection breaking Javascript layout engine loops
                 let rawTitle = item.title || "Unnamed Script";
                 let cleanTitle = rawTitle.replace(/['"`\\]/g, ' ');
                 let gameName = item.game ? (item.game.name || 'Universal') : 'Universal';
@@ -637,17 +676,22 @@
             document.body.className = `theme-${name}`;
             localStorage.setItem('obv_theme', name);
             if (document.getElementById('cfg-theme')) document.getElementById('cfg-theme').value = name;
+            
             setTimeout(() => {
                 const accent = getComputedStyle(document.body).getPropertyValue('--accent').trim();
                 const bg = getComputedStyle(document.body).getPropertyValue('--bg').trim();
                 if(window.monaco) {
                     monaco.editor.defineTheme('obv-theme', {
                         base: 'vs-dark', inherit: true, rules: [],
-                        colors: { 'editor.background': bg, 'editorCursor.foreground': accent, 'editorLineNumber.activeForeground': accent }
+                        colors: { 
+                            'editor.background': bg, 
+                            'editorCursor.foreground': accent, 
+                            'editorLineNumber.activeForeground': accent 
+                        }
                     });
                     monaco.editor.setTheme('obv-theme');
                 }
-            }, 50);
+            }, 60);
             sendWebviewMessage({ action: "theme", value: name });
         }
 
@@ -662,7 +706,6 @@
             const isExecuteOn = cbExecute ? cbExecute.checked : false;
             const isTopmostOn = cbTopmost ? cbTopmost.checked : false;
             
-            // Force save settings into local persistent key values
             localStorage.setItem('obv_cfg_discord', isRpcOn);
             localStorage.setItem('obv_cfg_attach', isAttachOn);
             localStorage.setItem('obv_cfg_execute', isExecuteOn);
@@ -693,7 +736,6 @@
         }
 
         window.loadExecutorSettings = function(cfg) {
-            // Backup validation mapping logic for handling incoming C# configuration overrides directly
             if (cfg) {
                 if(document.getElementById('cfg-discord')) document.getElementById('cfg-discord').checked = cfg.discordRpc;
                 if(document.getElementById('cfg-attach')) document.getElementById('cfg-attach').checked = cfg.autoAttach;
