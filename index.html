@@ -221,6 +221,12 @@
         input:checked + .slider { background-color: var(--accent); }
         input:checked + .slider:before { transform: translateX(14px); }
         .form-select, .form-input { background: #09090b; color: #fff; border: 1px solid var(--border); padding: 6px 10px; border-radius: 6px; font-size: 11px; width: 160px; }
+        
+        .catalog-action-btn {
+            background: transparent; border: 1px solid var(--border); border-radius: 6px;
+            color: #fff; padding: 4px 10px; font-size: 11px; cursor: pointer; font-family: var(--font-sans); font-weight: 600;
+        }
+        .catalog-action-btn:hover { border-color: var(--accent); background: rgba(255,255,255,0.02); }
     </style>
 </head>
 <body class="theme-purple">
@@ -578,7 +584,7 @@
                             <span>G//<span>${gameName.substring(0,14)}${gameName.length > 14 ? '...' : ''}</span></span>
                             <span>V//<span>${views}</span></span>
                         </div>
-                        <button class="icon-btn" style="border-color:var(--border); font-size:11px; padding:4px 10px; color:#fff;" onclick="requestRawScript('${scriptId}', '${cleanTitle}')">Load Code</button>
+                        <button class="catalog-action-btn" onclick="requestRawScript('${scriptId}', '${cleanTitle}')">Load Code</button>
                     </div>
                 `;
                 listContainer.appendChild(card);
