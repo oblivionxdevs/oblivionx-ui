@@ -1,881 +1,1403 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>OblivionX Engine Elite</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>OblivionX Engine</title>
 
-        :root {
-            --accent: #8C5AFF;
-            --accent-glow: rgba(140, 90, 255, 0.15);
-            --bg: #000000;
-            --panel: #050505;
-            --panel-sub: #0c0c0f;
-            --border: rgba(255, 255, 255, 0.08);
-            --border-hover: rgba(255, 255, 255, 0.15);
-            --text-main: #ffffff;
-            --text-dim: #666666;
-            --text-muted: #444444;
-            --tab-active: #111111;
-            --modal-bg: rgba(6, 6, 8, 0.98);
-            --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-            --font-mono: 'JetBrains Mono', monospace;
-            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-            --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
-        }
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-        .theme-purple   { --accent: #8C5AFF; --accent-glow: rgba(140, 90, 255, 0.15); --bg: #060608; --panel: #0b0b0e; --panel-sub: #111116; --tab-active: #16161d; --modal-bg: rgba(11, 11, 14, 0.98); }
-        .theme-gold     { --accent: #FEE227; --accent-glow: rgba(254, 226, 39, 0.1);  --bg: #080805; --panel: #0f0f0a; --panel-sub: #181810; --tab-active: #222216; --modal-bg: rgba(15, 15, 10, 0.98); }
-        .theme-vampire  { --accent: #FF3131; --accent-glow: rgba(255, 49, 49, 0.12);  --bg: #080303; --panel: #120606; --panel-sub: #1c0a0a; --tab-active: #2a0e0e; --modal-bg: rgba(18, 6, 6, 0.98); }
-        .theme-ocean    { --accent: #00D1FF; --accent-glow: rgba(0, 209, 255, 0.12);  --bg: #03070a; --panel: #060b12; --panel-sub: #0a121e; --tab-active: #0e1a2b; --modal-bg: rgba(6, 11, 18, 0.98); }
-        .theme-matrix   { --accent: #00FF41; --accent-glow: rgba(0, 255, 65, 0.12);   --bg: #020502; --panel: #050a05; --panel-sub: #0a140a; --tab-active: #0f1f0f; --modal-bg: rgba(5, 10, 5, 0.98); }
+<style>
+:root{
+    --accent:#8c5aff;
+    --accent2:#b388ff;
+    --bg:#050505;
+    --panel:#0b0b0b;
+    --panel2:#101010;
+    --border:rgba(255,255,255,.08);
+    --text:#f5f5f5;
+    --text-dim:#9d9d9d;
+    --danger:#ff4d67;
+    --success:#39ff88;
+    --shadow:0 0 30px rgba(140,90,255,.25);
+    --font:'Inter',sans-serif;
+    --font-mono:'JetBrains Mono',monospace;
+}
 
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.97) translateY(4px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-        @keyframes tabSpawn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes dotPulse { 0% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.15); opacity: 1; box-shadow: 0 0 12px var(--accent); } 100% { transform: scale(1); opacity: 0.8; } }
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
 
-        * { box-sizing: border-box; outline: none; transition: background 0.2s var(--ease-out-expo), border 0.2s var(--ease-out-expo), color 0.2s var(--ease-out-expo); }
-        
-        body, html { 
-            margin: 0; padding: 0; width: 100%; height: 100%; 
-            background: var(--bg); color: var(--text-main); 
-            font-family: var(--font-sans); overflow: hidden; 
-        }
+body{
+    width:100vw;
+    height:100vh;
+    overflow:hidden;
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--font);
+}
 
-        #weather-canvas {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; z-index: 1; opacity: 0.25;
-        }
+body.theme-purple{
+    --accent:#8c5aff;
+    --accent2:#b388ff;
+}
+body.theme-blue{
+    --accent:#00b7ff;
+    --accent2:#6fdfff;
+}
+body.theme-red{
+    --accent:#ff3f6c;
+    --accent2:#ff8da6;
+}
+body.theme-green{
+    --accent:#00ff88;
+    --accent2:#7affc1;
+}
+body.theme-orange{
+    --accent:#ff8a00;
+    --accent2:#ffc266;
+}
 
-        .app-shell { 
-            position: relative; display: flex; flex-direction: column; 
-            height: 100vh; border: 1px solid var(--border); z-index: 2; 
-            background: rgba(0, 0, 0, 0.2);
-        }
+#weather-canvas{
+    position:fixed;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+}
 
-        .topbar { 
-            height: 48px; display: flex; align-items: center; justify-content: space-between; 
-            padding: 0 16px; border-bottom: 1px solid var(--border); background: var(--panel);
-            backdrop-filter: blur(12px); -webkit-app-region: drag;
-        }
-        .brand-wrapper { display: flex; align-items: center; gap: 12px; -webkit-app-region: drag; }
-        .logo { font-weight: 800; font-size: 11px; letter-spacing: 2px; color: #888; }
-        .logo span { color: var(--accent); }
+.app{
+    position:relative;
+    z-index:2;
+    width:100%;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+}
 
-        .status-badge-container {
-            display: flex; align-items: center; gap: 6px; background: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--border); padding: 4px 8px; border-radius: 6px; font-size: 9px;
-            font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.5px;
-        }
-        .attach-indicator-dot { width: 6px; height: 6px; border-radius: 50%; background: #3f3f46; }
-        .attach-indicator-dot.active { background: var(--accent); box-shadow: 0 0 10px var(--accent); animation: dotPulse 2s infinite ease-in-out; }
-        .attach-indicator-dot.failed { background: #ef4444; box-shadow: 0 0 10px #ef4444; }
+.topbar{
+    height:54px;
+    background:rgba(10,10,10,.9);
+    border-bottom:1px solid var(--border);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 16px;
+    backdrop-filter:blur(20px);
+}
 
-        .header-actions { display: flex; align-items: center; gap: 6px; -webkit-app-region: no-drag; }
-        
-        .icon-btn {
-            background: var(--panel-sub); border: 1px solid var(--border); border-radius: 6px;
-            color: #aaa; padding: 6px 12px; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 6px;
-            font-family: var(--font-sans); font-weight: 600;
-        }
-        .icon-btn:hover { color: var(--text-main); border-color: var(--accent); background: var(--panel); }
-        
-        .icon-btn svg, .window-control-btn svg, .modal-close-trigger svg { 
-            width: 14px !important; 
-            height: 14px !important; 
-            display: inline-block;
-            vertical-align: middle;
-            fill: none;
-            stroke: currentColor;
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
+.brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
 
-        .window-control-btn {
-            background: transparent; border: 1px solid var(--border); color: #666;
-            width: 28px; height: 28px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center;
-        }
-        .window-control-btn:hover { color: var(--text-main); border-color: var(--border-hover); background: rgba(255, 255, 255, 0.03); }
-        .window-control-btn.close-btn:hover { border-color: #ff4444; color: #ff4444; background: rgba(255, 68, 68, 0.05); }
+.brand-logo{
+    width:34px;
+    height:34px;
+    border-radius:12px;
+    background:linear-gradient(135deg,var(--accent),transparent);
+    box-shadow:var(--shadow);
+}
 
-        .workspace-grid { display: flex; flex: 1; overflow: hidden; background: transparent; }
-        .editor-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg); }
-        
-        .tab-bar { 
-            height: 38px; background: var(--panel-sub); display: flex; align-items: center; 
-            padding: 0 8px; gap: 4px; border-bottom: 1px solid var(--border); justify-content: space-between;
-        }
-        .tab { 
-            display: flex; align-items: center; padding: 4px 12px; font-size: 11px; 
-            cursor: pointer; border-radius: 6px; color: #888; font-weight: 500;
-            border: 1px solid transparent; animation: tabSpawn 0.2s var(--ease-out-expo);
-            background: transparent;
-        }
-        .tab.active { color: var(--text-main); background: var(--tab-active); border-color: var(--border); }
-        .tab .close-x { margin-left: 6px; font-size: 13px; opacity: 0.3; }
-        .tab .close-x:hover { opacity: 1; color: #ff4444; }
+.brand h1{
+    font-size:15px;
+    letter-spacing:1px;
+    font-weight:700;
+}
 
-        .add-tab-btn {
-            background: transparent; border: none; color: #666; font-size: 16px; cursor: pointer;
-            padding: 4px 8px; border-radius: 4px; display: flex; align-items: center; justify-content: center;
-        }
-        .add-tab-btn:hover { color: var(--accent); background: rgba(255,255,255,0.02); }
+.status{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:12px;
+    color:var(--text-dim);
+}
 
-        main { flex: 1; position: relative; background: var(--bg); }
-        #editor { width: 100%; height: 100%; }
+.attach-indicator-dot{
+    width:10px;
+    height:10px;
+    border-radius:50%;
+    background:#444;
+}
+.attach-indicator-dot.active{
+    background:var(--success);
+    box-shadow:0 0 15px var(--success);
+}
+.attach-indicator-dot.failed{
+    background:var(--danger);
+    box-shadow:0 0 15px var(--danger);
+}
 
-        .cli-bar { 
-            height: 42px; background: var(--panel); border-top: 1px solid var(--border); 
-            display: flex; align-items: center; padding: 0 16px; gap: 12px;
-        }
-        .cli-input { flex: 1; background: transparent; border: none; color: #fff; font-family: var(--font-mono); font-size: 12px; }
-        #status-glow { width: 6px; height: 6px; border-radius: 50%; background: #222; transition: all 0.4s var(--ease-out-expo); }
+.window-controls{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
 
-        .modal-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(14px);
-            display: none; align-items: center; justify-content: center; z-index: 100;
-        }
-        .modal-card {
-            background: var(--modal-bg); border: 1px solid var(--border);
-            border-radius: 16px; box-shadow: 0 24px 50px rgba(0,0,0,0.6);
-            animation: fadeIn 0.4s var(--ease-out-expo) forwards;
-        }
-        .settings-card { width: 460px; padding: 24px; max-height: 85vh; overflow-y: auto; }
-        
-        .scripthub-card { 
-            width: 780px; height: 80vh; max-height: 680px; 
-            padding: 28px; display: flex; flex-direction: column; gap: 20px; 
-            position: relative; overflow: hidden;
-        }
-        
-        .scripthub-card::before {
-            content: ""; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-            width: 100%; height: 250px; background: radial-gradient(circle 200px at 50% -30px, var(--accent-glow), transparent 80%);
-            pointer-events: none; z-index: 0;
-        }
+.window-btn{
+    width:36px;
+    height:36px;
+    border:none;
+    border-radius:12px;
+    background:rgba(255,255,255,.04);
+    color:white;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:.2s;
+}
 
-        .hub-header-zone { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 4px; }
-        .hub-title { font-size: 16px; font-weight: 800; letter-spacing: -0.02em; color: #fff; }
-        .hub-subtitle { font-size: 11px; color: #666; }
+.window-btn:hover{
+    background:rgba(255,255,255,.08);
+}
 
-        .hub-search-bar { position: relative; z-index: 1; display: flex; gap: 8px; width: 100%; }
-        .hub-search-input { 
-            flex: 1; background: var(--panel-sub); border: 1px solid var(--border); 
-            border-radius: 8px; color: #fff; padding: 10px 14px; font-size: 12px; font-family: var(--font-sans);
-        }
-        .hub-search-input:focus { border-color: var(--accent); background: var(--panel); }
+.window-btn.close:hover{
+    background:var(--danger);
+}
 
-        .hub-filter-row { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
-        .hub-tabs { display: flex; gap: 4px; }
-        .hub-tab { 
-            background: transparent; border: 1px solid transparent; color: #666; 
-            padding: 5px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; 
-        }
-        .hub-tab:hover { color: var(--text-main); }
-        .hub-tab.active { background: var(--tab-active); border-color: var(--border); color: #fff; }
+.window-btn svg{
+    width:16px;
+    height:16px;
+    stroke:white;
+    fill:none;
+    stroke-width:2;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+}
 
-        .hub-catalog-list { 
-            position: relative; z-index: 1; flex: 1; overflow-y: auto; 
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 12px; padding-right: 4px;
-        }
-        .hub-catalog-list::-webkit-scrollbar { width: 4px; }
-        .hub-catalog-list::-webkit-scrollbar-track { background: transparent; }
-        .hub-catalog-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.main{
+    flex:1;
+    display:flex;
+    overflow:hidden;
+}
 
-        .script-card-item {
-            background: var(--panel-sub); border: 1px solid var(--border);
-            border-radius: 10px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; gap: 14px;
-        }
-        .script-card-item:hover { border-color: var(--accent); background: var(--panel); transform: translateY(-1px); }
-        .script-info { display: flex; flex-direction: column; gap: 6px; }
-        .script-title-row { display: flex; flex-direction: column; gap: 4px; }
-        .script-title { font-size: 13px; font-weight: 700; color: #fff; line-height: 1.3; }
-        
-        .badge-layout-row { display: flex; flex-wrap: wrap; gap: 4px; }
-        .script-badge { font-size: 8px; font-weight: 800; text-transform: uppercase; padding: 2px 6px; border-radius: 4px; background: rgba(255,255,255,0.04); color: #666; font-family: var(--font-mono); }
-        .script-badge.universal { background: rgba(140, 90, 255, 0.12); color: #b392ff; }
-        .script-badge.verified { background: rgba(0, 209, 255, 0.12); color: #66e3ff; }
-        .script-badge.patched { background: rgba(255, 49, 49, 0.12); color: #ff7e7e; }
-        
-        .script-desc { font-size: 11px; color: #888; line-height: 14px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; min-height: 28px; }
-        
-        .script-card-footer { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border); padding-top: 10px; }
-        .script-meta-metrics { display: flex; gap: 10px; font-size: 10px; font-family: var(--font-mono); color: #444; }
-        .script-meta-metrics span span { color: #888; }
+.sidebar{
+    width:78px;
+    background:rgba(12,12,12,.9);
+    border-right:1px solid var(--border);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:14px 0;
+    gap:12px;
+    backdrop-filter:blur(20px);
+}
 
-        .setting-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; font-size: 12px; color: #aaa; gap: 16px; }
-        .setting-label { display: flex; flex-direction: column; gap: 2px; }
-        .setting-desc { font-size: 10px; color: var(--text-dim); }
-        
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .modal-title { font-size: 12px; font-weight: 800; letter-spacing: 1px; color: #fff; text-transform: uppercase; }
-        
-        .modal-close-trigger {
-            cursor: pointer; color: #666; display: flex; align-items: center; justify-content: center;
-            background: transparent; border: none; padding: 4px; border-radius: 6px;
-        }
-        .modal-close-trigger:hover { color: var(--text-main); background: rgba(255, 255, 255, 0.04); }
-        .modal-close-trigger svg { width: 16px !important; height: 16px !important; }
+.side-btn{
+    width:52px;
+    height:52px;
+    border-radius:18px;
+    border:1px solid transparent;
+    background:rgba(255,255,255,.04);
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:.2s;
+}
 
-        .switch { position: relative; display: inline-block; width: 34px; height: 20px; flex-shrink: 0; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #222; border: 1px solid var(--border); border-radius: 20px; }
-        .slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 3px; bottom: 3px; background-color: #fff; border-radius: 50%; transition: .2s; }
-        input:checked + .slider { background-color: var(--accent); }
-        input:checked + .slider:before { transform: translateX(14px); }
-        .form-select, .form-input { background: var(--panel-sub); color: #fff; border: 1px solid var(--border); padding: 6px 10px; border-radius: 6px; font-size: 11px; width: 160px; }
-        .form-select:focus, .form-input:focus { border-color: var(--accent); }
-        
-        .catalog-action-btn {
-            background: transparent; border: 1px solid var(--border); border-radius: 6px;
-            color: #fff; padding: 4px 10px; font-size: 11px; cursor: pointer; font-family: var(--font-sans); font-weight: 600;
-        }
-        .catalog-action-btn:hover { border-color: var(--accent); background: var(--tab-active); }
-    </style>
+.side-btn:hover{
+    border-color:var(--accent);
+    box-shadow:0 0 18px rgba(140,90,255,.25);
+}
+
+.side-btn svg{
+    width:22px;
+    height:22px;
+    stroke:var(--accent2);
+    fill:none;
+    stroke-width:2;
+}
+
+.workspace{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+}
+
+.tabs{
+    height:48px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:0 14px;
+    background:rgba(15,15,15,.85);
+    border-bottom:1px solid var(--border);
+    overflow-x:auto;
+}
+
+.tab{
+    min-width:140px;
+    height:34px;
+    border-radius:12px;
+    background:rgba(255,255,255,.04);
+    border:1px solid transparent;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 12px;
+    font-size:12px;
+    cursor:pointer;
+    transition:.2s;
+    font-family:var(--font-mono);
+}
+
+.tab.active{
+    border-color:var(--accent);
+    background:rgba(140,90,255,.14);
+}
+
+.close-x{
+    opacity:.6;
+    transition:.2s;
+}
+
+.close-x:hover{
+    opacity:1;
+    color:var(--danger);
+}
+
+.editor-shell{
+    flex:1;
+    position:relative;
+}
+
+#editor{
+    width:100%;
+    height:100%;
+}
+
+.bottom-bar{
+    height:52px;
+    border-top:1px solid var(--border);
+    background:rgba(10,10,10,.9);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 16px;
+    backdrop-filter:blur(20px);
+}
+
+.action-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.action-btn{
+    height:38px;
+    padding:0 18px;
+    border:none;
+    border-radius:12px;
+    background:rgba(255,255,255,.05);
+    color:white;
+    cursor:pointer;
+    transition:.2s;
+    font-weight:600;
+}
+
+.action-btn:hover{
+    transform:translateY(-1px);
+}
+
+.action-btn.primary{
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    color:white;
+    box-shadow:var(--shadow);
+}
+
+.cli{
+    width:280px;
+    height:38px;
+    border:none;
+    outline:none;
+    border-radius:12px;
+    background:rgba(255,255,255,.04);
+    color:white;
+    padding:0 14px;
+    font-family:var(--font-mono);
+    border:1px solid var(--border);
+}
+
+.modal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.6);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:100;
+    backdrop-filter:blur(8px);
+}
+
+.modal-card{
+    width:850px;
+    max-width:95vw;
+    height:680px;
+    max-height:92vh;
+    border-radius:28px;
+    background:#0d0d0d;
+    border:1px solid var(--border);
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    box-shadow:0 0 50px rgba(0,0,0,.5);
+}
+
+.modal-header{
+    height:64px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 24px;
+    border-bottom:1px solid var(--border);
+}
+
+.modal-title{
+    font-size:15px;
+    font-weight:700;
+    letter-spacing:1px;
+}
+
+.modal-body{
+    flex:1;
+    overflow:auto;
+    padding:24px;
+}
+
+.settings-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:18px;
+}
+
+.setting-card{
+    background:rgba(255,255,255,.03);
+    border:1px solid var(--border);
+    border-radius:22px;
+    padding:20px;
+}
+
+.setting-card h3{
+    margin-bottom:16px;
+    font-size:14px;
+}
+
+.setting-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:14px;
+    font-size:13px;
+}
+
+.setting-row input[type="checkbox"]{
+    width:18px;
+    height:18px;
+    accent-color:var(--accent);
+}
+
+.setting-row select,
+.setting-row input[type="text"]{
+    background:#111;
+    color:white;
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:8px 10px;
+    width:140px;
+}
+
+.script-hub-toolbar{
+    display:flex;
+    gap:12px;
+    margin-bottom:20px;
+}
+
+.hub-tab{
+    height:38px;
+    padding:0 18px;
+    border-radius:12px;
+    border:none;
+    background:rgba(255,255,255,.05);
+    color:white;
+    cursor:pointer;
+}
+
+.hub-tab.active{
+    background:var(--accent);
+}
+
+#hub-search-input{
+    flex:1;
+    background:#111;
+    border:1px solid var(--border);
+    color:white;
+    border-radius:12px;
+    padding:0 14px;
+}
+
+.script-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+    gap:18px;
+}
+
+.script-card-item{
+    background:rgba(255,255,255,.03);
+    border:1px solid var(--border);
+    border-radius:22px;
+    padding:18px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    gap:16px;
+}
+
+.script-title-row{
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+}
+
+.script-title{
+    font-weight:700;
+    font-size:14px;
+}
+
+.script-desc{
+    color:var(--text-dim);
+    font-size:12px;
+    margin-top:10px;
+    line-height:1.6;
+}
+
+.script-card-footer{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+
+.catalog-action-btn{
+    border:none;
+    background:var(--accent);
+    color:white;
+    height:34px;
+    padding:0 14px;
+    border-radius:10px;
+    cursor:pointer;
+}
+
+.script-meta-metrics{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+    font-size:11px;
+    color:var(--text-dim);
+    font-family:var(--font-mono);
+}
+
+.script-badge{
+    font-size:10px;
+    padding:4px 7px;
+    border-radius:999px;
+    background:rgba(255,255,255,.08);
+}
+
+.script-badge.verified{
+    background:#1f7a42;
+}
+.script-badge.universal{
+    background:#3158ff;
+}
+.script-badge.patched{
+    background:#923535;
+}
+
+#hub-catalog-status{
+    margin-bottom:18px;
+    color:var(--text-dim);
+    font-size:12px;
+    font-family:var(--font-mono);
+}
+
+::-webkit-scrollbar{
+    width:7px;
+    height:7px;
+}
+::-webkit-scrollbar-thumb{
+    background:rgba(255,255,255,.1);
+    border-radius:999px;
+}
+</style>
 </head>
+
 <body class="theme-purple">
 
-    <canvas id="weather-canvas"></canvas>
+<canvas id="weather-canvas"></canvas>
 
-    <div class="app-shell">
-        <div class="topbar">
-            <div class="brand-wrapper">
-                <div class="logo">OBLIVION<span>//</span>PRO</div>
-                <div class="status-badge-container">
-                    <div id="top-attach-dot" class="attach-indicator-dot"></div>
-                    <span id="status-text">Not Attached</span>
-                </div>
-            </div>
-            
-            <div class="header-actions">
-                <button class="icon-btn" onclick="openScriptHub()">
-                    <span class="custom-icon" data-icon="layers"></span>Script Hub
-                </button>
-                <button class="icon-btn" onclick="openModal('settings-modal')">
-                    <span class="custom-icon" data-icon="settings"></span>Settings
-                </button>
-                <button class="window-control-btn" onclick="minimize()">
-                    <span class="custom-icon" data-icon="minus"></span>
-                </button>
-                <button class="window-control-btn close-btn" onclick="closeApp()">
-                    <span class="custom-icon" data-icon="x"></span>
-                </button>
-            </div>
+<div class="app">
+
+    <div class="topbar">
+        <div class="brand">
+            <div class="brand-logo"></div>
+            <h1>OBLIVIONX ENGINE</h1>
         </div>
 
-        <div class="workspace-grid">
-            <div class="editor-container">
-                <div class="tab-bar">
-                    <div id="tab-container" style="display:flex; gap:4px; align-items:center;"></div>
-                    <button class="add-tab-btn" onclick="createNewTab()">+</button>
-                </div>
-                <main><div id="editor"></div></main>
-            </div>
+        <div class="status">
+            <div class="attach-indicator-dot" id="top-attach-dot"></div>
+            <span id="status-text">Not Attached</span>
         </div>
 
-        <div class="cli-bar">
-            <span style="color: var(--accent); font-weight: bold;">></span>
-            <input type="text" id="cli" class="cli-input" placeholder="Type /run, /inject, /new, /clear, /topmost..." autocomplete="off">
-            <div id="status-glow"></div>
+        <div class="window-controls">
+            <button class="window-btn" onclick="openModal('settings-modal')">
+                <span data-icon="settings"></span>
+            </button>
+
+            <button class="window-btn" onclick="minimize()">
+                <span data-icon="minus"></span>
+            </button>
+
+            <button class="window-btn close" onclick="closeApp()">
+                <span data-icon="x"></span>
+            </button>
         </div>
     </div>
 
-    <div id="settings-modal" class="modal-overlay" onclick="closeModalOnOuter(event, 'settings-modal')">
-        <div class="modal-card settings-card">
-            <div class="modal-header">
-                <div class="modal-title">Preferences Matrix</div>
-                <button class="modal-close-trigger" onclick="closeModal('settings-modal')">
-                    <span class="custom-icon" data-icon="x"></span>
-                </button>
-            </div>
-            <div class="setting-row">
-                <div class="setting-label"><span>Discord Rich Presence</span><span class="setting-desc">Broadcast activity parameters</span></div>
-                <label class="switch"><input type="checkbox" id="cfg-discord" onchange="pushConfigUpdate()"><span class="slider"></span></label>
-            </div>
-            <div class="setting-row" id="rpc-details-row">
-                <div class="setting-label"><span>RPC Title Summary</span><span class="setting-desc">Primary description line string</span></div>
-                <input type="text" id="cfg-rpc-details" class="form-input" oninput="pushRpcMessageUpdate()">
-            </div>
-            <div class="setting-row" id="rpc-state-row">
-                <div class="setting-label"><span>RPC Sub-State Status</span><span class="setting-desc">Secondary status validation tracking append</span></div>
-                <input type="text" id="cfg-rpc-state" class="form-input" oninput="pushRpcMessageUpdate()">
-            </div>
-            <div class="setting-row">
-                <div class="setting-label"><span>Auto Attach Engine</span><span class="setting-desc">Inject immediately when found</span></div>
-                <label class="switch"><input type="checkbox" id="cfg-attach" onchange="pushConfigUpdate()"><span class="slider"></span></label>
-            </div>
-            <div class="setting-row">
-                <div class="setting-label"><span>Auto Execute Stream</span><span class="setting-desc">Deploy loaded buffer contents upon link-up</span></div>
-                <label class="switch"><input type="checkbox" id="cfg-execute" onchange="pushConfigUpdate()"><span class="slider"></span></label>
-            </div>
-            <div class="setting-row">
-                <div class="setting-label"><span>Always On Top View</span><span class="setting-desc">Pin frame viewport window priority layer</span></div>
-                <label class="switch"><input type="checkbox" id="cfg-topmost" onchange="pushConfigUpdate()"><span class="slider"></span></label>
-            </div>
-            <div class="setting-row">
-                <div class="setting-label"><span>Visual System Theme</span><span class="setting-desc">Interface canvas accent profiles</span></div>
-                <select id="cfg-theme" class="form-select" onchange="applyGlobalTheme(this.value)">
-                    <option value="purple">Infinity Purple</option>
-                    <option value="gold">Midas Gold</option>
-                    <option value="vampire">Vampire Red</option>
-                    <option value="ocean">Abyssal Ocean</option>
-                    <option value="matrix">Matrix Emerald</option>
-                </select>
-            </div>
-            <div class="setting-row">
-                <div class="setting-label"><span>Ambient Atmosphere Rig</span><span class="setting-desc">Background procedural rendering effects canvas</span></div>
-                <select id="cfg-weather" class="form-select" onchange="setWeatherEffect(this.value)">
-                    <option value="matrix">Matrix Cascade</option>
-                    <option value="cybergrid">Cyberpunk Grid</option>
-                    <option value="hyperjump">Hyper Jump Warp</option>
-                    <option value="snow">Blizzard Snow</option>
-                    <option value="rain">Downpours Rain</option>
-                    <option value="stars">Starfield Horizon</option>
-                    <option value="none">Static Darkness</option>
-                </select>
-            </div>
-        </div>
-    </div>
+    <div class="main">
 
-    <div id="script-hub-modal" class="modal-overlay" onclick="closeModalOnOuter(event, 'script-hub-modal')">
-        <div class="modal-card scripthub-card">
-            <div class="hub-header-zone">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <div class="hub-title">OBLIVIONX // SCRIPTHUB</div>
-                    <button class="modal-close-trigger" onclick="closeModal('script-hub-modal')">
-                        <span class="custom-icon" data-icon="x"></span>
+        <div class="sidebar">
+
+            <button class="side-btn" onclick="createNewTab()">
+                <span data-icon="layers"></span>
+            </button>
+
+            <button class="side-btn" onclick="openScriptHub()">
+                <span data-icon="settings"></span>
+            </button>
+
+        </div>
+
+        <div class="workspace">
+
+            <div class="tabs" id="tab-container"></div>
+
+            <div class="editor-shell">
+                <div id="editor"></div>
+            </div>
+
+            <div class="bottom-bar">
+
+                <div class="action-row">
+                    <button class="action-btn" onclick="sendWebviewMessage({action:'inject'})">
+                        Inject
+                    </button>
+
+                    <button class="action-btn primary" onclick="getEditorBuffer()">
+                        Execute
+                    </button>
+
+                    <button class="action-btn" onclick="openScriptHub()">
+                        Script Hub
                     </button>
                 </div>
-                <div class="hub-subtitle">Access millions of globally pooled game assets directly synced through network pipelines.</div>
-            </div>
-            
-            <div class="hub-search-bar">
-                <input type="text" id="hub-search-input" class="hub-search-input" placeholder="Search across global index layers (e.g., Blox Fruits, Infinite Yield)..." onkeydown="handleHubSearchKey(event)">
-                <button class="icon-btn" style="padding:0 20px; background:var(--accent); color:#000; border:none; font-weight:700; border-radius:8px;" onclick="triggerHubQuerySearch()">Search Matrix</button>
+
+                <input class="cli" id="cli" placeholder="/inject  /run  /new  /topmost"/>
             </div>
 
-            <div class="hub-filter-row">
-                <div class="hub-tabs">
-                    <button id="hub-tab-trending" class="hub-tab active" onclick="switchHubFilter('trending')">Trending Now</button>
-                    <button id="hub-tab-latest" class="hub-tab" onclick="switchHubFilter('latest')">Latest Releases</button>
-                </div>
-                <div id="hub-catalog-status" class="status-indicator" style="font-family: var(--font-mono); font-size: 11px; color: var(--accent); font-weight: 600;">Ready</div>
-            </div>
-
-            <div id="hub-catalog-list" class="hub-catalog-list"></div>
-            
-            <div style="font-size:9px; color:var(--text-dim); text-transform:uppercase; font-weight:700; letter-spacing:0.5px; text-align:center; position:relative; z-index:1;">
-                Powered by ScriptBlox Systems
-            </div>
         </div>
+
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.0/min/vs/loader.min.js"></script>
-    <script>
-        const VectorDictionary = {
-            minus: `<svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line></svg>`,
-            x: `<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`,
-            settings: `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>`,
-            layers: `<svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`
-        };
+</div>
 
-        function renderApplicationIcons() {
-            document.querySelectorAll('[data-icon]').forEach(element => {
-                const iconName = element.getAttribute('data-icon');
-                if (VectorDictionary[iconName]) {
-                    element.innerHTML = VectorDictionary[iconName];
-                }
-            });
+<!-- SETTINGS -->
+
+<div class="modal" id="settings-modal" onclick="closeModalOnOuter(event,'settings-modal')">
+    <div class="modal-card">
+
+        <div class="modal-header">
+            <div class="modal-title">SETTINGS MATRIX</div>
+
+            <button class="window-btn close" onclick="closeModal('settings-modal')">
+                <span data-icon="x"></span>
+            </button>
+        </div>
+
+        <div class="modal-body">
+
+            <div class="settings-grid">
+
+                <div class="setting-card">
+                    <h3>Core</h3>
+
+                    <div class="setting-row">
+                        <span>Discord RPC</span>
+                        <input type="checkbox" id="cfg-discord" onchange="pushConfigUpdate()">
+                    </div>
+
+                    <div class="setting-row">
+                        <span>Auto Attach</span>
+                        <input type="checkbox" id="cfg-attach" onchange="pushConfigUpdate()">
+                    </div>
+
+                    <div class="setting-row">
+                        <span>Auto Execute</span>
+                        <input type="checkbox" id="cfg-execute" onchange="pushConfigUpdate()">
+                    </div>
+
+                    <div class="setting-row">
+                        <span>Always On Top</span>
+                        <input type="checkbox" id="cfg-topmost" onchange="pushConfigUpdate()">
+                    </div>
+                </div>
+
+                <div class="setting-card">
+                    <h3>Appearance</h3>
+
+                    <div class="setting-row">
+                        <span>Theme</span>
+
+                        <select id="cfg-theme" onchange="applyGlobalTheme(this.value)">
+                            <option value="purple">Purple</option>
+                            <option value="blue">Blue</option>
+                            <option value="red">Red</option>
+                            <option value="green">Green</option>
+                            <option value="orange">Orange</option>
+                        </select>
+                    </div>
+
+                    <div class="setting-row">
+                        <span>Weather FX</span>
+
+                        <select id="cfg-weather" onchange="setWeatherEffect(this.value)">
+                            <option value="none">None</option>
+                            <option value="matrix">Matrix</option>
+                            <option value="cybergrid">Cyber Grid</option>
+                            <option value="hyperjump">Hyperjump</option>
+                            <option value="stars">Stars</option>
+                            <option value="rain">Rain</option>
+                            <option value="snow">Snow</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="setting-card">
+                    <h3>Discord Presence</h3>
+
+                    <div class="setting-row" id="rpc-details-row">
+                        <span>Details</span>
+                        <input type="text" id="cfg-rpc-details" value="OblivionX Executor" oninput="pushRpcMessageUpdate()">
+                    </div>
+
+                    <div class="setting-row" id="rpc-state-row">
+                        <span>State</span>
+                        <input type="text" id="cfg-rpc-state" value="Idle" oninput="pushRpcMessageUpdate()">
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<!-- SCRIPT HUB -->
+
+<div class="modal" id="script-hub-modal" onclick="closeModalOnOuter(event,'script-hub-modal')">
+
+    <div class="modal-card">
+
+        <div class="modal-header">
+
+            <div class="modal-title">SCRIPT HUB</div>
+
+            <button class="window-btn close" onclick="closeModal('script-hub-modal')">
+                <span data-icon="x"></span>
+            </button>
+
+        </div>
+
+        <div class="modal-body">
+
+            <div class="script-hub-toolbar">
+
+                <button class="hub-tab active" id="hub-tab-trending" onclick="switchHubFilter('trending')">
+                    Trending
+                </button>
+
+                <button class="hub-tab" id="hub-tab-latest" onclick="switchHubFilter('latest')">
+                    Latest
+                </button>
+
+                <input id="hub-search-input" placeholder="Search scripts..." onkeydown="handleHubSearchKey(event)">
+
+                <button class="catalog-action-btn" onclick="triggerHubQuerySearch()">
+                    Search
+                </button>
+
+            </div>
+
+            <div id="hub-catalog-status">READY</div>
+
+            <div class="script-grid" id="hub-catalog-list"></div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
+
+<script>
+const VectorDictionary = {
+    minus: `<svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line></svg>`,
+    x: `<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`,
+    settings: `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82"></path></svg>`,
+    layers: `<svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`
+};
+
+function renderApplicationIcons(){
+    document.querySelectorAll('[data-icon]').forEach(element=>{
+        const iconName = element.getAttribute('data-icon');
+        if(VectorDictionary[iconName]){
+            element.innerHTML = VectorDictionary[iconName];
         }
+    });
+}
 
-        let editor;
-        let tabModels = {}; // Stores Monaco TextModels mapping for clean tab switching
-        let files = JSON.parse(localStorage.getItem('obv_fs')) || { "main.lua": "-- Workspace Active\nprint('OblivionX Engine Pro Ready.')" };
-        let current = Object.keys(files)[0] || "main.lua";
-        let topmost = false;
-        let activeHubFilter = "trending";
+renderApplicationIcons();
 
-        function sendWebviewMessage(payload) {
-            if (window.chrome && window.chrome.webview && typeof window.chrome.webview.postMessage === 'function') {
-                window.chrome.webview.postMessage(payload);
-            } else {
-                console.warn("[IPC Bridge]: WebView2 pipeline not initialized yet.", payload);
+let editor;
+let tabModels = {};
+let files = JSON.parse(localStorage.getItem('obv_fs')) || {
+    "main.lua":"-- Workspace Active\nprint('OblivionX Engine Pro Ready.')"
+};
+let current = Object.keys(files)[0] || "main.lua";
+let topmost = false;
+let activeHubFilter = "trending";
+
+function sendWebviewMessage(payload){
+    if(window.chrome && window.chrome.webview){
+        window.chrome.webview.postMessage(payload);
+    } else {
+        console.log("[IPC]",payload);
+    }
+}
+
+require.config({
+    paths:{
+        vs:"https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.0/min/vs"
+    }
+});
+
+require(["vs/editor/editor.main"],function(){
+
+    Object.keys(files).forEach(f=>{
+        tabModels[f]=monaco.editor.createModel(files[f],"lua");
+    });
+
+    editor = monaco.editor.create(document.getElementById("editor"),{
+        model:tabModels[current],
+        theme:"vs-dark",
+        automaticLayout:true,
+        minimap:{enabled:false},
+        fontSize:13,
+        fontFamily:"JetBrains Mono",
+        lineHeight:22,
+        smoothScrolling:true
+    });
+
+    editor.onDidChangeModelContent(()=>{
+        save();
+    });
+
+    renderTabs();
+
+    applyGlobalTheme(localStorage.getItem('obv_theme') || 'purple');
+    setWeatherEffect(localStorage.getItem('obv_weather') || 'matrix');
+
+    document.getElementById('cfg-discord').checked = localStorage.getItem('obv_cfg_discord') !== 'false';
+    document.getElementById('cfg-attach').checked = localStorage.getItem('obv_cfg_attach') === 'true';
+    document.getElementById('cfg-execute').checked = localStorage.getItem('obv_cfg_execute') === 'true';
+    document.getElementById('cfg-topmost').checked = localStorage.getItem('obv_cfg_topmost') === 'true';
+});
+
+function save(){
+    if(editor && tabModels[current]){
+        files[current] = tabModels[current].getValue();
+        localStorage.setItem('obv_fs',JSON.stringify(files));
+    }
+}
+
+function getEditorBuffer(){
+    sendWebviewMessage({
+        action:"execute",
+        code:editor.getValue()
+    });
+}
+
+function renderTabs(){
+    const container = document.getElementById("tab-container");
+    container.innerHTML = "";
+
+    Object.keys(files).forEach(f=>{
+        const tab = document.createElement("div");
+        tab.className = "tab" + (f===current ? " active":"");
+
+        tab.innerHTML = `
+            <span>${f}</span>
+            <span class="close-x"
+                onclick="event.stopPropagation();closeTab('${f}')">×</span>
+        `;
+
+        tab.onclick = ()=>switchActiveBuffer(f);
+
+        container.appendChild(tab);
+    });
+}
+
+function switchActiveBuffer(fileName){
+    save();
+    current = fileName;
+    editor.setModel(tabModels[fileName]);
+    renderTabs();
+}
+
+function createNewTab(title=null,initialContent=""){
+    save();
+
+    let n = title || "script_" + (Object.keys(files).length+1)+".lua";
+
+    if(files[n]){
+        n = "script_" + Math.floor(Math.random()*1000)+".lua";
+    }
+
+    files[n] = initialContent || "-- New Script";
+    tabModels[n] = monaco.editor.createModel(files[n],"lua");
+
+    current = n;
+
+    editor.setModel(tabModels[n]);
+
+    renderTabs();
+
+    save();
+}
+
+function closeTab(f){
+    if(Object.keys(files).length <= 1) return;
+
+    tabModels[f].dispose();
+    delete tabModels[f];
+    delete files[f];
+
+    if(current===f){
+        current = Object.keys(files)[0];
+    }
+
+    editor.setModel(tabModels[current]);
+
+    renderTabs();
+
+    save();
+}
+
+function openModal(id){
+    document.getElementById(id).style.display='flex';
+}
+
+function closeModal(id){
+    document.getElementById(id).style.display='none';
+}
+
+function closeModalOnOuter(e,id){
+    if(e.target.id===id){
+        closeModal(id);
+    }
+}
+
+function applyGlobalTheme(name){
+    document.body.className = "theme-" + name;
+
+    localStorage.setItem('obv_theme',name);
+
+    document.getElementById('cfg-theme').value = name;
+
+    setTimeout(()=>{
+        const accent = getComputedStyle(document.body).getPropertyValue('--accent').trim();
+        const bg = getComputedStyle(document.body).getPropertyValue('--bg').trim();
+
+        monaco.editor.defineTheme('obv-theme',{
+            base:'vs-dark',
+            inherit:true,
+            rules:[],
+            colors:{
+                'editor.background':bg,
+                'editorCursor.foreground':accent,
+                'editorLineNumber.activeForeground':accent
             }
-        }
-
-        function initNativeIPCListeners() {
-            if (window.chrome && window.chrome.webview && typeof window.chrome.webview.addEventListener === 'function') {
-                window.chrome.webview.addEventListener('message', handleBackendIPCMessage);
-                console.log("[IPC Bridge]: Event listener linked successfully.");
-            } else {
-                setTimeout(initNativeIPCListeners, 50);
-            }
-        }
-
-        require.config({ paths: { vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.0/min/vs" }});
-        require(["vs/editor/editor.main"], function () {
-            
-            // Build text models for each file recovered from storage layers
-            Object.keys(files).forEach(f => {
-                tabModels[f] = monaco.editor.createModel(files[f], "lua");
-            });
-
-            // Fallback initialization check
-            if (!tabModels[current]) {
-                current = "main.lua";
-                files[current] = "-- Workspace Active\n";
-                tabModels[current] = monaco.editor.createModel(files[current], "lua");
-            }
-
-            editor = monaco.editor.create(document.getElementById("editor"), {
-                model: tabModels[current],
-                theme: "vs-dark",
-                automaticLayout: true,
-                minimap: { enabled: false },
-                fontSize: 13,
-                fontFamily: 'JetBrains Mono, monospace',
-                lineHeight: 22,
-                cursorSmoothCaretAnimation: true,
-            });
-
-            editor.onDidChangeModelContent(() => { save(); });
-
-            // Restore persistent structural settings
-            const savedTheme = localStorage.getItem('obv_theme') || 'purple';
-            applyGlobalTheme(savedTheme);
-
-            const savedWeather = localStorage.getItem('obv_weather') || 'matrix';
-            setWeatherEffect(savedWeather);
-
-            // Synchronize and restore setting checkboxes directly from localStorage mapping layer
-            if (document.getElementById('cfg-discord')) document.getElementById('cfg-discord').checked = (localStorage.getItem('obv_cfg_discord') !== 'false');
-            if (document.getElementById('cfg-attach')) document.getElementById('cfg-attach').checked = (localStorage.getItem('obv_cfg_attach') === 'true');
-            if (document.getElementById('cfg-execute')) document.getElementById('cfg-execute').checked = (localStorage.getItem('obv_cfg_execute') === 'true');
-            if (document.getElementById('cfg-topmost')) {
-                const isTopmost = (localStorage.getItem('obv_cfg_topmost') === 'true');
-                document.getElementById('cfg-topmost').checked = isTopmost;
-                topmost = isTopmost;
-            }
-
-            if (document.getElementById('cfg-rpc-details')) document.getElementById('cfg-rpc-details').value = localStorage.getItem('obv_rpc_details') || "OblivionX Executor";
-            if (document.getElementById('cfg-rpc-state')) document.getElementById('cfg-rpc-state').value = localStorage.getItem('obv_rpc_state') || "Idle";
-
-            renderTabs();
-            initNativeIPCListeners();
-            
-            // Push active cached settings down to C# CefSharp/WebView2 layer handlers instantly
-            setTimeout(() => { pushConfigUpdate(); }, 200);
-            
-            renderApplicationIcons();
         });
 
-        function save(){
-            if(editor && tabModels[current]){
-                files[current] = tabModels[current].getValue();
-                localStorage.setItem('obv_fs', JSON.stringify(files));
-            }
+        monaco.editor.setTheme('obv-theme');
+    },50);
+
+    sendWebviewMessage({
+        action:"theme",
+        value:name
+    });
+}
+
+function pushConfigUpdate(){
+
+    const config = {
+        discordRpc:document.getElementById('cfg-discord').checked,
+        autoAttach:document.getElementById('cfg-attach').checked,
+        autoExecute:document.getElementById('cfg-execute').checked,
+        alwaysOnTop:document.getElementById('cfg-topmost').checked
+    };
+
+    localStorage.setItem('obv_cfg_discord',config.discordRpc);
+    localStorage.setItem('obv_cfg_attach',config.autoAttach);
+    localStorage.setItem('obv_cfg_execute',config.autoExecute);
+    localStorage.setItem('obv_cfg_topmost',config.alwaysOnTop);
+
+    sendWebviewMessage({
+        action:"update_config",
+        settings:config
+    });
+}
+
+function pushRpcMessageUpdate(){
+
+    const d = document.getElementById('cfg-rpc-details').value;
+    const s = document.getElementById('cfg-rpc-state').value;
+
+    localStorage.setItem('obv_rpc_details',d);
+    localStorage.setItem('obv_rpc_state',s);
+
+    sendWebviewMessage({
+        action:'update_rpc_details',
+        details:d,
+        state:s
+    });
+}
+
+function updateStatusUI(mode,pid=null){
+
+    const dot = document.getElementById('top-attach-dot');
+    const txt = document.getElementById('status-text');
+
+    if(mode==='attached'){
+        dot.className = "attach-indicator-dot active";
+        txt.innerText = "Attached ("+pid+")";
+    }
+    else if(mode==='failed'){
+        dot.className = "attach-indicator-dot failed";
+        txt.innerText = "Attachment Failed";
+    }
+    else{
+        dot.className = "attach-indicator-dot";
+        txt.innerText = "Not Attached";
+    }
+}
+
+function minimize(){
+    sendWebviewMessage({action:"minimize"});
+}
+
+function closeApp(){
+    sendWebviewMessage({action:"exit"});
+}
+
+function openScriptHub(){
+    openModal('script-hub-modal');
+    switchHubFilter(activeHubFilter);
+}
+
+function switchHubFilter(mode){
+
+    activeHubFilter = mode;
+
+    document.getElementById("hub-tab-trending").classList.toggle("active",mode==='trending');
+    document.getElementById("hub-tab-latest").classList.toggle("active",mode==='latest');
+
+    updateHubStatus("FETCHING_STREAM");
+
+    sendWebviewMessage({
+        action:"scriptblox_fetch_trending",
+        filter:mode
+    });
+}
+
+function triggerHubQuerySearch(){
+
+    const query = document.getElementById('hub-search-input').value.trim();
+
+    if(!query){
+        switchHubFilter(activeHubFilter);
+        return;
+    }
+
+    updateHubStatus("QUERYING_MATRIX");
+
+    sendWebviewMessage({
+        action:"scriptblox_search",
+        query:query
+    });
+}
+
+function handleHubSearchKey(e){
+    if(e.key==="Enter"){
+        triggerHubQuerySearch();
+    }
+}
+
+function updateHubStatus(text){
+    document.getElementById('hub-catalog-status').innerText = text;
+}
+
+function populateScriptHubCatalog(responseObj){
+
+    const listContainer = document.getElementById('hub-catalog-list');
+
+    listContainer.innerHTML = "";
+
+    let scriptsArray = responseObj?.scripts || responseObj?.result || responseObj?.data || responseObj;
+
+    if(!scriptsArray || scriptsArray.length===0){
+        updateHubStatus("NULL_MATRIX");
+        return;
+    }
+
+    updateHubStatus("RENDERED_" + scriptsArray.length + "_ASSETS");
+
+    scriptsArray.forEach(item=>{
+
+        let badgesHtml = "";
+
+        if(item.universal){
+            badgesHtml += `<span class="script-badge universal">Universal</span>`;
         }
 
-        window.getEditorBuffer = function() {
-            if(editor) {
-                sendWebviewMessage({ action: "execute", code: editor.getValue() });
-            }
+        if(item.verified){
+            badgesHtml += `<span class="script-badge verified">Verified</span>`;
         }
 
-        window.SetText = function(text) {
-            if(editor && tabModels[current]) {
-                tabModels[current].setValue(text);
-                save();
-            }
+        if(item.patched){
+            badgesHtml += `<span class="script-badge patched">Patched</span>`;
         }
 
-        function renderTabs(){
-            const container = document.getElementById("tab-container");
-            if (!container) return;
-            container.innerHTML = "";
+        const card = document.createElement('div');
 
-            Object.keys(files).forEach(f => {
-                let tab = document.createElement("div");
-                tab.className = "tab" + (f === current ? " active" : "");
-                tab.innerHTML = `<span>${f}</span><span class="close-x" onclick="event.stopPropagation(); closeTab('${f}')">×</span>`;
-                tab.onclick = () => switchActiveBuffer(f);
-                container.appendChild(tab);
-            });
+        card.className = "script-card-item";
+
+        card.innerHTML = `
+            <div>
+                <div class="script-title-row">
+                    <span class="script-title">${item.title || "Unnamed Script"}</span>
+                    <div>${badgesHtml}</div>
+                </div>
+
+                <div class="script-desc">
+                    ${item.description || item.features || "No description attached."}
+                </div>
+            </div>
+
+            <div class="script-card-footer">
+
+                <div class="script-meta-metrics">
+                    <span>Views: ${item.views || 0}</span>
+                    <span>${item.game?.name || "Universal"}</span>
+                </div>
+
+                <button class="catalog-action-btn"
+                    onclick="requestRawScript('${item._id || item.id}','${(item.title || 'script').replace(/'/g,"")}')">
+                    Load
+                </button>
+
+            </div>
+        `;
+
+        listContainer.appendChild(card);
+    });
+}
+
+function requestRawScript(scriptId,cleanTitle){
+
+    updateHubStatus("STREAM_CODE");
+
+    sendWebviewMessage({
+        action:"scriptblox_get_raw",
+        id:scriptId,
+        title:cleanTitle
+    });
+}
+
+function injectRawScriptIntoEditor(slugTitle,rawCode){
+
+    closeModal('script-hub-modal');
+
+    let workspaceTitle = slugTitle.toLowerCase().replace(/\s+/g,'_') + ".lua";
+
+    createNewTab(workspaceTitle,rawCode);
+}
+
+document.getElementById("cli").addEventListener("keydown",e=>{
+
+    if(e.key==="Enter"){
+
+        const cmd = e.target.value.trim().toLowerCase();
+
+        if(cmd==="/run"){
+            getEditorBuffer();
         }
 
-        function switchActiveBuffer(fileName) {
-            if (!tabModels[fileName]) return;
-            save();
-            current = fileName;
-            editor.setModel(tabModels[fileName]);
-            renderTabs();
+        if(cmd==="/inject"){
+            sendWebviewMessage({action:"inject"});
         }
 
-        function createNewTab(title = null, initialContent = "") {
-            save();
-            let n = title || "script_" + (Object.keys(files).length + 1) + ".lua";
-            
-            // Deduplicate names if multiple files are loaded with the same title sequence
-            if(files[n]) {
-                n = "script_" + Math.floor(Math.random() * 1000) + "_" + n;
-            }
-
-            files[n] = initialContent || "-- New Workbook Frame\n";
-            tabModels[n] = monaco.editor.createModel(files[n], "lua");
-            
-            current = n;
-            renderTabs();
-            if(editor) editor.setModel(tabModels[n]);
-            save();
+        if(cmd==="/new"){
+            createNewTab();
         }
 
-        function closeTab(f) {
-            if (Object.keys(files).length <= 1) return;
-            
-            // Dispose of the text model cleanly to save browser memory resources
-            if (tabModels[f]) {
-                tabModels[f].dispose();
-                delete tabModels[f];
-            }
-            delete files[f];
-            
-            if (current === f) {
-                current = Object.keys(files)[0];
-            }
-            
-            if(editor) editor.setModel(tabModels[current]);
-            renderTabs();
-            save();
-        }
+        if(cmd==="/topmost"){
+            document.getElementById('cfg-topmost').checked =
+                !document.getElementById('cfg-topmost').checked;
 
-        window.openScriptHub = function() {
-            openModal('script-hub-modal');
-            switchHubFilter(activeHubFilter || 'trending');
-        }
-
-        window.switchHubFilter = function(mode) {
-            activeHubFilter = mode;
-            document.getElementById("hub-tab-trending").classList.toggle("active", mode === 'trending');
-            document.getElementById("hub-tab-latest").classList.toggle("active", mode === 'latest');
-            document.getElementById("hub-search-input").value = "";
-            
-            updateHubStatus("FETCHING_STREAM");
-            sendWebviewMessage({ action: "scriptblox_fetch_trending", filter: mode });
-        }
-
-        window.triggerHubQuerySearch = function() {
-            const query = document.getElementById('hub-search-input').value.trim();
-            if(!query) {
-                switchHubFilter(activeHubFilter);
-                return;
-            }
-            document.getElementById("hub-tab-trending").classList.remove("active");
-            document.getElementById("hub-tab-latest").classList.remove("active");
-            
-            updateHubStatus("QUERYING_MATRIX");
-            sendWebviewMessage({ action: "scriptblox_search", query: query });
-        }
-
-        window.handleHubSearchKey = function(e) {
-            if(e.key === "Enter") triggerHubQuerySearch();
-        }
-
-        function updateHubStatus(text) {
-            const el = document.getElementById('hub-catalog-status');
-            if (el) el.innerText = text;
-        }
-
-        window.populateScriptHubCatalog = function(responseObj) {
-            const listContainer = document.getElementById('hub-catalog-list');
-            if (!listContainer) return;
-            listContainer.innerHTML = "";
-            
-            let scriptsArray = null;
-            if (responseObj) {
-                if (Array.isArray(responseObj)) scriptsArray = responseObj;
-                else if (responseObj.scripts && Array.isArray(responseObj.scripts)) scriptsArray = responseObj.scripts;
-                else if (responseObj.result && Array.isArray(responseObj.result)) scriptsArray = responseObj.result;
-                else if (responseObj.result && responseObj.result.scripts && Array.isArray(responseObj.result.scripts)) scriptsArray = responseObj.result.scripts;
-                else if (responseObj.data && Array.isArray(responseObj.data)) scriptsArray = responseObj.data;
-                else if (responseObj.data && responseObj.data.scripts && Array.isArray(responseObj.data.scripts)) scriptsArray = responseObj.data.scripts;
-            }
-
-            if(!scriptsArray || scriptsArray.length === 0) {
-                updateHubStatus("NULL_MATRIX");
-                listContainer.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--text-dim); font-family:var(--font-mono); font-size:12px;">No asset records found matching criteria.</div>`;
-                return;
-            }
-
-            updateHubStatus(`RENDERED_${scriptsArray.length}_ASSETS`);
-
-            scriptsArray.forEach(item => {
-                if (!item) return;
-                let card = document.createElement('div');
-                card.className = "script-card-item";
-
-                let badgesHtml = "";
-                if(item.universal) badgesHtml += `<span class="script-badge universal">Universal</span>`;
-                if(item.verified) badgesHtml += `<span class="script-badge verified">Verified</span>`;
-                if(item.patched) badgesHtml += `<span class="script-badge patched">Patched</span>`;
-
-                let views = item.views || 0;
-                let scriptId = item._id || item.id || "";
-                
-                let rawTitle = item.title || "Unnamed Script";
-                let cleanTitle = rawTitle.replace(/['"`\\]/g, ' ');
-                let gameName = item.game ? (item.game.name || 'Universal') : 'Universal';
-                let featuresText = item.features || item.description || 'No parameters attached to this node.';
-                let cleanFeatures = featuresText.replace(/['"`\\]/g, ' ');
-
-                card.innerHTML = `
-                    <div class="script-info">
-                        <div class="script-title-row">
-                            <span class="script-title">${rawTitle}</span>
-                            <div class="badge-layout-row">${badgesHtml}</div>
-                        </div>
-                        <div class="script-desc">${cleanFeatures}</div>
-                    </div>
-                    <div class="script-card-footer">
-                        <div class="script-meta-metrics">
-                            <span>G//<span>${gameName.substring(0,14)}${gameName.length > 14 ? '...' : ''}</span></span>
-                            <span>V//<span>${views}</span></span>
-                        </div>
-                        <button class="catalog-action-btn" onclick="requestRawScript('${scriptId}', '${cleanTitle}')">Load Code</button>
-                    </div>
-                `;
-                listContainer.appendChild(card);
-            });
-        }
-
-        window.requestRawScript = function(scriptId, cleanTitle) {
-            updateHubStatus(`STREAM_CODE`);
-            sendWebviewMessage({ action: "scriptblox_get_raw", id: scriptId, title: cleanTitle });
-        }
-
-        window.injectRawScriptIntoEditor = function(slugTitle, rawCode) {
-            closeModal('script-hub-modal');
-            let workspaceTitle = slugTitle.toLowerCase().replace(/\s+/g, '_') + ".lua";
-            if(!workspaceTitle.endsWith(".lua")) workspaceTitle += ".lua";
-            createNewTab(workspaceTitle, rawCode);
-        }
-
-        window.openModal = function(id) { 
-            const el = document.getElementById(id);
-            if(el) el.style.display = 'flex';
-        }
-        window.closeModal = function(id) { 
-            const el = document.getElementById(id);
-            if(el) el.style.display = 'none'; 
-        }
-        window.closeModalOnOuter = function(e, id) { if(e.target.id === id) closeModal(id); }
-
-        window.applyGlobalTheme = function(name) {
-            document.body.className = `theme-${name}`;
-            localStorage.setItem('obv_theme', name);
-            if (document.getElementById('cfg-theme')) document.getElementById('cfg-theme').value = name;
-            
-            setTimeout(() => {
-                const accent = getComputedStyle(document.body).getPropertyValue('--accent').trim();
-                const bg = getComputedStyle(document.body).getPropertyValue('--bg').trim();
-                if(window.monaco) {
-                    monaco.editor.defineTheme('obv-theme', {
-                        base: 'vs-dark', inherit: true, rules: [],
-                        colors: { 
-                            'editor.background': bg, 
-                            'editorCursor.foreground': accent, 
-                            'editorLineNumber.activeForeground': accent 
-                        }
-                    });
-                    monaco.editor.setTheme('obv-theme');
-                }
-            }, 60);
-            sendWebviewMessage({ action: "theme", value: name });
-        }
-
-        window.pushConfigUpdate = function() {
-            const cbDiscord = document.getElementById('cfg-discord');
-            const cbAttach = document.getElementById('cfg-attach');
-            const cbExecute = document.getElementById('cfg-execute');
-            const cbTopmost = document.getElementById('cfg-topmost');
-            
-            const isRpcOn = cbDiscord ? cbDiscord.checked : true;
-            const isAttachOn = cbAttach ? cbAttach.checked : false;
-            const isExecuteOn = cbExecute ? cbExecute.checked : false;
-            const isTopmostOn = cbTopmost ? cbTopmost.checked : false;
-            
-            localStorage.setItem('obv_cfg_discord', isRpcOn);
-            localStorage.setItem('obv_cfg_attach', isAttachOn);
-            localStorage.setItem('obv_cfg_execute', isExecuteOn);
-            localStorage.setItem('obv_cfg_topmost', isTopmostOn);
-            topmost = isTopmostOn;
-            
-            if (document.getElementById('rpc-details-row')) document.getElementById('rpc-details-row').style.opacity = isRpcOn ? "1" : "0.4";
-            if (document.getElementById('rpc-state-row')) document.getElementById('rpc-state-row').style.opacity = isRpcOn ? "1" : "0.4";
-
-            sendWebviewMessage({
-                action: "update_config",
-                settings: {
-                    discordRpc: isRpcOn,
-                    autoAttach: isAttachOn,
-                    autoExecute: isExecuteOn,
-                    alwaysOnTop: isTopmostOn
-                }
-            });
-            pushRpcMessageUpdate();
-        }
-
-        window.pushRpcMessageUpdate = function() {
-            const d = document.getElementById('cfg-rpc-details')?.value || "OblivionX Executor";
-            const s = document.getElementById('cfg-rpc-state')?.value || "Idle";
-            localStorage.setItem('obv_rpc_details', d);
-            localStorage.setItem('obv_rpc_state', s);
-            sendWebviewMessage({ action: 'update_rpc_details', details: d, state: s });
-        }
-
-        window.loadExecutorSettings = function(cfg) {
-            if (cfg) {
-                if(document.getElementById('cfg-discord')) document.getElementById('cfg-discord').checked = cfg.discordRpc;
-                if(document.getElementById('cfg-attach')) document.getElementById('cfg-attach').checked = cfg.autoAttach;
-                if(document.getElementById('cfg-execute')) document.getElementById('cfg-execute').checked = cfg.autoExecute;
-                if(document.getElementById('cfg-topmost')) document.getElementById('cfg-topmost').checked = cfg.alwaysOnTop;
-                topmost = cfg.alwaysOnTop;
-                pushConfigUpdate();
-            }
-        }
-
-        function updateStatusUI(mode, pid = null) {
-            const dot = document.getElementById('top-attach-dot');
-            const txt = document.getElementById('status-text');
-            const glow = document.getElementById('status-glow');
-            if(!dot || !txt) return;
-
-            if(mode === 'attached') {
-                dot.className = "attach-indicator-dot active";
-                txt.innerText = `Attached (${pid})`;
-                if(glow) glow.style.background = "var(--accent)";
-            } else if (mode === 'failed') {
-                dot.className = "attach-indicator-dot failed";
-                txt.innerText = "Attachment Failed";
-                if(glow) glow.style.background = "#ef4444";
-            } else {
-                dot.className = "attach-indicator-dot";
-                txt.innerText = "Not Attached";
-                if(glow) glow.style.background = "#222";
-            }
-        }
-
-        window.toggleTopMost = function(){
-            topmost = !topmost;
-            if(document.getElementById('cfg-topmost')) document.getElementById('cfg-topmost').checked = topmost;
             pushConfigUpdate();
         }
 
-        window.minimize = function(){ sendWebviewMessage({ action: "minimize" }); }
-        window.closeApp = function(){ sendWebviewMessage({ action: "exit" }); }
+        e.target.value = "";
+    }
+});
 
-        function handleBackendIPCMessage(event) {
-            try {
-                const msg = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
-                if(!msg) return;
-                
-                if(msg.action === "pid_update") updateStatusUI('attached', msg.pid);
-                if(msg.action === "clear_pid") updateStatusUI('idle');
-                if(msg.action === "injection_failed") updateStatusUI('failed');
-                if(msg.action === "scriptblox_render_results") populateScriptHubCatalog(msg.data);
-                if(msg.action === "scriptblox_deliver_raw") injectRawScriptIntoEditor(msg.title, msg.rawCode);
-                if(msg.action === "scriptblox_error") updateHubStatus("STREAM_FAULT");
-            } catch(e) {
-                console.error("[IPC Parse Error]", e);
-            }
+const canvas = document.getElementById('weather-canvas');
+const ctx = canvas.getContext('2d');
+
+let animationId;
+let weatherMode = 'matrix';
+
+function resizeCanvas(){
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+
+window.addEventListener('resize',resizeCanvas);
+
+resizeCanvas();
+
+let matrixParticles = [];
+let warpStars = [];
+let environmentDrops = [];
+
+function initWeather(mode){
+
+    matrixParticles = [];
+    warpStars = [];
+    environmentDrops = [];
+
+    const cols = Math.floor(canvas.width / 14) + 1;
+
+    if(mode==='matrix'){
+
+        for(let i=0;i<cols;i++){
+
+            matrixParticles.push({
+                x:i*14,
+                y:Math.random()*-500,
+                speed:2 + Math.random()*5
+            });
         }
+    }
 
-        document.getElementById("cli").addEventListener("keydown", e => {
-            if(e.key === "Enter"){
-                let cmd = e.target.value.trim().toLowerCase();
-                if(cmd === "/run") getEditorBuffer();
-                if(cmd === "/inject") sendWebviewMessage({ action: "inject" });
-                if(cmd === "/new") createNewTab();
-                if(cmd === "/topmost") toggleTopMost();
-                e.target.value = "";
+    else if(mode==='hyperjump' || mode==='stars'){
+
+        for(let i=0;i<150;i++){
+
+            warpStars.push({
+                x:Math.random()*canvas.width,
+                y:Math.random()*canvas.height,
+                z:Math.random()*canvas.width
+            });
+        }
+    }
+
+    else if(mode==='rain' || mode==='snow'){
+
+        for(let i=0;i<120;i++){
+
+            environmentDrops.push({
+                x:Math.random()*canvas.width,
+                y:Math.random()*canvas.height,
+                speed:4 + Math.random()*6,
+                size:1 + Math.random()*3
+            });
+        }
+    }
+}
+
+function setWeatherEffect(mode){
+
+    weatherMode = mode;
+
+    localStorage.setItem('obv_weather',mode);
+
+    document.getElementById('cfg-weather').value = mode;
+
+    cancelAnimationFrame(animationId);
+
+    if(mode!=='none'){
+        initWeather(mode);
+        renderWeatherLoop();
+    } else {
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+    }
+
+    sendWebviewMessage({
+        action:'set_weather',
+        weather:mode
+    });
+}
+
+function renderWeatherLoop(){
+
+    const accentColor = getComputedStyle(document.body)
+        .getPropertyValue('--accent')
+        .trim();
+
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    if(weatherMode==='matrix'){
+
+        ctx.font = '11px monospace';
+
+        matrixParticles.forEach(p=>{
+
+            ctx.fillStyle = accentColor;
+
+            ctx.fillText(
+                String.fromCharCode(0x30A0 + Math.random()*96),
+                p.x,
+                p.y
+            );
+
+            p.y += p.speed;
+
+            if(p.y > canvas.height){
+                p.y = -50;
             }
         });
+    }
 
-        const canvas = document.getElementById('weather-canvas');
-        const ctx = canvas.getContext('2d');
-        let animationId, weatherMode = 'matrix';
+    else if(weatherMode==='cybergrid'){
 
-        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
+        ctx.strokeStyle = accentColor;
 
-        let matrixParticles = [], warpStars = [], environmentDrops = [];
+        const step = 45;
+        const offset = (Date.now()/30)%step;
 
-        function initWeather(mode) {
-            matrixParticles = []; warpStars = []; environmentDrops = [];
-            const cols = Math.floor(canvas.width / 14) + 1;
-            if(mode === 'matrix') { for(let i=0; i<cols; i++) matrixParticles.push({ x: i*14, y: Math.random() * -500, speed: 2 + Math.random() * 5 }); }
-            else if(mode === 'hyperjump' || mode === 'stars') { for(let i=0; i<150; i++) warpStars.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, z: Math.random()*canvas.width, color: Math.random() > 0.5 ? '#fff' : 'var(--accent)' }); }
-            else if(mode === 'rain' || mode === 'snow') { for(let i=0; i<120; i++) environmentDrops.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, speed: 4 + Math.random()*6, size: 1 + Math.random()*3 }); }
+        for(let x=offset;x<canvas.width;x+=step){
+            ctx.beginPath();
+            ctx.moveTo(x,0);
+            ctx.lineTo(x,canvas.height);
+            ctx.stroke();
         }
 
-        window.setWeatherEffect = function(mode) {
-            weatherMode = mode;
-            localStorage.setItem('obv_weather', mode);
-            if(document.getElementById('cfg-weather')) document.getElementById('cfg-weather').value = mode;
-            cancelAnimationFrame(animationId);
-            if(mode !== 'none') { initWeather(mode); renderWeatherLoop(); } else { ctx.clearRect(0,0, canvas.width, canvas.height); }
-            sendWebviewMessage({ action: 'set_weather', weather: mode });
+        for(let y=offset;y<canvas.height;y+=step){
+            ctx.beginPath();
+            ctx.moveTo(0,y);
+            ctx.lineTo(canvas.width,y);
+            ctx.stroke();
         }
+    }
 
-        function renderWeatherLoop() {
-            const accentColor = getComputedStyle(document.body).getPropertyValue('--accent').trim();
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+    else if(weatherMode==='hyperjump'){
 
-            if(weatherMode === 'matrix') {
-                ctx.fillStyle = 'rgba(0,0,0,0.05)'; ctx.font = '11px monospace';
-                matrixParticles.forEach(p => {
-                    ctx.fillStyle = accentColor;
-                    ctx.fillText(String.fromCharCode(0x30A0 + Math.random() * 96), p.x, p.y);
-                    p.y += p.speed; if(p.y > canvas.height) { p.y = -50; p.speed = 2 + Math.random() * 5; }
-                });
+        warpStars.forEach(s=>{
+
+            s.z -= 8;
+
+            if(s.z<=0){
+                s.z = canvas.width;
             }
-            else if(weatherMode === 'cybergrid') {
-                ctx.strokeStyle = accentColor; ctx.lineWidth = 0.4;
-                const step = 45; const offset = (Date.now() / 30) % step;
-                for(let x = offset; x < canvas.width; x += step) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke(); }
-                for(let y = offset; y < canvas.height; y += step) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke(); }
+
+            const cx = canvas.width/2;
+            const cy = canvas.height/2;
+
+            const px = (s.x-cx)*(canvas.width/s.z)+cx;
+            const py = (s.y-cy)*(canvas.width/s.z)+cy;
+
+            ctx.strokeStyle = "#fff";
+
+            ctx.beginPath();
+            ctx.moveTo(px,py);
+            ctx.lineTo(px+(px-cx)*0.09,py+(py-cy)*0.09);
+            ctx.stroke();
+        });
+    }
+
+    else if(weatherMode==='stars'){
+
+        warpStars.forEach(s=>{
+
+            ctx.fillStyle = "#fff";
+
+            ctx.fillRect(s.x,s.y,1.5,1.5);
+
+            s.y += .2;
+
+            if(s.y > canvas.height){
+                s.y = 0;
             }
-            else if(weatherMode === 'hyperjump') {
-                warpStars.forEach(s => {
-                    s.z -= 8; if(s.z <= 0) { s.z = canvas.width; s.x = Math.random()*canvas.width; s.y = Math.random()*canvas.height; }
-                    const cx = canvas.width / 2, cy = canvas.height / 2;
-                    const px = (s.x - cx) * (canvas.width / s.z) + cx, py = (s.y - cy) * (canvas.width / s.z) + cy;
-                    ctx.strokeStyle = s.color; ctx.lineWidth = 2;
-                    ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px + (px - cx)*0.09, py + (py - cy)*0.09); ctx.stroke();
-                });
+        });
+    }
+
+    else if(weatherMode==='rain'){
+
+        ctx.strokeStyle = accentColor;
+
+        environmentDrops.forEach(d=>{
+
+            ctx.beginPath();
+            ctx.moveTo(d.x,d.y);
+            ctx.lineTo(d.x+1,d.y+12);
+            ctx.stroke();
+
+            d.y += d.speed;
+
+            if(d.y > canvas.height){
+                d.y = -20;
             }
-            else if(weatherMode === 'stars') {
-                warpStars.forEach(s => { ctx.fillStyle = s.color; ctx.fillRect(s.x, s.y, 1.5, 1.5); s.y += 0.2; if(s.y > canvas.height) s.y = 0; });
+        });
+    }
+
+    else if(weatherMode==='snow'){
+
+        ctx.fillStyle = '#fff';
+
+        environmentDrops.forEach(d=>{
+
+            ctx.beginPath();
+            ctx.arc(d.x,d.y,d.size/2,0,Math.PI*2);
+            ctx.fill();
+
+            d.y += d.speed * .25;
+
+            if(d.y > canvas.height){
+                d.y = -10;
             }
-            else if(weatherMode === 'rain') {
-                ctx.strokeStyle = accentColor; ctx.lineWidth = 1;
-                environmentDrops.forEach(d => {
-                    ctx.beginPath(); ctx.moveTo(d.x, d.y); ctx.lineTo(d.x + 1, d.y + 12); ctx.stroke();
-                    d.y += d.speed; d.x += 0.5; if(d.y > canvas.height) { d.y = -20; d.x = Math.random()*canvas.width; }
-                });
-            }
-            else if(weatherMode === 'snow') {
-                ctx.fillStyle = '#ffffff';
-                environmentDrops.forEach(d => {
-                    ctx.beginPath(); ctx.arc(d.x, d.y, d.size/2, 0, Math.PI*2); ctx.fill();
-                    d.y += d.speed * 0.25; d.x += Math.sin(d.y/30) * 0.5; if(d.y > canvas.height) { d.y = -10; d.x = Math.random()*canvas.width; }
-                });
-            }
-            animationId = requestAnimationFrame(renderWeatherLoop);
-        }
-    </script>
+        });
+    }
+
+    animationId = requestAnimationFrame(renderWeatherLoop);
+}
+</script>
+
 </body>
 </html>
