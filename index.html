@@ -80,7 +80,13 @@
             font-family: var(--font-sans); font-weight: 600;
         }
         .icon-btn:hover { color: var(--text-main); border-color: var(--accent); background: rgba(255,255,255,0.02); }
-        .icon-btn .lucide, .icon-btn svg { width: 13px; height: 13px; }
+        
+        /* Forces standard geometric rendering constraints on all lucide svgs */
+        .icon-btn .lucide, .icon-btn svg, .window-control-btn .lucide, .window-control-btn svg { 
+            width: 14px !important; 
+            height: 14px !important; 
+            display: inline-block;
+        }
 
         .window-control-btn {
             background: transparent; border: 1px solid var(--border); color: #666;
@@ -88,7 +94,6 @@
         }
         .window-control-btn:hover { color: var(--text-main); border-color: rgba(255, 255, 255, 0.15); background: rgba(255, 255, 255, 0.03); }
         .window-control-btn.close-btn:hover { border-color: #ff4444; color: #ff4444; background: rgba(255, 68, 68, 0.05); }
-        .window-control-btn .lucide, .window-control-btn svg { width: 14px; height: 14px; }
 
         .workspace-grid { display: flex; flex: 1; overflow: hidden; background: transparent; }
         .editor-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
@@ -201,7 +206,7 @@
             background: transparent; border: none; padding: 4px; border-radius: 6px;
         }
         .modal-close-trigger:hover { color: var(--text-main); background: rgba(255, 255, 255, 0.04); }
-        .modal-close-trigger .lucide { width: 16px; height: 16px; }
+        .modal-close-trigger .lucide { width: 16px !important; height: 16px !important; }
 
         .switch { position: relative; display: inline-block; width: 34px; height: 20px; flex-shrink: 0; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -349,7 +354,7 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.0/min/vs/loader.min.js"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/lucide"></script>
     <script>
         let editor;
         let files = JSON.parse(localStorage.getItem('obv_fs')) || { "main.lua": "-- Workspace Active\nprint('OblivionX Engine Pro Ready.')" };
@@ -403,8 +408,8 @@
             initNativeIPCListeners();
             sendWebviewMessage({ action: "request_settings" });
             
-            // Initial scan to render top-level icons
-            lucide.createIcons();
+            // Render visible icons on load
+            if (window.lucide) lucide.createIcons();
         });
 
         function save(){
@@ -574,7 +579,7 @@
             const el = document.getElementById(id);
             if(el) {
                 el.style.display = 'flex';
-                // Scans the newly revealed modal elements for un-rendered lucide hooks
+                // Force a DOM parse directly when the structural box opens
                 if (window.lucide) lucide.createIcons();
             }
         }
