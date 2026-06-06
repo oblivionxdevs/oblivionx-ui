@@ -347,6 +347,7 @@
     .tab:hover { color:var(--text-1); background:rgba(255,255,255,.03); border-color:var(--line-0); }
     .tab.active { color:var(--text-0); background:var(--panel-2); border-color:var(--line-1); }
     .tab.active { box-shadow:inset 0 -1px 0 var(--accent-border); }
+    .tab.system { border-color:var(--accent-border); background:var(--accent-soft); }
     .tab.modified .tab-dot { background:var(--warn); }
     .tab-dot { width:6px; height:6px; border-radius:50%; background:var(--text-3); flex:0 0 auto; }
     .tab.active .tab-dot { background:var(--accent); }
@@ -362,6 +363,8 @@
       line-height:1;
     }
     .tab-close:hover { color:var(--danger); background:rgba(255,107,122,.08); }
+    .tab:hover .tab-close,
+    .tab.active .tab-close { display:grid; }
     .tab-action-btn,
     .new-tab { width:30px; height:29px; flex:0 0 auto; padding:0; }
     .tab-action-btn { animation:tabIn .22s var(--ease) both; }
@@ -373,6 +376,52 @@
       overflow:hidden;
     }
     #editor { position:absolute; inset:0; }
+    .settings-tab-view {
+      position:absolute;
+      inset:0;
+      z-index:14;
+      display:none;
+      overflow:auto;
+      padding:20px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.008)),
+        radial-gradient(circle at 82% 8%, var(--accent-soft), transparent 36%),
+        var(--bg);
+      animation:panelIn .24s var(--ease) both;
+      scrollbar-gutter:stable;
+    }
+    .settings-tab-view.open { display:block; }
+    .settings-tab-view::-webkit-scrollbar { width:8px; height:8px; }
+    .settings-tab-view::-webkit-scrollbar-track { background:rgba(255,255,255,.018); }
+    .settings-tab-view::-webkit-scrollbar-thumb {
+      border:2px solid var(--bg);
+      border-radius:999px;
+      background:linear-gradient(180deg, var(--accent), rgba(255,255,255,.14));
+    }
+    .settings-tab-head {
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:14px;
+      max-width:920px;
+      margin:0 auto 14px;
+      padding-bottom:14px;
+      border-bottom:1px solid var(--line-1);
+    }
+    .settings-tab-kicker {
+      color:var(--accent);
+      font-family:var(--mono);
+      font-size:9px;
+      font-weight:800;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+    }
+    .settings-tab-title { margin-top:6px; color:var(--text-0); font-size:21px; font-weight:800; letter-spacing:.01em; }
+    .settings-tab-sub { margin-top:5px; color:var(--text-3); font-family:var(--mono); font-size:10px; }
+    .settings-tab-view .settings-grid { max-width:920px; margin:0 auto; }
+    .editor-shell.settings-active #editor { opacity:0; pointer-events:none; }
+    .editor-shell.settings-active .find-panel,
+    .editor-shell.settings-active .console-panel { display:none; }
 
     .find-panel, .console-panel {
       position:absolute;
@@ -625,6 +674,8 @@
     .modal-card {
       width:min(92vw, 520px);
       max-height:88vh;
+      display:flex;
+      flex-direction:column;
       border:1px solid var(--line-2);
       border-radius:8px;
       background:var(--panel-1);
@@ -643,11 +694,26 @@
       padding:0 16px;
       border-bottom:1px solid var(--line-1);
       background:rgba(255,255,255,.025);
+      flex:0 0 auto;
     }
     .modal-title { font-size:12px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
     .modal-sub { color:var(--text-3); font-family:var(--mono); font-size:10px; margin-top:2px; }
-    .modal-body { padding:14px 16px 16px; overflow:auto; }
-
+    .modal-body {
+      min-height:0;
+      flex:1 1 auto;
+      padding:14px 16px 16px;
+      overflow:auto;
+      overscroll-behavior:contain;
+      scrollbar-gutter:stable;
+    }
+    .modal-body::-webkit-scrollbar { width:7px; height:7px; }
+    .modal-body::-webkit-scrollbar-track { background:rgba(255,255,255,.018); }
+    .modal-body::-webkit-scrollbar-thumb {
+      border-radius:999px;
+      background:linear-gradient(180deg, var(--accent), rgba(255,255,255,.12));
+      border:2px solid var(--panel-1);
+    }
+    .modal-body::-webkit-scrollbar-thumb:hover { background:var(--accent); }
     .settings-grid { display:grid; gap:12px; }
     .settings-category {
       border:1px solid var(--line-1);
@@ -714,6 +780,15 @@
       padding:0 9px;
       font-family:var(--mono);
       font-size:11px;
+    }
+
+    @media (max-height: 720px), (max-width: 640px) {
+      .modal-overlay { padding:12px; }
+      .setting-row {
+        min-height:0;
+        align-items:flex-start;
+        gap:10px;
+      }
     }
 
     .hub-search { display:flex; align-items:center; gap:8px; padding:9px 14px; border-bottom:1px solid var(--line-1); }
@@ -830,7 +905,7 @@
       </div>
 
       <div class="top-actions">
-        <button class="btn icon" onclick="openModal('settings-modal')" title="Settings">
+        <button class="btn icon" onclick="openSettingsTab()" title="Settings">
           <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82A1.65 1.65 0 0 0 3.09 14H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06A2 2 0 1 1 7.04 4.3l.06.06A1.65 1.65 0 0 0 8.92 4a1.65 1.65 0 0 0 1-1.51V2.4a2 2 0 0 1 4 0v.09A1.65 1.65 0 0 0 15 4a1.65 1.65 0 0 0 1.82-.33l.06-.06A2 2 0 1 1 19.7 6.44l-.06.06A1.65 1.65 0 0 0 19.4 8.3c.2.5.7.83 1.25.83H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
         </button>
         <button class="btn icon" onclick="minimize()" title="Minimize">
@@ -848,7 +923,7 @@
         <button class="rail-btn tip" data-tip="Script Hub" onclick="openScriptHub()"><svg viewBox="0 0 24 24"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg></button>
         <button class="rail-btn tip" data-tip="Find" onclick="openFindReplace()"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
         <button class="rail-btn tip" data-tip="Console" onclick="toggleConsole()"><svg viewBox="0 0 24 24"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg></button>
-        <button class="rail-btn tip" data-tip="Settings" onclick="openModal('settings-modal')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 1 1-7-7"/></svg></button>
+        <button class="rail-btn tip" data-tip="Settings" onclick="openSettingsTab()"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 1 1-7-7"/></svg></button>
         <div class="rail-spacer"></div>
         <button class="rail-btn tip" data-tip="Key Bindings" onclick="openModal('keybind-modal')"><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M6 12h.01M10 12h.01M14 12h.01M18 12h.01M7 16h10"/></svg></button>
         <button class="rail-btn tip" data-tip="About" onclick="openModal('about-modal')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></button>
@@ -864,13 +939,63 @@
             <button class="btn icon tab-action-btn" onclick="renameTab()" title="Rename active tab">
               <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
             </button>
-            <button class="btn icon tab-action-btn danger" onclick="closeTab(current)" title="Close active tab">
+            <button class="btn icon tab-action-btn danger" onclick="closeActiveTab()" title="Close active tab">
               <svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
             </button>
           </div>
         </div>
         <div class="editor-shell">
           <div id="editor"></div>
+
+          <div id="settings-tab-view" class="settings-tab-view">
+            <div class="settings-tab-head">
+              <div>
+                <div class="settings-tab-kicker">Workspace</div>
+                <div class="settings-tab-title">Settings</div>
+                <div class="settings-tab-sub">Native config and workspace appearance</div>
+              </div>
+              <button class="btn icon danger" onclick="closeSettingsTab()" title="Close settings tab"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+            </div>
+            <div class="settings-grid">
+              <section class="settings-category">
+                <div class="settings-category-title"><span>Connection</span><small>bridge</small></div>
+                <div class="settings-category-body">
+                  <div class="setting-row"><div><div class="setting-title">Discord Rich Presence</div><div class="setting-desc">Broadcast editor activity</div></div><label class="switch"><input type="checkbox" id="cfg-discord" onchange="pushConfigUpdate()"><span class="slider"></span></label></div>
+                  <div class="setting-row" id="rpc-details-row"><div><div class="setting-title">RPC Title</div><div class="setting-desc">Primary status line</div></div><input type="text" id="cfg-rpc-details" class="form-input" oninput="pushRpcMessageUpdate()"></div>
+                  <div class="setting-row" id="rpc-state-row"><div><div class="setting-title">RPC State</div><div class="setting-desc">Secondary status line</div></div><input type="text" id="cfg-rpc-state" class="form-input" oninput="pushRpcMessageUpdate()"></div>
+                  <div class="setting-row"><div><div class="setting-title">Auto Attach</div><div class="setting-desc">Inject when the target is found</div></div><label class="switch"><input type="checkbox" id="cfg-attach" onchange="pushConfigUpdate()"><span class="slider"></span></label></div>
+                  <div class="setting-row"><div><div class="setting-title">Auto Execute</div><div class="setting-desc">Run the active buffer after attach</div></div><label class="switch"><input type="checkbox" id="cfg-execute" onchange="pushConfigUpdate()"><span class="slider"></span></label></div>
+                  <div class="setting-row"><div><div class="setting-title">Always On Top</div><div class="setting-desc">Pin the executor window</div></div><label class="switch"><input type="checkbox" id="cfg-topmost" onchange="pushConfigUpdate()"><span class="slider"></span></label></div>
+                </div>
+              </section>
+              <section class="settings-category">
+                <div class="settings-category-title"><span>Appearance</span><small>surface</small></div>
+                <div class="settings-category-body">
+                  <div class="setting-row"><div><div class="setting-title">Accent Theme</div><div class="setting-desc">Control color profile</div></div><select id="cfg-theme" class="form-select" onchange="applyGlobalTheme(this.value)"><option value="steel">Steel</option><option value="lime">Lime</option><option value="purple">Purple</option><option value="gold">Gold</option><option value="red">Red</option><option value="ocean">Ocean</option><option value="matrix">Matrix</option><option value="white">White</option><option value="coral">Coral</option></select></div>
+                  <div class="setting-row"><div><div class="setting-title">Atmosphere</div><div class="setting-desc">Canvas background effect</div></div><select id="cfg-weather" class="form-select" onchange="setWeatherEffect(this.value)"><option value="particles">Particles</option><option value="grid">Grid Drift</option><option value="matrix">Matrix</option><option value="hyperjump">Hyperjump</option><option value="stars">Stars</option><option value="rain">Rain</option><option value="snow">Snow</option><option value="none">None</option></select></div>
+                  <div class="setting-row"><div><div class="setting-title">Toast SFX</div><div class="setting-desc">Play soft sounds with notifications</div></div><label class="switch"><input type="checkbox" id="cfg-toast-sfx" checked onchange="setToastSfxState(this.checked)"><span class="slider"></span></label></div>
+                </div>
+              </section>
+              <section class="settings-category">
+                <div class="settings-category-title"><span>Editor</span><small>monaco</small></div>
+                <div class="settings-category-body">
+                  <div class="setting-row"><div><div class="setting-title">Editor Font Size</div><div class="setting-desc">Monaco buffer text size</div></div><select id="cfg-fontsize" class="form-select" onchange="setFontSize(this.value)"><option value="11">11 px</option><option value="12">12 px</option><option value="13">13 px</option><option value="14">14 px</option><option value="15">15 px</option><option value="16">16 px</option><option value="18">18 px</option></select></div>
+                  <div class="setting-row"><div><div class="setting-title">Word Wrap</div><div class="setting-desc">Wrap long editor lines</div></div><label class="switch"><input type="checkbox" id="cfg-wrap" onchange="setWrapState(this.checked)"><span class="slider"></span></label></div>
+                  <div class="setting-row"><div><div class="setting-title">Minimap</div><div class="setting-desc">Show Monaco minimap</div></div><label class="switch"><input type="checkbox" id="cfg-minimap" onchange="setMinimapState(this.checked)"><span class="slider"></span></label></div>
+                  <div class="setting-row"><div><div class="setting-title">Line Numbers</div><div class="setting-desc">Show editor gutter numbers</div></div><label class="switch"><input type="checkbox" id="cfg-line-numbers" checked onchange="setLineNumberState(this.checked)"><span class="slider"></span></label></div>
+                  <div class="setting-row"><div><div class="setting-title">Whitespace Marks</div><div class="setting-desc">Render spaces and tabs</div></div><label class="switch"><input type="checkbox" id="cfg-whitespace" onchange="setWhitespaceState(this.checked)"><span class="slider"></span></label></div>
+                  <div class="setting-row"><div><div class="setting-title">Indent Guides</div><div class="setting-desc">Show editor indentation guides</div></div><label class="switch"><input type="checkbox" id="cfg-guides" checked onchange="setGuideState(this.checked)"><span class="slider"></span></label></div>
+                </div>
+              </section>
+              <section class="settings-category">
+                <div class="settings-category-title"><span>Layout</span><small>workspace</small></div>
+                <div class="settings-category-body">
+                  <div class="setting-row"><div><div class="setting-title">Side Inspector</div><div class="setting-desc">Show buffer stats panel</div></div><label class="switch"><input type="checkbox" id="cfg-inspector" checked onchange="setInspectorState(this.checked)"><span class="slider"></span></label></div>
+                  <div class="setting-row"><div><div class="setting-title">Compact Action Bar</div><div class="setting-desc">Icon-only bottom controls</div></div><label class="switch"><input type="checkbox" id="cfg-compact-dock" onchange="setDockCompactState(this.checked)"><span class="slider"></span></label></div>
+                </div>
+              </section>
+            </div>
+          </div>
 
           <div class="find-panel" id="find-panel">
             <div class="find-row">
@@ -929,58 +1054,6 @@
   </div>
 
   <div id="toast-root"></div>
-
-  <div id="settings-modal" class="modal-overlay" onclick="closeModalOnOuter(event,'settings-modal')">
-    <div class="modal-card">
-      <div class="modal-head">
-        <div>
-          <div class="modal-title">Settings</div>
-          <div class="modal-sub">Native config and workspace appearance</div>
-        </div>
-        <button class="btn icon danger" onclick="closeModal('settings-modal')"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
-      </div>
-      <div class="modal-body">
-        <div class="settings-grid">
-          <section class="settings-category">
-            <div class="settings-category-title"><span>Connection</span><small>bridge</small></div>
-            <div class="settings-category-body">
-              <div class="setting-row"><div><div class="setting-title">Discord Rich Presence</div><div class="setting-desc">Broadcast editor activity</div></div><label class="switch"><input type="checkbox" id="cfg-discord" onchange="pushConfigUpdate()"><span class="slider"></span></label></div>
-              <div class="setting-row" id="rpc-details-row"><div><div class="setting-title">RPC Title</div><div class="setting-desc">Primary status line</div></div><input type="text" id="cfg-rpc-details" class="form-input" oninput="pushRpcMessageUpdate()"></div>
-              <div class="setting-row" id="rpc-state-row"><div><div class="setting-title">RPC State</div><div class="setting-desc">Secondary status line</div></div><input type="text" id="cfg-rpc-state" class="form-input" oninput="pushRpcMessageUpdate()"></div>
-              <div class="setting-row"><div><div class="setting-title">Auto Attach</div><div class="setting-desc">Inject when the target is found</div></div><label class="switch"><input type="checkbox" id="cfg-attach" onchange="pushConfigUpdate()"><span class="slider"></span></label></div>
-              <div class="setting-row"><div><div class="setting-title">Auto Execute</div><div class="setting-desc">Run the active buffer after attach</div></div><label class="switch"><input type="checkbox" id="cfg-execute" onchange="pushConfigUpdate()"><span class="slider"></span></label></div>
-              <div class="setting-row"><div><div class="setting-title">Always On Top</div><div class="setting-desc">Pin the executor window</div></div><label class="switch"><input type="checkbox" id="cfg-topmost" onchange="pushConfigUpdate()"><span class="slider"></span></label></div>
-            </div>
-          </section>
-          <section class="settings-category">
-            <div class="settings-category-title"><span>Appearance</span><small>surface</small></div>
-            <div class="settings-category-body">
-              <div class="setting-row"><div><div class="setting-title">Accent Theme</div><div class="setting-desc">Control color profile</div></div><select id="cfg-theme" class="form-select" onchange="applyGlobalTheme(this.value)"><option value="steel">Steel</option><option value="lime">Lime</option><option value="purple">Purple</option><option value="gold">Gold</option><option value="red">Red</option><option value="ocean">Ocean</option><option value="matrix">Matrix</option><option value="white">White</option><option value="coral">Coral</option></select></div>
-              <div class="setting-row"><div><div class="setting-title">Atmosphere</div><div class="setting-desc">Canvas background effect</div></div><select id="cfg-weather" class="form-select" onchange="setWeatherEffect(this.value)"><option value="particles">Particles</option><option value="grid">Grid Drift</option><option value="matrix">Matrix</option><option value="hyperjump">Hyperjump</option><option value="stars">Stars</option><option value="rain">Rain</option><option value="snow">Snow</option><option value="none">None</option></select></div>
-            </div>
-          </section>
-          <section class="settings-category">
-            <div class="settings-category-title"><span>Editor</span><small>monaco</small></div>
-            <div class="settings-category-body">
-              <div class="setting-row"><div><div class="setting-title">Editor Font Size</div><div class="setting-desc">Monaco buffer text size</div></div><select id="cfg-fontsize" class="form-select" onchange="setFontSize(this.value)"><option value="11">11 px</option><option value="12">12 px</option><option value="13">13 px</option><option value="14">14 px</option><option value="15">15 px</option><option value="16">16 px</option><option value="18">18 px</option></select></div>
-              <div class="setting-row"><div><div class="setting-title">Word Wrap</div><div class="setting-desc">Wrap long editor lines</div></div><label class="switch"><input type="checkbox" id="cfg-wrap" onchange="setWrapState(this.checked)"><span class="slider"></span></label></div>
-              <div class="setting-row"><div><div class="setting-title">Minimap</div><div class="setting-desc">Show Monaco minimap</div></div><label class="switch"><input type="checkbox" id="cfg-minimap" onchange="setMinimapState(this.checked)"><span class="slider"></span></label></div>
-              <div class="setting-row"><div><div class="setting-title">Line Numbers</div><div class="setting-desc">Show editor gutter numbers</div></div><label class="switch"><input type="checkbox" id="cfg-line-numbers" checked onchange="setLineNumberState(this.checked)"><span class="slider"></span></label></div>
-              <div class="setting-row"><div><div class="setting-title">Whitespace Marks</div><div class="setting-desc">Render spaces and tabs</div></div><label class="switch"><input type="checkbox" id="cfg-whitespace" onchange="setWhitespaceState(this.checked)"><span class="slider"></span></label></div>
-              <div class="setting-row"><div><div class="setting-title">Indent Guides</div><div class="setting-desc">Show editor indentation guides</div></div><label class="switch"><input type="checkbox" id="cfg-guides" checked onchange="setGuideState(this.checked)"><span class="slider"></span></label></div>
-            </div>
-          </section>
-          <section class="settings-category">
-            <div class="settings-category-title"><span>Layout</span><small>workspace</small></div>
-            <div class="settings-category-body">
-              <div class="setting-row"><div><div class="setting-title">Side Inspector</div><div class="setting-desc">Show buffer stats panel</div></div><label class="switch"><input type="checkbox" id="cfg-inspector" checked onchange="setInspectorState(this.checked)"><span class="slider"></span></label></div>
-              <div class="setting-row"><div><div class="setting-title">Compact Action Bar</div><div class="setting-desc">Icon-only bottom controls</div></div><label class="switch"><input type="checkbox" id="cfg-compact-dock" onchange="setDockCompactState(this.checked)"><span class="slider"></span></label></div>
-            </div>
-          </section>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <div id="script-hub-modal" class="modal-overlay" onclick="closeModalOnOuter(event,'script-hub-modal')">
     <div class="modal-card large">
@@ -1050,6 +1123,8 @@
     let tabModified = {};
     let files = JSON.parse(localStorage.getItem('obv_fs') || 'null') || { "main.lua": "-- OblivionX Pro\nprint('ready')\n" };
     let current = Object.keys(files)[0] || "main.lua";
+    let activeWorkspaceView = "editor";
+    let settingsTabOpen = false;
     let topmost = false;
     let activeHubFilter = "trending";
     let hubCurrentPage = 1;
@@ -1061,11 +1136,15 @@
     let lineNumbers = true;
     let whitespaceVisible = false;
     let guidesVisible = true;
+    let toastSfxEnabled = localStorage.getItem('obv_cfg_toast_sfx') !== 'false';
+    let toastAudioCtx = null;
     let currentFontSize = parseInt(localStorage.getItem('obv_fontsize') || '13', 10);
     let findMatches = [];
     let findIndex = -1;
     let animationId;
     let weatherMode = "particles";
+    let lastInjectDispatchAt = 0;
+    const INJECT_DISPATCH_COOLDOWN_MS = 1500;
     const MATRIX_CHARS = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
     let particles = [];
     let matrixParticles = [];
@@ -1131,6 +1210,7 @@
     function toast(message, type) {
       const root = document.getElementById('toast-root');
       if (!root) return;
+      playToastSfx(type || 'info');
       const el = document.createElement('div');
       el.className = `toast ${type || 'info'}`;
       el.innerHTML = `<span class="toast-dot"></span><span>${escHtml(message)}</span>`;
@@ -1139,6 +1219,63 @@
         el.classList.add('out');
         setTimeout(() => el.remove(), 240);
       }, 2400);
+    }
+
+    function getToastAudioContext() {
+      if (!toastSfxEnabled) return null;
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return null;
+      if (!toastAudioCtx) toastAudioCtx = new AudioCtx();
+      if (toastAudioCtx.state === 'suspended') {
+        toastAudioCtx.resume().catch(() => {});
+      }
+      return toastAudioCtx;
+    }
+
+    function playToastSfx(type) {
+      if (!toastSfxEnabled) return;
+      try {
+        const ctx = getToastAudioContext();
+        if (!ctx) return;
+        const start = ctx.currentTime + 0.012;
+        const patterns = {
+          ok: [[660, 0], [940, 0.07]],
+          info: [[520, 0], [690, 0.06]],
+          warn: [[420, 0], [330, 0.075]],
+          err: [[240, 0], [185, 0.08]]
+        };
+        const tones = patterns[type] || patterns.info;
+        const master = ctx.createGain();
+        master.gain.setValueAtTime(0.0001, start);
+        master.gain.exponentialRampToValueAtTime(0.055, start + 0.018);
+        master.gain.exponentialRampToValueAtTime(0.0001, start + 0.22);
+        master.connect(ctx.destination);
+
+        tones.forEach(([frequency, offset], index) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          const t = start + offset;
+          osc.type = index ? 'sine' : 'triangle';
+          osc.frequency.setValueAtTime(frequency, t);
+          gain.gain.setValueAtTime(0.0001, t);
+          gain.gain.exponentialRampToValueAtTime(index ? 0.42 : 0.34, t + 0.012);
+          gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.12);
+          osc.connect(gain);
+          gain.connect(master);
+          osc.start(t);
+          osc.stop(t + 0.14);
+        });
+      } catch {
+        // Audio is optional; notification visuals should never fail because sound is unavailable.
+      }
+    }
+
+    function setToastSfxState(enabled, silent) {
+      toastSfxEnabled = !!enabled;
+      const input = document.getElementById('cfg-toast-sfx');
+      if (input) input.checked = toastSfxEnabled;
+      localStorage.setItem('obv_cfg_toast_sfx', String(toastSfxEnabled));
+      if (!silent) toast(`Toast SFX ${toastSfxEnabled ? 'on' : 'off'}`, 'info');
     }
 
     function log(message, type) {
@@ -1167,7 +1304,47 @@
     }
 
     function focusEditor() {
-      if (editor) editor.focus();
+      setWorkspaceView('editor');
+    }
+
+    function setWorkspaceView(view, options = {}) {
+      activeWorkspaceView = view === 'settings' ? 'settings' : 'editor';
+      const shell = document.querySelector('.editor-shell');
+      const settingsView = document.getElementById('settings-tab-view');
+      const isSettings = activeWorkspaceView === 'settings';
+      shell?.classList.toggle('settings-active', isSettings);
+      settingsView?.classList.toggle('open', isSettings);
+      document.querySelectorAll('.rail-btn').forEach(btn => {
+        const tip = btn.getAttribute('data-tip');
+        btn.classList.toggle('active', isSettings ? tip === 'Settings' : tip === 'Editor');
+      });
+      if (options.render !== false) renderTabs();
+      updateStats();
+      if (!isSettings && options.focus !== false && editor) {
+        setTimeout(() => {
+          editor.layout();
+          editor.focus();
+        }, 0);
+      }
+    }
+
+    function openSettingsTab() {
+      if (editor) save();
+      settingsTabOpen = true;
+      setWorkspaceView('settings');
+    }
+
+    function closeSettingsTab() {
+      settingsTabOpen = false;
+      setWorkspaceView('editor');
+    }
+
+    function closeActiveTab() {
+      if (activeWorkspaceView === 'settings') {
+        closeSettingsTab();
+        return;
+      }
+      closeTab(current);
     }
 
     function save() {
@@ -1201,6 +1378,9 @@
     }
 
     function doInject() {
+      const now = performance.now();
+      if (now - lastInjectDispatchAt < INJECT_DISPATCH_COOLDOWN_MS) return;
+      lastInjectDispatchAt = now;
       sendWebviewMessage({ action: "inject" });
       log('Inject requested', 'warn');
       toast('Inject dispatched', 'info');
@@ -1244,6 +1424,7 @@
       tabModels[name] = monaco.editor.createModel(files[name], "lua");
       current = name;
       if (editor) editor.setModel(tabModels[current]);
+      setWorkspaceView('editor', { render:false, focus:false });
       renderTabs();
       save();
       updateStats();
@@ -1255,6 +1436,7 @@
       save();
       current = fileName;
       editor.setModel(tabModels[fileName]);
+      setWorkspaceView('editor', { render:false, focus:false });
       renderTabs();
       updateStats();
       editor.focus();
@@ -1273,6 +1455,7 @@
       delete tabModified[fileName];
       if (current === fileName) current = Object.keys(files)[0];
       if (editor) editor.setModel(tabModels[current]);
+      setWorkspaceView('editor', { render:false, focus:false });
       renderTabs();
       save();
       updateStats();
@@ -1298,6 +1481,10 @@
     }
 
     function renameTab() {
+      if (activeWorkspaceView === 'settings') {
+        toast('Settings tab cannot be renamed', 'warn');
+        return;
+      }
       const next = prompt('Rename tab:', current);
       if (!next || next === current) return;
       const name = uniqueTabName(next.endsWith('.lua') ? next : `${next}.lua`);
@@ -1320,7 +1507,7 @@
       container.innerHTML = '';
       Object.keys(files).forEach(name => {
         const tab = document.createElement('div');
-        tab.className = `tab${name === current ? ' active' : ''}${tabModified[name] ? ' modified' : ''}`;
+        tab.className = `tab${activeWorkspaceView === 'editor' && name === current ? ' active' : ''}${tabModified[name] ? ' modified' : ''}`;
         tab.title = name;
         const dot = document.createElement('span');
         dot.className = 'tab-dot';
@@ -1335,13 +1522,34 @@
           closeTab(name);
         });
         tab.append(dot, label, close);
-      tab.addEventListener('click', () => switchActiveBuffer(name));
-      tab.addEventListener('dblclick', () => {
-        switchActiveBuffer(name);
-        renameTab();
+        tab.addEventListener('click', () => switchActiveBuffer(name));
+        tab.addEventListener('dblclick', () => {
+          switchActiveBuffer(name);
+          renameTab();
+        });
+        container.appendChild(tab);
       });
-      container.appendChild(tab);
-    });
+
+      if (settingsTabOpen) {
+        const tab = document.createElement('div');
+        tab.className = `tab system${activeWorkspaceView === 'settings' ? ' active' : ''}`;
+        tab.title = 'Settings';
+        const dot = document.createElement('span');
+        dot.className = 'tab-dot';
+        const label = document.createElement('span');
+        label.className = 'tab-name';
+        label.textContent = 'Settings';
+        const close = document.createElement('span');
+        close.className = 'tab-close';
+        close.textContent = 'x';
+        close.addEventListener('click', event => {
+          event.stopPropagation();
+          closeSettingsTab();
+        });
+        tab.append(dot, label, close);
+        tab.addEventListener('click', () => setWorkspaceView('settings'));
+        container.appendChild(tab);
+      }
     }
 
     function markModified() {
@@ -1411,6 +1619,7 @@
             tabModels = {};
             Object.keys(files).forEach(name => tabModels[name] = monaco.editor.createModel(String(files[name]), "lua"));
             editor.setModel(tabModels[current]);
+            setWorkspaceView('editor', { render:false, focus:false });
             renderTabs();
             save();
             toast('Workspace imported', 'ok');
@@ -1431,6 +1640,7 @@
       tabModels = { "main.lua": monaco.editor.createModel(files["main.lua"], "lua") };
       tabModified = {};
       editor.setModel(tabModels[current]);
+      setWorkspaceView('editor', { render:false, focus:false });
       renderTabs();
       save();
       toast('Workspace reset', 'warn');
@@ -2382,7 +2592,7 @@
       setText('stat-chars', chars);
       setText('stat-tabs', Object.keys(files).length);
       setText('stat-size', `${(bytes / 1024).toFixed(1)} KB`);
-      setText('active-file-label', current);
+      setText('active-file-label', activeWorkspaceView === 'settings' ? 'Settings' : current);
       setText('about-tabs', Object.keys(files).length);
       setText('about-lines', lines);
     }
@@ -2469,10 +2679,13 @@
         }
         if (typing && !ctrl) return;
         if (event.key === 'F5') { event.preventDefault(); doExecute(); }
-        if (event.key === 'F6') { event.preventDefault(); doInject(); }
+        if (event.key === 'F6') {
+          event.preventDefault();
+          if (!event.repeat) doInject();
+        }
         if (ctrl && event.key.toLowerCase() === 'o') { event.preventDefault(); openFile(); }
         if (ctrl && event.key.toLowerCase() === 's') { event.preventDefault(); saveFile(); }
-        if (ctrl && event.key === ',') { event.preventDefault(); openModal('settings-modal'); }
+        if (ctrl && event.key === ',') { event.preventDefault(); openSettingsTab(); }
       });
     }
 
@@ -2554,6 +2767,7 @@
       }
       if (g('cfg-rpc-details')) g('cfg-rpc-details').value = localStorage.getItem('obv_rpc_details') || 'OblivionX Pro';
       if (g('cfg-rpc-state')) g('cfg-rpc-state').value = localStorage.getItem('obv_rpc_state') || 'Idle';
+      setToastSfxState(localStorage.getItem('obv_cfg_toast_sfx') !== 'false', true);
       setWrapState(localStorage.getItem('obv_cfg_wrap') === 'true', true);
       setMinimapState(localStorage.getItem('obv_cfg_minimap') === 'true', true);
       setLineNumberState(localStorage.getItem('obv_cfg_line_numbers') !== 'false', true);
