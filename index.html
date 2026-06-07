@@ -1,12 +1,11 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OblivionX Pro</title>
+  <title>OblivionX</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
-
     :root {
       --accent: #7dd3a7;
       --accent-soft: rgba(125, 211, 167, .12);
@@ -27,14 +26,14 @@
       --warn: #f6b85c;
       --ok: #7dd3a7;
       --info: #79b8ff;
-      --font: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      --mono: 'JetBrains Mono', Consolas, monospace;
+      --font: 'Segoe UI', system-ui, sans-serif;
+      --mono: 'Cascadia Mono', Consolas, monospace;
       --top: 46px;
       --dock: 62px;
       --rail: 0px;
       --inspector: 250px;
       --radius: 6px;
-      --ease: cubic-bezier(.2, .8, .2, 1);
+      --ease: ease;
     }
 
     .theme-steel { --accent:#7dd3a7; --accent-soft:rgba(125,211,167,.12); --accent-border:rgba(125,211,167,.32); --bg:#090a0b; --panel-0:#0c0d0f; --panel-1:#111316; --panel-2:#171a1e; }
@@ -47,21 +46,21 @@
     .theme-white { --accent:#f4f4f5; --accent-soft:rgba(255,255,255,.10); --accent-border:rgba(255,255,255,.30); }
     .theme-coral { --accent:#ff8f7d; --accent-soft:rgba(255,143,125,.12); --accent-border:rgba(255,143,125,.32); }
 
-    @keyframes appIn { from { opacity:0; transform:translateY(8px) scale(.992); } to { opacity:1; transform:translateY(0) scale(1); } }
-    @keyframes panelIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
-    @keyframes tabIn { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
-    @keyframes dockIn { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
-    @keyframes modalIn { from { opacity:0; transform:scale(.965) translateY(10px); } to { opacity:1; transform:scale(1) translateY(0); } }
-    @keyframes toastIn { from { opacity:0; transform:translateX(18px); } to { opacity:1; transform:translateX(0); } }
-    @keyframes toastOut { to { opacity:0; transform:translateX(18px); } }
-    @keyframes pulse { 0%,100% { box-shadow:0 0 0 0 var(--accent-border); } 60% { box-shadow:0 0 0 6px transparent; } }
-    @keyframes spin { to { transform:rotate(360deg); } }
-    @keyframes ripple { from { opacity:.4; transform:scale(0); } to { opacity:0; transform:scale(2.6); } }
-    @keyframes breathe { 0%,100% { filter:drop-shadow(0 0 0 transparent); transform:translateY(0); } 50% { filter:drop-shadow(0 0 10px var(--accent-soft)); transform:translateY(-1px); } }
-    @keyframes gridDrift { from { background-position:0 0, 0 0; } to { background-position:88px 44px, 44px 88px; } }
-    @keyframes categoryIn { from { opacity:0; transform:translateY(12px) scale(.985); } to { opacity:1; transform:translateY(0) scale(1); } }
-    @keyframes rowIn { from { opacity:0; transform:translateX(-8px); } to { opacity:1; transform:translateX(0); } }
-    @keyframes sweep { from { transform:translateX(-120%) skewX(-18deg); } to { transform:translateX(220%) skewX(-18deg); } }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
     * { box-sizing:border-box; }
     html, body { width:100%; height:100%; margin:0; overflow:hidden; background:var(--bg); color:var(--text-0); font-family:var(--font); font-size:13px; }
@@ -79,8 +78,7 @@
         linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px) 0 0 / 88px 88px,
         linear-gradient(0deg, rgba(255,255,255,.012) 1px, transparent 1px) 0 0 / 88px 88px;
       mask-image: linear-gradient(to bottom, transparent, #000 10%, #000 85%, transparent);
-      animation:gridDrift 24s linear infinite;
-      opacity:0;
+opacity:0;
       transition:opacity .3s var(--ease);
     }
     body.weather-grid::after { opacity:1; }
@@ -111,8 +109,7 @@
         radial-gradient(1000px 560px at 50% -260px, var(--accent-soft), transparent 55%),
         linear-gradient(180deg, rgba(255,255,255,.018), transparent 28%),
         var(--bg);
-      animation:appIn .38s var(--ease) both;
-    }
+}
 
     .topbar {
       display:flex;
@@ -146,8 +143,7 @@
       font-size:10px;
       font-weight:800;
       letter-spacing:.08em;
-      animation:breathe 3.8s ease-in-out infinite;
-    }
+}
 
     .brand-copy { display:flex; flex-direction:column; gap:1px; min-width:0; }
     .brand-name { font-size:12px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; white-space:nowrap; }
@@ -183,7 +179,8 @@
       border-radius:50%;
       background:var(--text-3);
     }
-    .attach-dot.active, #status-glow.active { background:var(--accent); animation:pulse 2.4s ease infinite; }
+    .attach-dot.active, #status-glow.active { background:var(--accent);
+}
     .attach-dot.failed, #status-glow.failed { background:var(--danger); box-shadow:0 0 12px rgba(255,107,122,.35); }
 
     .top-actions {
@@ -219,7 +216,8 @@
       pointer-events:none;
       transform:translateX(-120%) skewX(-18deg);
     }
-    .btn:hover::before { opacity:1; animation:sweep .72s var(--ease); }
+    .btn:hover::before { opacity:1;
+}
     .btn:hover { color:var(--text-0); border-color:var(--line-2); background:rgba(255,255,255,.05); }
     .btn:active { transform:translateY(1px) scale(.985); }
     .btn.primary { color:#07100b; background:var(--accent); border-color:var(--accent); font-weight:800; }
@@ -248,8 +246,7 @@
       padding:10px 7px;
       border-right:1px solid var(--line-1);
       background:rgba(12,13,15,.75);
-      animation:panelIn .34s var(--ease) both;
-    }
+}
 
     .rail-spacer { flex:1; }
     .rail-btn {
@@ -341,8 +338,7 @@
       color:var(--text-2);
       background:transparent;
       cursor:pointer;
-      animation:tabIn .16s var(--ease) both;
-      transition:all .16s var(--ease);
+transition:all .16s var(--ease);
     }
     .tab:hover { color:var(--text-1); background:rgba(255,255,255,.03); border-color:var(--line-0); }
     .tab.active { color:var(--text-0); background:var(--panel-2); border-color:var(--line-1); }
@@ -367,7 +363,8 @@
     .tab.active .tab-close { display:grid; }
     .tab-action-btn,
     .new-tab { width:30px; height:29px; flex:0 0 auto; padding:0; }
-    .tab-action-btn { animation:tabIn .22s var(--ease) both; }
+    .tab-action-btn {
+}
     .tab-action-btn:hover { transform:translateY(-1px); }
 
     .editor-shell {
@@ -387,8 +384,7 @@
         linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.008)),
         radial-gradient(circle at 82% 8%, var(--accent-soft), transparent 36%),
         var(--bg);
-      animation:panelIn .24s var(--ease) both;
-      scrollbar-gutter:stable;
+scrollbar-gutter:stable;
     }
     .settings-tab-view.open { display:block; }
     .settings-tab-view::-webkit-scrollbar { width:8px; height:8px; }
@@ -430,8 +426,7 @@
       background:rgba(17,19,22,.96);
       backdrop-filter:blur(14px);
       box-shadow:0 22px 50px rgba(0,0,0,.36);
-      animation:panelIn .18s var(--ease) both;
-    }
+}
 
     .find-panel {
       top:12px;
@@ -503,8 +498,7 @@
       background:rgba(12,13,15,.76);
       overflow:hidden;
       transition:width .2s var(--ease), opacity .2s var(--ease);
-      animation:panelIn .4s var(--ease) both;
-    }
+}
     body.inspector-hidden .inspector { width:0; opacity:0; border-left:0; }
     .inspector-inner {
       width:var(--inspector);
@@ -535,7 +529,7 @@
       letter-spacing:.08em;
       text-transform:uppercase;
     }
-    .stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--line-0); }
+    .stats-grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:1px; background:var(--line-0); }
     .stat {
       min-height:58px;
       padding:10px;
@@ -553,8 +547,7 @@
       background:rgba(12,13,15,.94);
       backdrop-filter:blur(18px);
       display:block;
-      animation:dockIn .38s var(--ease) both;
-    }
+}
     .dock-meta {
       display:none;
     }
@@ -641,23 +634,14 @@
       pointer-events:none;
       transform:translateX(-120%) skewX(-18deg);
     }
-    .dock-btn:hover::after { opacity:1; animation:sweep .68s var(--ease); }
+    .dock-btn:hover::after { opacity:1;
+}
     .dock-btn:active { transform:translateY(1px) scale(.98); }
     .dock-btn.primary { color:#07100b; background:var(--accent); border-color:var(--accent); font-weight:800; }
     .dock-btn.danger:hover { color:var(--danger); border-color:rgba(255,107,122,.34); background:rgba(255,107,122,.07); }
     .dock-btn.toggled { color:var(--accent); border-color:var(--accent-border); background:var(--accent-soft); }
     body.dock-compact .dock-btn { width:34px; min-width:34px; padding:0; }
     body.dock-compact .dock-btn span { display:none; }
-
-    .ripple {
-      position:absolute;
-      width:42px;
-      height:42px;
-      border-radius:50%;
-      background:var(--accent-soft);
-      pointer-events:none;
-      animation:ripple .46s var(--ease) forwards;
-    }
 
     .modal-overlay {
       position:absolute;
@@ -681,8 +665,7 @@
       background:var(--panel-1);
       box-shadow:0 28px 70px rgba(0,0,0,.55);
       overflow:hidden;
-      animation:modalIn .22s var(--ease) both;
-    }
+}
     .modal-card.large { width:min(94vw, 980px); height:min(82vh, 740px); display:grid; grid-template-rows:56px 50px 42px 1fr 34px; }
     .modal-card.medium { width:min(92vw, 620px); }
     .modal-head {
@@ -720,8 +703,7 @@
       border-radius:8px;
       background:rgba(255,255,255,.018);
       overflow:hidden;
-      animation:categoryIn .26s var(--ease) both;
-    }
+}
     .settings-category:nth-child(2) { animation-delay:.04s; }
     .settings-category:nth-child(3) { animation-delay:.08s; }
     .settings-category:nth-child(4) { animation-delay:.12s; }
@@ -758,8 +740,7 @@
       border:1px solid var(--line-0);
       border-radius:var(--radius);
       background:rgba(255,255,255,.02);
-      animation:rowIn .18s var(--ease) both;
-      transition:transform .16s var(--ease), background .16s var(--ease), border-color .16s var(--ease);
+transition:transform .16s var(--ease), background .16s var(--ease), border-color .16s var(--ease);
     }
     .setting-row:hover { transform:translateX(2px); border-color:var(--line-2); background:rgba(255,255,255,.036); }
     .setting-title { color:var(--text-0); font-size:12px; font-weight:650; }
@@ -813,8 +794,7 @@
       border-radius:8px;
       background:rgba(255,255,255,.024);
       overflow:hidden;
-      animation:panelIn .18s var(--ease) both;
-      transition:border-color .16s var(--ease), transform .16s var(--ease), background .16s var(--ease);
+transition:border-color .16s var(--ease), transform .16s var(--ease), background .16s var(--ease);
     }
     .script-card:hover { transform:translateY(-1px); border-color:var(--line-2); background:rgba(255,255,255,.04); }
     .script-banner { width:100%; height:86px; object-fit:cover; background:linear-gradient(135deg, var(--panel-2), var(--panel-0)); }
@@ -829,7 +809,8 @@
     .badge.danger { color:var(--danger); border-color:rgba(255,107,122,.25); background:rgba(255,107,122,.07); }
     .script-foot { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:0 10px; border-top:1px solid var(--line-0); color:var(--text-3); font-family:var(--mono); font-size:10px; }
     .hub-empty { grid-column:1/-1; display:grid; place-items:center; min-height:260px; color:var(--text-3); font-family:var(--mono); font-size:11px; text-align:center; }
-    .spinner { width:26px; height:26px; border-radius:50%; border:2px solid var(--line-1); border-top-color:var(--accent); animation:spin .7s linear infinite; }
+    .spinner { width:26px; height:26px; border-radius:50%; border:2px solid var(--line-1); border-top-color:var(--accent);
+}
 
     .keybind-list { display:grid; gap:6px; }
     .key-row { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:7px 10px; border:1px solid var(--line-0); border-radius:var(--radius); background:rgba(255,255,255,.02); }
@@ -863,9 +844,9 @@
       box-shadow:0 16px 35px rgba(0,0,0,.35);
       font-family:var(--mono);
       font-size:11px;
-      animation:toastIn .22s var(--ease) both;
-    }
-    .toast.out { animation:toastOut .2s var(--ease) forwards; }
+}
+    .toast.out {
+}
     .toast-dot { width:7px; height:7px; border-radius:50%; background:var(--accent); flex:0 0 auto; }
     .toast.ok .toast-dot { background:var(--ok); }
     .toast.warn .toast-dot { background:var(--warn); }
@@ -878,6 +859,185 @@
       .workspace { grid-template-columns:minmax(0, 1fr); }
       .top-meta .metric-pill:nth-of-type(n+3) { display:none; }
     }
+
+    *, *::before, *::after {
+transition: none !important;
+    }
+
+    body::after,
+    #weather-canvas,
+    .btn::before,
+    .dock-btn::after,
+    .settings-tab-kicker,
+    .settings-category-title small,
+    .setting-desc,
+    .hub-foot,
+    .dock-meta {
+      display: none !important;
+    }
+
+    .app-shell {
+      background: var(--bg);
+    }
+
+    .topbar,
+    .dock,
+    .find-panel,
+    .console-panel,
+    .modal-overlay,
+    .inspector {
+      backdrop-filter: none !important;
+    }
+
+    .topbar {
+      background: #0d0f11;
+      padding: 0 10px;
+    }
+
+    .brand {
+      gap: 9px;
+    }
+
+    .brand-mark {
+      width: 25px;
+      height: 25px;
+      border-color: var(--line-1);
+      background: var(--panel-1);
+      color: var(--text-1);
+      font-size: 9px;
+      letter-spacing: 0;
+    }
+
+    .brand-name {
+      font-weight: 700;
+      letter-spacing: .03em;
+    }
+
+    .brand-sub {
+      font-size: 9px;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+
+    .btn,
+    .dock-btn,
+    .rail-btn,
+    .tab,
+    .field,
+    .form-select,
+    .form-input,
+    .panel-section,
+    .settings-category,
+    .setting-row,
+    .modal-card,
+    .script-card,
+    .toast,
+    .console-panel,
+    .find-panel,
+    .status-pill,
+    .metric-pill {
+      border-radius: 3px !important;
+      box-shadow: none !important;
+    }
+
+    .btn:hover,
+    .dock-btn:hover,
+    .rail-btn:hover,
+    .tab:hover,
+    .setting-row:hover,
+    .script-card:hover {
+      transform: none !important;
+    }
+
+    .btn.primary,
+    .dock-btn.primary {
+      color: var(--text-0);
+      background: #2d3438;
+      border-color: var(--line-2);
+      font-weight: 700;
+    }
+
+    .tab {
+      height: 28px;
+      padding-left: 8px;
+    }
+
+    .tab.active {
+      box-shadow: none;
+      background: #1b1f23;
+    }
+
+    .settings-tab-view {
+      background: var(--bg);
+      padding: 14px;
+    }
+
+    .settings-tab-head {
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+    }
+
+    .settings-tab-title {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .settings-tab-sub {
+      margin-top: 3px;
+      font-size: 10px;
+    }
+
+    .settings-category-title {
+      min-height: 30px;
+      background: var(--panel-1);
+      letter-spacing: .04em;
+    }
+
+    .settings-category-body {
+      gap: 4px;
+      padding: 6px;
+    }
+
+    .setting-row {
+      min-height: 34px;
+      padding: 6px 8px;
+      background: rgba(255,255,255,.014);
+    }
+
+    .dock {
+      background: #0d0f11;
+    }
+
+    .dock-scroll {
+      padding: 9px 10px;
+    }
+
+    .dock-btn {
+      height: 30px;
+    }
+
+    .modal-overlay {
+      background: rgba(0,0,0,.65);
+    }
+
+    .modal-card {
+      box-shadow: none;
+      border-radius: 4px;
+    }
+
+    .script-banner {
+      display: none;
+    }
+
+    .script-card {
+      grid-template-rows: 1fr 34px;
+      min-height: 138px;
+    }
+
+    .toast {
+      background: #1c2024;
+    }
   </style>
 </head>
 <body class="theme-steel">
@@ -888,8 +1048,8 @@
       <div class="brand">
         <div class="brand-mark">OX</div>
         <div class="brand-copy">
-          <div class="brand-name">OblivionX Pro</div>
-          <div class="brand-sub">executor workspace</div>
+          <div class="brand-name">OblivionX</div>
+          <div class="brand-sub">v1.0.0</div>
         </div>
       </div>
 
@@ -950,9 +1110,8 @@
           <div id="settings-tab-view" class="settings-tab-view">
             <div class="settings-tab-head">
               <div>
-                <div class="settings-tab-kicker">Workspace</div>
                 <div class="settings-tab-title">Settings</div>
-                <div class="settings-tab-sub">Native config and workspace appearance</div>
+                <div class="settings-tab-sub">Config</div>
               </div>
               <button class="btn icon danger" onclick="closeSettingsTab()" title="Close settings tab"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
             </div>
@@ -960,20 +1119,20 @@
               <section class="settings-category">
                 <div class="settings-category-title"><span>Connection</span><small>bridge</small></div>
                 <div class="settings-category-body">
-                  <div class="setting-row"><div><div class="setting-title">Discord Rich Presence</div><div class="setting-desc">Broadcast editor activity</div></div><label class="switch"><input type="checkbox" id="cfg-discord" onchange="pushConfigUpdate()"><span class="slider"></span></label></div>
-                  <div class="setting-row" id="rpc-details-row"><div><div class="setting-title">RPC Title</div><div class="setting-desc">Primary status line</div></div><input type="text" id="cfg-rpc-details" class="form-input" oninput="pushRpcMessageUpdate()"></div>
-                  <div class="setting-row" id="rpc-state-row"><div><div class="setting-title">RPC State</div><div class="setting-desc">Secondary status line</div></div><input type="text" id="cfg-rpc-state" class="form-input" oninput="pushRpcMessageUpdate()"></div>
-                  <div class="setting-row"><div><div class="setting-title">Auto Attach</div><div class="setting-desc">Inject when the target is found</div></div><label class="switch"><input type="checkbox" id="cfg-attach" onchange="pushConfigUpdate()"><span class="slider"></span></label></div>
-                  <div class="setting-row"><div><div class="setting-title">Auto Execute</div><div class="setting-desc">Run the active buffer after attach</div></div><label class="switch"><input type="checkbox" id="cfg-execute" onchange="pushConfigUpdate()"><span class="slider"></span></label></div>
-                  <div class="setting-row"><div><div class="setting-title">Always On Top</div><div class="setting-desc">Pin the executor window</div></div><label class="switch"><input type="checkbox" id="cfg-topmost" onchange="pushConfigUpdate()"><span class="slider"></span></label></div>
+                  <div class="setting-row"><div><div class="setting-title">Discord RPC</div><div class="setting-desc">Presence</div></div><label class="switch"><input type="checkbox" id="cfg-discord" onchange="pushConfigUpdate()"><span class="slider"></span></label></div>
+                  <div class="setting-row" id="rpc-details-row"><div><div class="setting-title">RPC Title</div><div class="setting-desc">Title</div></div><input type="text" id="cfg-rpc-details" class="form-input" oninput="pushRpcMessageUpdate()"></div>
+                  <div class="setting-row" id="rpc-state-row"><div><div class="setting-title">RPC State</div><div class="setting-desc">State</div></div><input type="text" id="cfg-rpc-state" class="form-input" oninput="pushRpcMessageUpdate()"></div>
+                  <div class="setting-row"><div><div class="setting-title">Auto Attach</div><div class="setting-desc">Startup</div></div><label class="switch"><input type="checkbox" id="cfg-attach" onchange="pushConfigUpdate()"><span class="slider"></span></label></div>
+                  <div class="setting-row"><div><div class="setting-title">Auto Execute</div><div class="setting-desc">After attach</div></div><label class="switch"><input type="checkbox" id="cfg-execute" onchange="pushConfigUpdate()"><span class="slider"></span></label></div>
+                  <div class="setting-row"><div><div class="setting-title">Always On Top</div><div class="setting-desc">Pin window</div></div><label class="switch"><input type="checkbox" id="cfg-topmost" onchange="pushConfigUpdate()"><span class="slider"></span></label></div>
                 </div>
               </section>
               <section class="settings-category">
                 <div class="settings-category-title"><span>Appearance</span><small>surface</small></div>
                 <div class="settings-category-body">
-                  <div class="setting-row"><div><div class="setting-title">Accent Theme</div><div class="setting-desc">Control color profile</div></div><select id="cfg-theme" class="form-select" onchange="applyGlobalTheme(this.value)"><option value="steel">Steel</option><option value="lime">Lime</option><option value="purple">Purple</option><option value="gold">Gold</option><option value="red">Red</option><option value="ocean">Ocean</option><option value="matrix">Matrix</option><option value="white">White</option><option value="coral">Coral</option></select></div>
-                  <div class="setting-row"><div><div class="setting-title">Atmosphere</div><div class="setting-desc">Canvas background effect</div></div><select id="cfg-weather" class="form-select" onchange="setWeatherEffect(this.value)"><option value="particles">Particles</option><option value="grid">Grid Drift</option><option value="matrix">Matrix</option><option value="hyperjump">Hyperjump</option><option value="stars">Stars</option><option value="rain">Rain</option><option value="snow">Snow</option><option value="none">None</option></select></div>
-                  <div class="setting-row"><div><div class="setting-title">Toast SFX</div><div class="setting-desc">Play soft sounds with notifications</div></div><label class="switch"><input type="checkbox" id="cfg-toast-sfx" checked onchange="setToastSfxState(this.checked)"><span class="slider"></span></label></div>
+                  <div class="setting-row"><div><div class="setting-title">Theme</div><div class="setting-desc">Color</div></div><select id="cfg-theme" class="form-select" onchange="applyGlobalTheme(this.value)"><option value="steel">Steel</option><option value="lime">Lime</option><option value="purple">Purple</option><option value="gold">Gold</option><option value="red">Red</option><option value="ocean">Ocean</option><option value="matrix">Matrix</option><option value="white">White</option><option value="coral">Coral</option></select></div>
+                  <div class="setting-row"><div><div class="setting-title">Background</div><div class="setting-desc">Effect</div></div><select id="cfg-weather" class="form-select" onchange="setWeatherEffect(this.value)"><option value="none">None</option><option value="particles">Particles</option><option value="grid">Grid</option><option value="matrix">Matrix</option><option value="hyperjump">Hyperjump</option><option value="stars">Stars</option><option value="rain">Rain</option><option value="snow">Snow</option></select></div>
+                  <div class="setting-row"><div><div class="setting-title">Sounds</div><div class="setting-desc">Toasts</div></div><label class="switch"><input type="checkbox" id="cfg-toast-sfx" onchange="setToastSfxState(this.checked)"><span class="slider"></span></label></div>
                 </div>
               </section>
               <section class="settings-category">
@@ -1031,7 +1190,6 @@
             <div class="section-head"><span>Buffer</span><span id="active-file-label">main.lua</span></div>
             <div class="stats-grid">
               <div class="stat"><b id="stat-lines">1</b><span>Lines</span></div>
-              <div class="stat"><b id="stat-chars">0</b><span>Characters</span></div>
               <div class="stat"><b id="stat-tabs">1</b><span>Tabs</span></div>
               <div class="stat"><b id="stat-size">0 KB</b><span>Size</span></div>
             </div>
@@ -1060,7 +1218,7 @@
       <div class="modal-head">
         <div>
           <div class="modal-title">Script Hub</div>
-          <div class="modal-sub">ScriptBlox index with direct editor loading</div>
+          <div class="modal-sub">Script list</div>
         </div>
         <button class="btn icon danger" onclick="closeModal('script-hub-modal')"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
       </div>
@@ -1083,7 +1241,7 @@
   <div id="keybind-modal" class="modal-overlay" onclick="closeModalOnOuter(event,'keybind-modal')">
     <div class="modal-card medium">
       <div class="modal-head">
-        <div><div class="modal-title">Key Bindings</div><div class="modal-sub">Dock first, shortcuts second</div></div>
+        <div><div class="modal-title">Key Bindings</div><div class="modal-sub">Shortcuts</div></div>
         <button class="btn icon danger" onclick="closeModal('keybind-modal')"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
       </div>
       <div class="modal-body">
@@ -1102,7 +1260,7 @@
   <div id="about-modal" class="modal-overlay" onclick="closeModalOnOuter(event,'about-modal')">
     <div class="modal-card medium">
       <div class="modal-head">
-        <div><div class="modal-title">About OblivionX Pro</div><div class="modal-sub">Advanced executor interface</div></div>
+        <div><div class="modal-title">About OblivionX</div><div class="modal-sub">Build info</div></div>
         <button class="btn icon danger" onclick="closeModal('about-modal')"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
       </div>
       <div class="modal-body">
@@ -1111,7 +1269,7 @@
           <div class="stat"><b id="about-tools">0</b><span>Dock tools</span></div>
           <div class="stat"><b id="about-lines">1</b><span>Active lines</span></div>
         </div>
-        <p class="about-copy">This build keeps the native executor bridge intact while keeping the main workspace intentionally simple: execute, inject, clear, open file, and save file stay in the action bar; everything else belongs in Settings.</p>
+        <p class="about-copy">Local editor shell with tabs, file controls, settings, and bridge messages.</p>
       </div>
     </div>
   </div>
@@ -1121,7 +1279,7 @@
     let editor;
     let tabModels = {};
     let tabModified = {};
-    let files = JSON.parse(localStorage.getItem('obv_fs') || 'null') || { "main.lua": "-- OblivionX Pro\nprint('ready')\n" };
+    let files = JSON.parse(localStorage.getItem('obv_fs') || 'null') || { "main.lua": "-- OblivionX\nprint('ready')\n" };
     let current = Object.keys(files)[0] || "main.lua";
     let activeWorkspaceView = "editor";
     let settingsTabOpen = false;
@@ -1136,13 +1294,13 @@
     let lineNumbers = true;
     let whitespaceVisible = false;
     let guidesVisible = true;
-    let toastSfxEnabled = localStorage.getItem('obv_cfg_toast_sfx') !== 'false';
+    let toastSfxEnabled = localStorage.getItem('obv_cfg_toast_sfx') === 'true';
     let toastAudioCtx = null;
     let currentFontSize = parseInt(localStorage.getItem('obv_fontsize') || '13', 10);
     let findMatches = [];
     let findIndex = -1;
     let animationId;
-    let weatherMode = "particles";
+    let weatherMode = "none";
     let lastInjectDispatchAt = 0;
     const INJECT_DISPATCH_COOLDOWN_MS = 1500;
     const MATRIX_CHARS = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
@@ -1635,7 +1793,7 @@
     function resetWorkspace() {
       if (!confirm('Reset the local workspace tabs?')) return;
       Object.values(tabModels).forEach(model => model.dispose());
-      files = { "main.lua": "-- OblivionX Pro\nprint('ready')\n" };
+      files = { "main.lua": "-- OblivionX\nprint('ready')\n" };
       current = "main.lua";
       tabModels = { "main.lua": monaco.editor.createModel(files["main.lua"], "lua") };
       tabModified = {};
@@ -1828,7 +1986,7 @@
     }
 
     function insertHeader() {
-      insertAtCursor(`--[[\n  ${current}\n  OblivionX Pro\n]]\n\n`);
+      insertAtCursor(`--[[\n  ${current}\n  OblivionX\n]]\n\n`);
     }
 
     function insertTimestamp() {
@@ -2318,7 +2476,7 @@
     }
 
     function pushRpcMessageUpdate() {
-      const details = document.getElementById('cfg-rpc-details')?.value || 'OblivionX Pro';
+      const details = document.getElementById('cfg-rpc-details')?.value || 'OblivionX';
       const state = document.getElementById('cfg-rpc-state')?.value || 'Idle';
       localStorage.setItem('obv_rpc_details', details);
       localStorage.setItem('obv_rpc_state', state);
@@ -2583,13 +2741,11 @@
       if (!editor) return;
       const value = editor.getValue();
       const lines = value.split('\n').length;
-      const chars = value.length;
       const bytes = new Blob([value]).size;
       const pos = editor.getPosition() || { lineNumber:1, column:1 };
       setText('metric-line', pos.lineNumber);
       setText('metric-col', pos.column);
       setText('stat-lines', lines);
-      setText('stat-chars', chars);
       setText('stat-tabs', Object.keys(files).length);
       setText('stat-size', `${(bytes / 1024).toFixed(1)} KB`);
       setText('active-file-label', activeWorkspaceView === 'settings' ? 'Settings' : current);
@@ -2607,18 +2763,7 @@
       if (el) el.textContent = text;
     }
 
-    function addRipple(button, event) {
-      const rect = button.getBoundingClientRect();
-      const ripple = document.createElement('span');
-      ripple.className = 'ripple';
-      ripple.style.left = `${(event ? event.clientX : rect.left + rect.width / 2) - rect.left - 21}px`;
-      ripple.style.top = `${(event ? event.clientY : rect.top + rect.height / 2) - rect.top - 21}px`;
-      button.appendChild(ripple);
-      setTimeout(() => ripple.remove(), 480);
-    }
-
     function runDock(action, button, event) {
-      addRipple(button, event);
       try {
         action.run();
       } catch (err) {
@@ -2732,7 +2877,7 @@
         fontSize: currentFontSize,
         fontFamily: 'JetBrains Mono, Consolas, monospace',
         lineHeight: 22,
-        cursorSmoothCaretAnimation: true,
+        cursorSmoothCaretAnimation: false,
         scrollBeyondLastLine: false,
         padding: { top:14, bottom:14 },
         renderLineHighlight: 'line',
@@ -2751,8 +2896,8 @@
       initNativeIPCListeners();
 
       const savedTheme = localStorage.getItem('obv_theme') || 'steel';
-      const storedWeather = localStorage.getItem('obv_weather');
-      const savedWeather = storedWeather && storedWeather !== 'grid' ? storedWeather : 'particles';
+        const storedWeather = localStorage.getItem('obv_weather');
+        const savedWeather = storedWeather || 'none';
       applyGlobalTheme(savedTheme);
       setWeatherEffect(savedWeather);
       setFontSize(localStorage.getItem('obv_fontsize') || '13');
@@ -2765,9 +2910,9 @@
         g('cfg-topmost').checked = localStorage.getItem('obv_cfg_topmost') === 'true';
         topmost = g('cfg-topmost').checked;
       }
-      if (g('cfg-rpc-details')) g('cfg-rpc-details').value = localStorage.getItem('obv_rpc_details') || 'OblivionX Pro';
+      if (g('cfg-rpc-details')) g('cfg-rpc-details').value = localStorage.getItem('obv_rpc_details') || 'OblivionX';
       if (g('cfg-rpc-state')) g('cfg-rpc-state').value = localStorage.getItem('obv_rpc_state') || 'Idle';
-      setToastSfxState(localStorage.getItem('obv_cfg_toast_sfx') !== 'false', true);
+      setToastSfxState(localStorage.getItem('obv_cfg_toast_sfx') === 'true', true);
       setWrapState(localStorage.getItem('obv_cfg_wrap') === 'true', true);
       setMinimapState(localStorage.getItem('obv_cfg_minimap') === 'true', true);
       setLineNumberState(localStorage.getItem('obv_cfg_line_numbers') !== 'false', true);
@@ -2777,7 +2922,7 @@
       setDockCompactState(localStorage.getItem('obv_cfg_compact_dock') === 'true', true);
       pushConfigUpdate();
       requestSettings();
-      log('OblivionX Pro interface initialized', 'ok');
+      log('OblivionX ready', 'ok');
     });
   </script>
 </body>
