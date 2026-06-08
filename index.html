@@ -101,7 +101,7 @@
         <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M10 2L14 6L6 14L2 10L10 2Z"/><line x1="7" y1="1" x2="11" y2="5"/>
         </svg>
-        Attach
+        <span class="btn-label">Attach</span>
       </button>
     </div>
   </div>
@@ -129,11 +129,7 @@
             </button>
           </div>
         </div>
-        <div class="console-output" id="console-output">
-          <div class="console-line console-info"><span class="console-ts">[16:59:01]</span> <span class="console-badge badge-info">INFO</span> OblivionX initialized.</div>
-          <div class="console-line console-ok"><span class="console-ts">[16:59:02]</span> <span class="console-badge badge-ok">OK</span> Monaco Editor loaded successfully.</div>
-          <div class="console-line console-warn"><span class="console-ts">[16:59:02]</span> <span class="console-badge badge-warn">WARN</span> Not attached to any Roblox process.</div>
-        </div>
+        <div class="console-output" id="console-output"></div>
       </div>
     </div>
   </div>
@@ -143,9 +139,13 @@
     <div class="statusbar-left">
       <span class="status-indicator" id="status-indicator">
         <span class="status-dot detached"></span>
-        Not Attached
+        <span id="status-label">Not Attached</span>
       </span>
       <span class="statusbar-sep">|</span>
+      <span class="status-item" id="status-bridge">Pages Preview</span>
+      <span class="statusbar-sep">|</span>
+      <span class="status-item" id="status-pid" hidden>PID -</span>
+      <span class="statusbar-sep" id="status-pid-sep" hidden>|</span>
       <span class="status-item">Lua 5.1</span>
       <span class="statusbar-sep">|</span>
       <span class="status-item">UTF-8</span>
@@ -263,6 +263,45 @@
           </div>
         </div>
         <div class="settings-section">
+          <h3 class="settings-section-title">Backend</h3>
+          <div class="settings-row">
+            <label>Discord RPC</label>
+            <label class="toggle-switch">
+              <input type="checkbox" id="setting-discord-rpc" checked />
+              <span class="toggle-track"></span>
+            </label>
+          </div>
+          <div class="settings-row">
+            <label>Auto Attach</label>
+            <label class="toggle-switch">
+              <input type="checkbox" id="setting-auto-attach" />
+              <span class="toggle-track"></span>
+            </label>
+          </div>
+          <div class="settings-row">
+            <label>Auto Execute</label>
+            <label class="toggle-switch">
+              <input type="checkbox" id="setting-auto-execute" />
+              <span class="toggle-track"></span>
+            </label>
+          </div>
+          <div class="settings-row">
+            <label>Always On Top</label>
+            <label class="toggle-switch">
+              <input type="checkbox" id="setting-always-on-top" />
+              <span class="toggle-track"></span>
+            </label>
+          </div>
+          <div class="settings-row settings-row-stack">
+            <label for="setting-rpc-details">RPC Details</label>
+            <input class="settings-input" id="setting-rpc-details" type="text" value="OblivionX Executor" />
+          </div>
+          <div class="settings-row settings-row-stack">
+            <label for="setting-rpc-state">RPC State</label>
+            <input class="settings-input" id="setting-rpc-state" type="text" value="Idle" />
+          </div>
+        </div>
+        <div class="settings-section">
           <h3 class="settings-section-title">About</h3>
           <div class="settings-about">
             <div class="about-logo">N</div>
@@ -276,6 +315,7 @@
     </div>
   </div>
 
+  <script src="bridge.js"></script>
   <script src="renderer.js"></script>
 </body>
 </html>

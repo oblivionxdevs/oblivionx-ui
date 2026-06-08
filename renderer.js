@@ -5,13 +5,17 @@
 
 'use strict';
 
+const bridge = window.oblivionBridge;
+
+console.log('Bridge mode:', bridge?.environmentLabel || 'Unavailable');
+
 // ─── Monaco Loader ─────────────────────────────────────────
-// Convert relative path to absolute file:// URL for Electron
-const htmlPath = window.location.pathname;
-const srcDir = htmlPath.substring(0, htmlPath.lastIndexOf('/'));
-const appRootDir = srcDir.substring(0, srcDir.lastIndexOf('/'));
-const monacoBase = `file://${appRootDir}/node_modules/monaco-editor/min`;
-const monacoPath = '../node_modules/monaco-editor/min/vs';
+const MONACO_VERSION = '0.44.0';
+const isFileProtocol = window.location.protocol === 'file:';
+const monacoBase = isFileProtocol
+  ? new URL('../node_modules/monaco-editor/min', window.location.href).href.replace(/\/$/, '')
+  : `https://cdn.jsdelivr.net/npm/monaco-editor@${MONACO_VERSION}/min`;
+const monacoPath = `${monacoBase}/vs`;
 
 window.MonacoEnvironment = {
   getWorkerUrl: function (moduleId, label) {
@@ -43,8 +47,16 @@ let tabCounter = 1;
 let activeTabId = null;
 let isAttached = false;
 let isConsoleOpen = false;
+let currentPid = null;
 
 const tabs = new Map(); // id → { name, model }
+
+const backendSettingIds = {
+  discordRpc: 'setting-discord-rpc',
+  autoAttach: 'setting-auto-attach',
+  autoExecute: 'setting-auto-execute',
+  alwaysOnTop: 'setting-always-on-top',
+};
 
 const THEMES = {
   'nova-dark':   { monaco: 'nova-dark',   body: '' },
@@ -227,6 +239,8 @@ function initMonaco() {
     },
   });
 
+  bridge?.setEditorGetter(() => editor ? editor.getValue() : '');
+
   // Track cursor position
   editor.onDidChangeCursorPosition(e => {
     document.getElementById('status-cursor').textContent =
@@ -320,17 +334,23 @@ async function handleExecute() {
   btn.classList.add('executing');
   setTimeout(() => btn.classList.remove('executing'), 700);
 
+  if (!bridge) {
+    addConsoleLine('error', 'Bridge unavailable. Reload the UI.');
+    return;
+  }
+
   const code = editor ? editor.getValue() : '';
   if (!isAttached) {
-    addConsoleLine('warn', 'Not attached — attach to Roblox first.');
-    return;
+    addConsoleLine('warn', 'Not attached; the backend will validate the request.');
   }
 
   addConsoleLine('info', 'Sending script to executor...');
   try {
-    const result = await window.electronAPI.executeScript(code);
-    if (result?.success) {
+    const result = await bridge.execute(code);
+    if (result?.success && !result.pending) {
       addConsoleLine('ok', result.message || `Script executed (${code.split('\n').length} lines).`);
+    } else if (result?.pending) {
+      addConsoleLine('info', result.message || 'Execution request sent.');
     } else {
       addConsoleLine('error', result?.message || 'Execution failed.');
     }
@@ -345,8 +365,8 @@ function handleClear() {
 }
 
 async function handleOpen() {
-  if (!window.electronAPI) return;
-  const result = await window.electronAPI.openFile();
+  if (!bridge) return;
+  const result = await bridge.openFile();
   if (result) {
     createTab(result.name, result.content);
     addConsoleLine('ok', `Opened: ${result.name}`);
@@ -354,10 +374,10 @@ async function handleOpen() {
 }
 
 async function handleSave() {
-  if (!window.electronAPI || !editor) return;
+  if (!bridge || !editor) return;
   const content = editor.getValue();
   const currentTab = tabs.get(activeTabId);
-  const result = await window.electronAPI.saveFile({
+  const result = await bridge.saveFile({
     content,
     defaultName: currentTab?.name || 'script.lua',
   });
@@ -377,56 +397,62 @@ async function handleAttach() {
   btn.classList.add('pinging');
   setTimeout(() => btn.classList.remove('pinging'), 500);
 
-  if (isAttached) {
-    const result = await window.electronAPI.detach();
-    if (result?.success) {
-      isAttached = false;
-      btn.classList.remove('attached');
-      setAttachState(false);
-      addConsoleLine('warn', 'Detached from Roblox.');
+  if (!bridge) {
+    addConsoleLine('error', 'Bridge unavailable. Reload the UI.');
+    return;
+  }
+
+  addConsoleLine('info', isAttached ? 'Refreshing attachment state...' : 'Attaching to Roblox...');
+  try {
+    const result = await bridge.attach();
+    if (result?.success && !result.pending) {
+      setAttachState(true, result.pid || currentPid);
+      addConsoleLine('ok', result.message || 'Successfully attached to Roblox.');
+    } else if (result?.pending) {
+      addConsoleLine('info', result.message || 'Attach request sent.');
     } else {
-      addConsoleLine('error', result?.message || 'Failed to detach.');
+      addConsoleLine('error', result?.message || 'Failed to attach.');
     }
-  } else {
-    addConsoleLine('info', 'Attaching to Roblox...');
-    try {
-      const result = await window.electronAPI.attach();
-      if (result?.success) {
-        isAttached = true;
-        btn.classList.add('attached');
-        setAttachState(true);
-        addConsoleLine('ok', 'Successfully attached to Roblox.');
-      } else {
-        addConsoleLine('error', result?.message || 'Failed to attach.');
-      }
-    } catch (err) {
-      addConsoleLine('error', `Attach error: ${err.message || err}`);
-    }
+  } catch (err) {
+    addConsoleLine('error', `Attach error: ${err.message || err}`);
   }
 }
 
-function setAttachState(attached) {
+function setAttachState(attached, pid = null) {
   const statusbar = document.getElementById('statusbar');
   const dot = document.querySelector('.status-dot');
-  const indicator = document.getElementById('status-indicator');
+  const label = document.getElementById('status-label');
   const attachBtn = document.getElementById('btn-attach');
+  const attachLabel = attachBtn?.querySelector('.btn-label');
+  const pidItem = document.getElementById('status-pid');
+  const pidSep = document.getElementById('status-pid-sep');
+
+  isAttached = attached;
+  currentPid = attached ? pid : null;
 
   if (attached) {
     statusbar.classList.add('attached');
     statusbar.classList.remove('detached');
     dot.className = 'status-dot attached';
-    indicator.childNodes[1].textContent = ' Attached';
-    attachBtn.querySelector('.tab-name, span') // update text node
-    // update text
-    const textNodes = [...attachBtn.childNodes].filter(n => n.nodeType === 3);
-    textNodes.forEach(n => { if (n.textContent.trim()) n.textContent = 'Detach'; });
+    label.textContent = pid ? `Attached to PID ${pid}` : 'Attached';
+    attachBtn.classList.add('attached');
+    if (attachLabel) attachLabel.textContent = 'Attached';
+    if (pidItem && pidSep) {
+      pidItem.textContent = pid ? `PID ${pid}` : 'PID linked';
+      pidItem.hidden = false;
+      pidSep.hidden = false;
+    }
   } else {
     statusbar.classList.remove('attached');
     statusbar.classList.add('detached');
     dot.className = 'status-dot detached';
-    indicator.childNodes[1].textContent = ' Not Attached';
-    const textNodes = [...attachBtn.childNodes].filter(n => n.nodeType === 3);
-    textNodes.forEach(n => { if (n.textContent.trim()) n.textContent = 'Attach'; });
+    label.textContent = 'Not Attached';
+    attachBtn.classList.remove('attached');
+    if (attachLabel) attachLabel.textContent = 'Attach';
+    if (pidItem && pidSep) {
+      pidItem.hidden = true;
+      pidSep.hidden = true;
+    }
   }
 }
 
@@ -440,7 +466,7 @@ function toggleConsole() {
 }
 
 // ─── Console Output ─────────────────────────────────────────
-function addConsoleLine(type, message) {
+function addConsoleLine(type, message, reveal = true) {
   const output = document.getElementById('console-output');
   const now = new Date();
   const ts = `[${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}]`;
@@ -452,11 +478,11 @@ function addConsoleLine(type, message) {
   output.scrollTop = output.scrollHeight;
   setTimeout(() => line.classList.remove('new'), 200);
 
-  if (!isConsoleOpen) toggleConsole();
+  if (reveal && !isConsoleOpen) toggleConsole();
 }
 
 function escapeHtml(str) {
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
 // ─── Theme Switcher ─────────────────────────────────────────
@@ -464,24 +490,63 @@ function applyTheme(name) {
   const theme = THEMES[name] || THEMES['nova-dark'];
   if (editor) monaco.editor.setTheme(name);
   document.body.dataset.theme = theme.body;
+  document.documentElement.dataset.theme = theme.body;
   document.querySelectorAll('.theme-card').forEach(card => {
     card.classList.toggle('active', card.dataset.theme === name);
   });
+  bridge?.applyTheme(name);
+}
+
+function getBackendSettings() {
+  return Object.fromEntries(
+    Object.entries(backendSettingIds).map(([key, id]) => {
+      const control = document.getElementById(id);
+      return [key, Boolean(control?.checked)];
+    })
+  );
+}
+
+function applyBackendSettings(settings = {}) {
+  Object.entries(backendSettingIds).forEach(([key, id]) => {
+    const control = document.getElementById(id);
+    if (control && key in settings) control.checked = Boolean(settings[key]);
+  });
+}
+
+function pushBackendSettings() {
+  bridge?.updateConfig(getBackendSettings());
+}
+
+function pushRpcDetails() {
+  const details = document.getElementById('setting-rpc-details')?.value || 'OblivionX Executor';
+  const state = document.getElementById('setting-rpc-state')?.value || 'Idle';
+  bridge?.updateRpcDetails(details, state);
+}
+
+function wireBridgeEvents() {
+  const bridgeStatus = document.getElementById('status-bridge');
+  if (bridgeStatus) bridgeStatus.textContent = bridge?.environmentLabel || 'No Bridge';
+
+  if (!bridge) {
+    addConsoleLine('error', 'Bridge unavailable.');
+    return;
+  }
+
+  bridge.on('console', ({ type, message }) => addConsoleLine(type || 'info', message || ''));
+  bridge.on('attach-state', ({ attached, pid }) => setAttachState(Boolean(attached), pid || null));
+  bridge.on('settings', applyBackendSettings);
+
+  addConsoleLine('info', `UI ready in ${bridge.environmentLabel} mode.`, false);
+  bridge.requestSettings();
 }
 
 // ─── Event Listeners ────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
 
   // Window controls
-  const api = window.electronAPI;
-  if (api) {
-    document.getElementById('btn-close').addEventListener('click', () => api.close());
-    document.getElementById('btn-minimize').addEventListener('click', () => api.minimize());
-    document.getElementById('btn-maximize').addEventListener('click', () => api.maximize());
-  } else {
-    // Fallback for non-electron dev
-    document.getElementById('btn-close').addEventListener('click', () => window.close());
-  }
+  document.getElementById('btn-close').addEventListener('click', () => bridge?.close());
+  document.getElementById('btn-minimize').addEventListener('click', () => bridge?.minimize());
+  document.getElementById('btn-maximize').addEventListener('click', () => bridge?.maximize());
 
   // Toolbar
   document.getElementById('btn-execute').addEventListener('click', handleExecute);
@@ -491,15 +556,17 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-console').addEventListener('click', toggleConsole);
   document.getElementById('btn-attach').addEventListener('click', handleAttach);
   document.getElementById('btn-kill').addEventListener('click', async () => {
+    if (!bridge) {
+      addConsoleLine('error', 'Bridge unavailable. Reload the UI.');
+      return;
+    }
     addConsoleLine('warn', 'Sending kill request to executor...');
     try {
-      const result = await window.electronAPI.killRoblox();
+      const result = await bridge.killRoblox();
       if (result?.success) {
         addConsoleLine('warn', result.message || 'Roblox process terminated.');
         if (isAttached) {
-          isAttached = false;
           setAttachState(false);
-          document.getElementById('btn-attach').classList.remove('attached');
         }
       } else {
         addConsoleLine('error', result?.message || 'Failed to kill Roblox.');
@@ -578,6 +645,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (editor) editor.layout();
   });
 
+  Object.values(backendSettingIds).forEach((id) => {
+    document.getElementById(id)?.addEventListener('change', pushBackendSettings);
+  });
+
+  document.getElementById('setting-rpc-details')?.addEventListener('input', pushRpcDetails);
+  document.getElementById('setting-rpc-state')?.addEventListener('input', pushRpcDetails);
+
   // Console close/clear
   document.getElementById('btn-close-console').addEventListener('click', toggleConsole);
   document.getElementById('btn-clear-console').addEventListener('click', () => {
@@ -586,4 +660,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Status bar initial state
   document.getElementById('statusbar').classList.add('detached');
+  wireBridgeEvents();
 });

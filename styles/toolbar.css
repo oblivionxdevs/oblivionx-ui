@@ -11,8 +11,11 @@
   padding: 0 6px;
   flex-shrink: 0;
   gap: 2px;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
 }
+.toolbar::-webkit-scrollbar { height: 0; }
 
 .toolbar-left, .toolbar-center, .toolbar-right {
   display: flex;
@@ -21,6 +24,8 @@
 }
 
 .toolbar-right { margin-left: auto; }
+
+.toolbar-center { min-width: 0; }
 
 .toolbar-divider {
   width: 1px;
@@ -148,6 +153,27 @@
   height: 100%;
   overflow: hidden;
   -webkit-app-region: no-drag;
+}
+
+@media (max-width: 720px) {
+  .toolbar {
+    gap: 4px;
+    padding: 0 5px;
+  }
+
+  .toolbar-center {
+    flex: 0 0 auto;
+    min-width: max-content;
+  }
+
+  .toolbar-right {
+    flex: 0 0 auto;
+    margin-left: 4px;
+  }
+
+  .toolbar-btn {
+    padding-inline: 8px;
+  }
 }
 
 .tabs-scroll {
