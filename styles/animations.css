@@ -1,0 +1,90 @@
+/* ============================================================
+   ANIMATIONS & MICRO-INTERACTIONS
+   ============================================================ */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(14px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(52,211,153,0.5); }
+  50%       { box-shadow: 0 0 0 5px rgba(52,211,153,0); }
+}
+
+@keyframes executePulse {
+  0%   { box-shadow: 0 4px 20px var(--accent-glow); }
+  50%  { box-shadow: 0 4px 40px rgba(124,106,247,0.7); }
+  100% { box-shadow: 0 4px 20px var(--accent-glow); }
+}
+
+@keyframes tabSlideIn {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes consoleLineIn {
+  from { opacity: 0; transform: translateX(-6px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes scriptCardIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes attachPing {
+  0%   { transform: scale(1); opacity: 1; }
+  50%  { transform: scale(1.4); opacity: 0.5; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Apply to new tabs */
+.tab.entering { animation: tabSlideIn 0.18s ease forwards; }
+
+/* Apply to new console lines */
+.console-line.new { animation: consoleLineIn 0.15s ease forwards; }
+
+/* Apply to script cards on load */
+.script-card { animation: scriptCardIn 0.2s ease both; }
+
+/* Attach button ping when attaching */
+.attach-btn.pinging svg { animation: attachPing 0.5s ease; }
+
+/* Smooth hover glow on sidebar cards */
+.script-card:hover {
+  box-shadow:
+    0 4px 16px rgba(0,0,0,0.25),
+    -3px 0 0 0 var(--accent);
+}
+
+/* Selection glow in editor */
+.monaco-editor .selected-text { background: rgba(124,106,247,0.15) !important; }
+
+/* Toolbar ripple */
+.toolbar-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(circle at center, rgba(255,255,255,0.12) 0%, transparent 70%);
+  opacity: 0;
+  transform: scale(0.6);
+  transition: opacity 0.2s, transform 0.2s;
+  pointer-events: none;
+}
+.toolbar-btn:active::before {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Status bar transition */
+.statusbar { transition: background 0.4s ease, color 0.3s ease; }
+
+/* Sidebar resize handle */
+.sidebar { position: relative; }
