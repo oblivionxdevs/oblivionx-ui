@@ -6,15 +6,20 @@
 'use strict';
 
 // ─── Monaco Loader ─────────────────────────────────────────
+// Convert relative path to absolute file:// URL for Electron
+const htmlPath = window.location.pathname;
+const srcDir = htmlPath.substring(0, htmlPath.lastIndexOf('/'));
+const appRootDir = srcDir.substring(0, srcDir.lastIndexOf('/'));
+const monacoBase = `file://${appRootDir}/node_modules/monaco-editor/min`;
 const monacoPath = '../node_modules/monaco-editor/min/vs';
 
 window.MonacoEnvironment = {
   getWorkerUrl: function (moduleId, label) {
-    const workerPath = `${monacoPath}/base/worker/workerMain.js`;
-    const blob = new Blob([
-      `self.MonacoEnvironment = { baseUrl: '${monacoPath}/' };\nimportScripts('${workerPath}');`
-    ], { type: 'application/javascript' });
-    return URL.createObjectURL(blob);
+    const workerScript = `
+      self.MonacoEnvironment = { baseUrl: '${monacoBase}/' };
+      importScripts('${monacoBase}/vs/base/worker/workerMain.js');
+    `;
+    return 'data:text/javascript;charset=utf-8,' + encodeURIComponent(workerScript);
   }
 };
 
