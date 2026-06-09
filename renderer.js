@@ -51,6 +51,11 @@ let currentPid = null;
 
 const tabs = new Map(); // id → { name, model }
 
+const SCRIPT_STORAGE_KEY = 'oblivionx:scripts:v1';
+const DEFAULT_SCRIPT = '-- Welcome to OblivionX\n-- Start scripting below\n\n';
+let scriptSaveTimer = null;
+let isRestoringScripts = false;
+
 const backendSettingIds = {
   discordRpc: 'setting-discord-rpc',
   autoAttach: 'setting-auto-attach',
@@ -268,8 +273,10 @@ function initMonaco() {
       `Ln ${e.position.lineNumber}, Col ${e.position.column}`;
   });
 
-  // Create first tab
-  createTab('untitled1.lua', '-- Welcome to OblivionX\n-- Start scripting below\n\n');
+  // Restore saved scripts or create first tab.
+  if (!restoreSavedScripts()) {
+    createTab('untitled1.lua', DEFAULT_SCRIPT);
+  }
 
   // Resize observer
   const resizeObserver = new ResizeObserver(() => editor.layout());
@@ -281,13 +288,16 @@ function initMonaco() {
     if (e.ctrlKey && e.key === 'o') { e.preventDefault(); handleOpen(); }
     if (e.key === 'F5') { e.preventDefault(); handleExecute(); }
   });
+
+  window.addEventListener('beforeunload', saveScriptsNow);
 }
 
 // ─── Tab Management ─────────────────────────────────────────
 function createTab(name, initialContent = '') {
   const id = `tab-${++tabCounter}`;
   const model = monaco.editor.createModel(initialContent, 'lua');
-  tabs.set(id, { name, model });
+  const contentListener = model.onDidChangeContent(scheduleScriptSave);
+  tabs.set(id, { name, model, contentListener });
 
   const tabEl = document.createElement('div');
   tabEl.className = 'tab entering';
@@ -316,6 +326,7 @@ function createTab(name, initialContent = '') {
   setTimeout(() => tabEl.classList.remove('entering'), 200);
 
   switchTab(id);
+  scheduleScriptSave();
   return id;
 }
 
@@ -334,18 +345,76 @@ function switchTab(id) {
 
   // Update status bar
   document.getElementById('status-tab-name').textContent = name;
+  scheduleScriptSave();
 }
 
 function closeTab(id) {
   if (tabs.size === 1) return; // keep at least one tab
   const tabEl = document.querySelector(`.tab[data-tab-id="${id}"]`);
   if (tabEl) tabEl.remove();
+  tabs.get(id)?.contentListener?.dispose();
   tabs.get(id)?.model.dispose();
   tabs.delete(id);
 
   if (activeTabId === id) {
     const remaining = [...tabs.keys()];
     if (remaining.length) switchTab(remaining[remaining.length - 1]);
+  }
+
+  scheduleScriptSave();
+}
+
+function scheduleScriptSave() {
+  if (isRestoringScripts) return;
+  window.clearTimeout(scriptSaveTimer);
+  scriptSaveTimer = window.setTimeout(saveScriptsNow, 250);
+}
+
+function saveScriptsNow() {
+  if (!tabs.size) return;
+
+  try {
+    const tabEntries = [...tabs.entries()];
+    const activeIndex = Math.max(0, tabEntries.findIndex(([id]) => id === activeTabId));
+    const payload = {
+      activeIndex,
+      savedAt: new Date().toISOString(),
+      tabs: tabEntries.map(([, tab]) => ({
+        name: tab.name,
+        content: tab.model.getValue(),
+      })),
+    };
+
+    localStorage.setItem(SCRIPT_STORAGE_KEY, JSON.stringify(payload));
+  } catch (error) {
+    console.warn('Failed to save scripts:', error);
+  }
+}
+
+function restoreSavedScripts() {
+  try {
+    const raw = localStorage.getItem(SCRIPT_STORAGE_KEY);
+    if (!raw) return false;
+
+    const payload = JSON.parse(raw);
+    if (!Array.isArray(payload.tabs) || payload.tabs.length === 0) return false;
+
+    isRestoringScripts = true;
+    const restoredIds = payload.tabs.map((tab, index) => createTab(
+      tab.name || `untitled${index + 1}.lua`,
+      typeof tab.content === 'string' ? tab.content : ''
+    ));
+    isRestoringScripts = false;
+
+    const activeIndex = Number.isInteger(payload.activeIndex) ? payload.activeIndex : 0;
+    const activeId = restoredIds[Math.min(Math.max(activeIndex, 0), restoredIds.length - 1)];
+    if (activeId) switchTab(activeId);
+    saveScriptsNow();
+    return true;
+  } catch (error) {
+    isRestoringScripts = false;
+    console.warn('Failed to restore scripts:', error);
+    return false;
   }
 }
 
@@ -409,6 +478,7 @@ async function handleSave() {
       const tabEl = document.querySelector(`.tab[data-tab-id="${activeTabId}"] .tab-name`);
       if (tabEl) tabEl.textContent = result;
       document.getElementById('status-tab-name').textContent = result;
+      scheduleScriptSave();
     }
   }
 }
