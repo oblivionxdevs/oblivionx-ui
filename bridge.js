@@ -20,6 +20,17 @@
     browser: 'Pages Preview',
   }[environment];
 
+  const pendingMessages = {
+    execute: 'Executing Script...',
+    inject: 'Attaching to Roblox...',
+    kill_roblox: 'Killing Roblox...',
+    exit: 'Closing OblivionX...',
+    request_settings: 'Loading Settings...',
+    theme: 'Applying Theme...',
+    update_config: 'Saving Settings...',
+    update_rpc_details: 'Updating Discord RPC...',
+  };
+
   function emit(type, payload) {
     const callbacks = listeners.get(type);
     if (!callbacks) return;
@@ -98,7 +109,7 @@
       return {
         success: true,
         pending: true,
-        message: `${payload.action} request sent to the C# backend.`,
+        message: pendingMessages[payload.action] || 'Working...',
       };
     } catch (error) {
       return {
@@ -233,6 +244,7 @@
       };
     },
     async killRoblox() {
+      if (webview) return postToWebView({ action: 'kill_roblox' });
       if (electron && typeof electron.killRoblox === 'function') return callElectron('killRoblox');
       return {
         success: false,

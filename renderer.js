@@ -58,6 +58,27 @@ const backendSettingIds = {
   alwaysOnTop: 'setting-always-on-top',
 };
 
+const actionMessages = {
+  attach: {
+    start: 'Attaching to Roblox...',
+    pending: 'Attaching to Roblox...',
+    success: 'Roblox Attached Successfully',
+    failure: 'Failed to Attach to Roblox',
+  },
+  execute: {
+    start: 'Executing Script...',
+    pending: 'Executing Script...',
+    success: 'Script Executed Successfully',
+    failure: 'Script Execution Failed',
+  },
+  kill: {
+    start: 'Killing Roblox...',
+    pending: 'Killing Roblox...',
+    success: 'Roblox Killed Successfully',
+    failure: 'Failed to Kill Roblox',
+  },
+};
+
 const THEMES = {
   'nova-dark':   { monaco: 'nova-dark',   body: '' },
   'midnight':    { monaco: 'midnight',    body: 'midnight' },
@@ -344,15 +365,15 @@ async function handleExecute() {
     addConsoleLine('warn', 'Not attached; the backend will validate the request.');
   }
 
-  addConsoleLine('info', 'Sending script to executor...');
+  addConsoleLine('info', actionMessages.execute.start);
   try {
     const result = await bridge.execute(code);
     if (result?.success && !result.pending) {
-      addConsoleLine('ok', result.message || `Script executed (${code.split('\n').length} lines).`);
+      addConsoleLine('ok', result.message || actionMessages.execute.success);
     } else if (result?.pending) {
-      addConsoleLine('info', result.message || 'Execution request sent.');
+      addConsoleLine('info', result.message || actionMessages.execute.pending);
     } else {
-      addConsoleLine('error', result?.message || 'Execution failed.');
+      addConsoleLine('error', result?.message || actionMessages.execute.failure);
     }
   } catch (err) {
     addConsoleLine('error', `Execution error: ${err.message || err}`);
@@ -402,16 +423,16 @@ async function handleAttach() {
     return;
   }
 
-  addConsoleLine('info', isAttached ? 'Refreshing attachment state...' : 'Attaching to Roblox...');
+  addConsoleLine('info', actionMessages.attach.start);
   try {
     const result = await bridge.attach();
     if (result?.success && !result.pending) {
       setAttachState(true, result.pid || currentPid);
-      addConsoleLine('ok', result.message || 'Successfully attached to Roblox.');
+      addConsoleLine('ok', result.message || actionMessages.attach.success);
     } else if (result?.pending) {
-      addConsoleLine('info', result.message || 'Attach request sent.');
+      addConsoleLine('info', result.message || actionMessages.attach.pending);
     } else {
-      addConsoleLine('error', result?.message || 'Failed to attach.');
+      addConsoleLine('error', result?.message || actionMessages.attach.failure);
     }
   } catch (err) {
     addConsoleLine('error', `Attach error: ${err.message || err}`);
@@ -560,16 +581,18 @@ document.addEventListener('DOMContentLoaded', () => {
       addConsoleLine('error', 'Bridge unavailable. Reload the UI.');
       return;
     }
-    addConsoleLine('warn', 'Sending kill request to executor...');
+    addConsoleLine('warn', actionMessages.kill.start);
     try {
       const result = await bridge.killRoblox();
-      if (result?.success) {
-        addConsoleLine('warn', result.message || 'Roblox process terminated.');
+      if (result?.success && !result.pending) {
+        addConsoleLine('ok', result.message || actionMessages.kill.success);
         if (isAttached) {
           setAttachState(false);
         }
+      } else if (result?.pending) {
+        addConsoleLine('warn', result.message || actionMessages.kill.pending);
       } else {
-        addConsoleLine('error', result?.message || 'Failed to kill Roblox.');
+        addConsoleLine('error', result?.message || actionMessages.kill.failure);
       }
     } catch (err) {
       addConsoleLine('error', `Kill error: ${err.message || err}`);
