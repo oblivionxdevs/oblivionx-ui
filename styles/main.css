@@ -129,6 +129,101 @@ html, body {
   user-select: none;
 }
 
+#loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(16, 18, 28, 0.96);
+  backdrop-filter: blur(22px);
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+  overflow: hidden;
+}
+
+#loading-overlay.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.loading-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: min(420px, calc(100% - 48px));
+  padding: 22px 24px;
+  border-radius: 18px;
+  background: transparent;
+  animation: fadeInOverlay 0.32s ease both;
+}
+
+.spinner {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  border: 4px solid rgba(255, 255, 255, 0.12);
+  border-left-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.88s linear infinite;
+}
+
+.spinner::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.loading-text strong {
+  display: block;
+  font-size: 15px;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.loading-text p {
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fadeInOverlay {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 /* --- App Layout Shell --- */
 .main-content {
   display: flex;

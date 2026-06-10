@@ -48,6 +48,8 @@ let activeTabId = null;
 let isAttached = false;
 let isConsoleOpen = false;
 let currentPid = null;
+let loadingOverlayStart = performance.now();
+const LOADING_MIN_DURATION_MS = 900;
 
 const tabs = new Map(); // id → { name, model }
 
@@ -290,6 +292,20 @@ function initMonaco() {
   });
 
   window.addEventListener('beforeunload', saveScriptsNow);
+  hideLoadingOverlay();
+}
+
+function hideLoadingOverlay() {
+  const overlay = document.getElementById('loading-overlay');
+  if (!overlay) return;
+
+  const elapsed = performance.now() - loadingOverlayStart;
+  const wait = Math.max(0, LOADING_MIN_DURATION_MS - elapsed);
+
+  window.setTimeout(() => {
+    overlay.classList.add('hidden');
+    window.setTimeout(() => overlay.remove(), 320);
+  }, wait);
 }
 
 // ─── Tab Management ─────────────────────────────────────────
