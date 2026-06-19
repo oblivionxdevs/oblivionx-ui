@@ -93,7 +93,13 @@ const THEMES = {
   'one-dark':    { monaco: 'one-dark',    body: 'one-dark' },
   'github-dark': { monaco: 'github-dark', body: 'github-dark' },
   'synthwave':   { monaco: 'synthwave',   body: 'synthwave' },
+  'pro-gold':    { monaco: 'pro-gold',    body: 'pro-gold' },
+  'cyberpunk':   { monaco: 'cyberpunk',   body: 'cyberpunk' },
+  'neon':        { monaco: 'neon',        body: 'neon' },
+  'rose-gold':   { monaco: 'rose-gold',   body: 'rose-gold' },
 };
+
+let isPro = localStorage.getItem('oblivionx:pro:status') === 'true';
 
 // ─── Monaco Init ────────────────────────────────────────────
 function initMonaco() {
@@ -227,6 +233,86 @@ function initMonaco() {
       'editor.selectionBackground': '#f7258530',
       'editor.lineHighlightBackground': '#100020',
       'minimap.background': '#07000e',
+    }
+  });
+
+  monaco.editor.defineTheme('pro-gold', {
+    base: 'vs-dark', inherit: true, rules: [
+      { token: 'keyword',  foreground: 'ffd700', fontStyle: 'bold' },
+      { token: 'string',   foreground: 'ffea70' },
+      { token: 'comment',  foreground: '5c5c4a', fontStyle: 'italic' },
+      { token: 'function', foreground: 'd4af37' },
+      { token: 'number',   foreground: 'fbfbf8' },
+    ],
+    colors: {
+      'editor.background': '#0f0f0c',
+      'editor.foreground': '#fbfbf8',
+      'editorLineNumber.foreground': '#333328',
+      'editorLineNumber.activeForeground': '#ffd700',
+      'editorCursor.foreground': '#ffd700',
+      'editor.selectionBackground': '#ffd70030',
+      'editor.lineHighlightBackground': '#141410',
+      'minimap.background': '#0b0b09',
+    }
+  });
+
+  monaco.editor.defineTheme('cyberpunk', {
+    base: 'vs-dark', inherit: true, rules: [
+      { token: 'keyword',  foreground: '00ff9f', fontStyle: 'bold' },
+      { token: 'string',   foreground: 'ff003c' },
+      { token: 'comment',  foreground: '3d3d4a', fontStyle: 'italic' },
+      { token: 'function', foreground: '00b8ff' },
+      { token: 'number',   foreground: 'fce205' },
+    ],
+    colors: {
+      'editor.background': '#09090b',
+      'editor.foreground': '#e0e0e0',
+      'editorLineNumber.foreground': '#1e1e28',
+      'editorLineNumber.activeForeground': '#00ff9f',
+      'editorCursor.foreground': '#00ff9f',
+      'editor.selectionBackground': '#00ff9f30',
+      'editor.lineHighlightBackground': '#0e0e12',
+      'minimap.background': '#050507',
+    }
+  });
+
+  monaco.editor.defineTheme('neon', {
+    base: 'vs-dark', inherit: true, rules: [
+      { token: 'keyword',  foreground: 'ff00ff', fontStyle: 'bold' },
+      { token: 'string',   foreground: '00ffff' },
+      { token: 'comment',  foreground: '4a4a4a', fontStyle: 'italic' },
+      { token: 'function', foreground: '8a2be2' },
+      { token: 'number',   foreground: 'ff66ff' },
+    ],
+    colors: {
+      'editor.background': '#050505',
+      'editor.foreground': '#ffffff',
+      'editorLineNumber.foreground': '#1a1a1a',
+      'editorLineNumber.activeForeground': '#ff00ff',
+      'editorCursor.foreground': '#ff00ff',
+      'editor.selectionBackground': '#ff00ff30',
+      'editor.lineHighlightBackground': '#0a0a0a',
+      'minimap.background': '#020202',
+    }
+  });
+
+  monaco.editor.defineTheme('rose-gold', {
+    base: 'vs-dark', inherit: true, rules: [
+      { token: 'keyword',  foreground: 'b76e79', fontStyle: 'bold' },
+      { token: 'string',   foreground: 'e0bfb8' },
+      { token: 'comment',  foreground: '4f3d41', fontStyle: 'italic' },
+      { token: 'function', foreground: 'd18d97' },
+      { token: 'number',   foreground: 'ffffff' },
+    ],
+    colors: {
+      'editor.background': '#141012',
+      'editor.foreground': '#e8dada',
+      'editorLineNumber.foreground': '#2b2327',
+      'editorLineNumber.activeForeground': '#b76e79',
+      'editorCursor.foreground': '#b76e79',
+      'editor.selectionBackground': '#b76e7930',
+      'editor.lineHighlightBackground': '#1a1518',
+      'minimap.background': '#0c0a0b',
     }
   });
 
@@ -594,6 +680,12 @@ function escapeHtml(str) {
 
 // ─── Theme Switcher ─────────────────────────────────────────
 function applyTheme(name) {
+  const themeCard = document.querySelector(`.theme-card[data-theme="${name}"]`);
+  if (themeCard && themeCard.classList.contains('locked') && !isPro) {
+    document.getElementById('pro-modal').classList.add('open');
+    return;
+  }
+
   const theme = THEMES[name] || THEMES['nova-dark'];
   if (editor) monaco.editor.setTheme(name);
   document.body.dataset.theme = theme.body;
@@ -602,6 +694,54 @@ function applyTheme(name) {
     card.classList.toggle('active', card.dataset.theme === name);
   });
   bridge?.applyTheme(name);
+}
+
+function updateProUI() {
+  if (isPro) {
+    document.getElementById('btn-upgrade-pro')?.classList.add('hidden');
+    document.getElementById('pro-badge-about')?.classList.remove('hidden');
+    document.querySelectorAll('.theme-card.locked').forEach(card => {
+      card.classList.remove('locked');
+    });
+  }
+}
+
+async function validateProKey() {
+  const input = document.getElementById('pro-key-input');
+  const errorMsg = document.getElementById('pro-error-msg');
+  const btn = document.getElementById('btn-validate-key');
+  const key = input.value.trim();
+
+  errorMsg.textContent = '';
+  
+  if (!/^OBX-(1MNTH|3MNTH|LIFETIME)-[A-Z0-9]{8,}$/i.test(key)) {
+    errorMsg.textContent = 'Invalid key format. Example: OBX-1MNTH-ABC123XYZ';
+    return;
+  }
+
+  btn.textContent = 'Validating...';
+  btn.style.opacity = '0.7';
+  btn.style.pointerEvents = 'none';
+
+  try {
+    const result = await bridge.validateKey(key);
+    if (result && result.success) {
+      isPro = true;
+      localStorage.setItem('oblivionx:pro:status', 'true');
+      updateProUI();
+      document.getElementById('pro-modal').classList.remove('open');
+      addConsoleLine('ok', 'OblivionX PRO activated successfully!');
+      applyTheme('pro-gold'); // auto apply pro theme
+    } else {
+      errorMsg.textContent = result?.message || 'Invalid key or HWID mismatch.';
+    }
+  } catch (err) {
+    errorMsg.textContent = 'Validation error occurred.';
+  } finally {
+    btn.textContent = 'Validate Key';
+    btn.style.opacity = '1';
+    btn.style.pointerEvents = 'auto';
+  }
 }
 
 function getBackendSettings() {
@@ -770,4 +910,20 @@ document.addEventListener('DOMContentLoaded', () => {
   // Status bar initial state
   document.getElementById('statusbar').classList.add('detached');
   wireBridgeEvents();
+  updateProUI();
+
+  // Pro features
+  document.getElementById('btn-upgrade-pro')?.addEventListener('click', () => {
+    document.getElementById('pro-modal').classList.add('open');
+  });
+  document.getElementById('pro-modal-close')?.addEventListener('click', () => {
+    document.getElementById('pro-modal').classList.remove('open');
+  });
+  document.getElementById('pro-modal')?.addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) e.currentTarget.classList.remove('open');
+  });
+  document.getElementById('btn-validate-key')?.addEventListener('click', validateProKey);
+  document.getElementById('pro-key-input')?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') validateProKey();
+  });
 });

@@ -106,6 +106,12 @@
       </button>
     </div>
     <div class="toolbar-right">
+      <button class="upgrade-pro-btn" id="btn-upgrade-pro">
+        <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="8,2 10.5,6.5 15.5,7 12,10.5 13,15.5 8,13 3,15.5 4,10.5 0.5,7 5.5,6.5"/>
+        </svg>
+        Upgrade to Pro
+      </button>
       <button class="toolbar-btn attach-btn" id="btn-attach" data-tooltip="Attach to Roblox">
         <svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M10 2L14 6L6 14L2 10L10 2Z"/><line x1="7" y1="1" x2="11" y2="5"/>
@@ -199,6 +205,22 @@
         <button class="theme-card" data-theme="synthwave">
           <div class="theme-preview synthwave-preview"></div>
           <span>Synthwave</span>
+        </button>
+        <button class="theme-card locked pro-only" data-theme="pro-gold">
+          <div class="theme-preview pro-gold-preview"></div>
+          <span>Pro Gold</span>
+        </button>
+        <button class="theme-card locked pro-only" data-theme="cyberpunk">
+          <div class="theme-preview cyberpunk-preview"></div>
+          <span>Cyberpunk</span>
+        </button>
+        <button class="theme-card locked pro-only" data-theme="neon">
+          <div class="theme-preview neon-preview"></div>
+          <span>Neon</span>
+        </button>
+        <button class="theme-card locked pro-only" data-theme="rose-gold">
+          <div class="theme-preview rose-gold-preview"></div>
+          <span>Rose Gold</span>
         </button>
       </div>
     </div>
@@ -315,10 +337,37 @@
           <div class="settings-about">
             <div class="about-logo">N</div>
             <div class="about-info">
-              <div class="about-name">OblivionX</div>
+              <div class="about-name">OblivionX <span class="pro-badge hidden" id="pro-badge-about">PRO</span></div>
               <div class="about-version">v1.0.0 · UI Preview</div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pro Redemption Modal -->
+  <div class="modal-overlay" id="pro-modal">
+    <div class="modal glass-modal">
+      <div class="modal-header">
+        <span>Upgrade to Pro</span>
+        <button class="modal-close" id="pro-modal-close">
+          <svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="2" y1="2" x2="14" y2="14"/><line x1="14" y1="2" x2="2" y2="14"/></svg>
+        </button>
+      </div>
+      <div class="pro-modal-body">
+        <div class="pro-modal-icon">
+          <svg viewBox="0 0 16 16" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="8,2 10.5,6.5 15.5,7 12,10.5 13,15.5 8,13 3,15.5 4,10.5 0.5,7 5.5,6.5"/>
+          </svg>
+        </div>
+        <div class="pro-modal-title">Unlock Premium Features</div>
+        <div class="pro-modal-desc">Enter your OblivionX Pro key below to unlock exclusive themes, badges, and premium features.</div>
+        <input type="text" id="pro-key-input" class="pro-key-input" placeholder="OBX-1MNTH-XXXXXXXXXXXXXXXX" spellcheck="false" autocomplete="off" />
+        <div class="pro-error-msg" id="pro-error-msg"></div>
+        <button class="pro-validate-btn" id="btn-validate-key">Validate Key</button>
+        <div class="pro-modal-footer">
+          Don't have a key? <a href="https://discord.gg/jdMazASKvf" target="_blank" id="pro-discord-link">Join our Discord to buy one</a>
         </div>
       </div>
     </div>

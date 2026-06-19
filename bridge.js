@@ -261,6 +261,11 @@
       if (webview) return postToWebView({ action: 'update_rpc_details', details, state });
       return { success: true, message: 'RPC details updated locally.' };
     },
+    async validateKey(key) {
+      if (webview) return postToWebView({ action: 'validate_key', key });
+      // In browser fallback mode, simulate verification for formatting purposes
+      return { success: true, message: 'Key validated locally (Browser Mode).' };
+    },
     async applyTheme(value) {
       if (webview) return postToWebView({ action: 'theme', value });
       return { success: true };
