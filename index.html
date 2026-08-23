@@ -1,14 +1,3985 @@
-<!doctype html>
-<html lang="en" class="dark">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>OblivionX</title>
-    <script type="module" crossorigin src="./assets/index-YV6hK_B8.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-mBEjJV9Z.css">
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OblivionX</title>
+<style>
+  @font-face{
+    font-family:'Chillax';
+    src:url('fonts/chillax-400.woff2') format('woff2');
+    font-weight:400;font-style:normal;font-display:swap;
+  }
+  @font-face{
+    font-family:'Chillax';
+    src:url('fonts/chillax-500.woff2') format('woff2');
+    font-weight:500;font-style:normal;font-display:swap;
+  }
+  @font-face{
+    font-family:'Chillax';
+    src:url('fonts/chillax-600.woff2') format('woff2');
+    font-weight:600;font-style:normal;font-display:swap;
+  }
+  @font-face{
+    font-family:'Chillax';
+    src:url('fonts/chillax-700.woff2') format('woff2');
+    font-weight:700;font-style:normal;font-display:swap;
+  }
+  @font-face{
+    font-family:'JetBrains Mono';
+    src:url('fonts/jetbrains-mono-400.woff2') format('woff2');
+    font-weight:400;font-style:normal;font-display:swap;
+  }
+  @font-face{
+    font-family:'JetBrains Mono';
+    src:url('fonts/jetbrains-mono-500.woff2') format('woff2');
+    font-weight:500;font-style:normal;font-display:swap;
+  }
+  @font-face{
+    font-family:'JetBrains Mono';
+    src:url('fonts/jetbrains-mono-600.woff2') format('woff2');
+    font-weight:600;font-style:normal;font-display:swap;
+  }
+  @font-face{
+    font-family:'Inter';
+    src:url('fonts/inter-400.woff2') format('woff2');
+    font-weight:400;font-style:normal;font-display:swap;
+  }
+  @font-face{
+    font-family:'Inter';
+    src:url('fonts/inter-500.woff2') format('woff2');
+    font-weight:500;font-style:normal;font-display:swap;
+  }
+  @font-face{
+    font-family:'Inter';
+    src:url('fonts/inter-600.woff2') format('woff2');
+    font-weight:600;font-style:normal;font-display:swap;
+  }
+  @font-face{
+    font-family:'Inter';
+    src:url('fonts/inter-700.woff2') format('woff2');
+    font-weight:700;font-style:normal;font-display:swap;
+  }
+  @font-face{
+    font-family:'Space Grotesk';
+    src:url('fonts/space-grotesk-400.woff2') format('woff2');
+    font-weight:400;font-style:normal;font-display:swap;
+  }
+  @font-face{
+    font-family:'Space Grotesk';
+    src:url('fonts/space-grotesk-500.woff2') format('woff2');
+    font-weight:500;font-style:normal;font-display:swap;
+  }
+  @font-face{
+    font-family:'Space Grotesk';
+    src:url('fonts/space-grotesk-600.woff2') format('woff2');
+    font-weight:600;font-style:normal;font-display:swap;
+  }
+  @font-face{
+    font-family:'Space Grotesk';
+    src:url('fonts/space-grotesk-700.woff2') format('woff2');
+    font-weight:700;font-style:normal;font-display:swap;
+  }
+
+  /* ===== OBLIVION X — DESIGN TOKENS ===== */
+  :root{
+    /* Void-core backgrounds */
+    --desk:#04030a;
+    --win:#07060f;
+    --titlebar:#0d0b1a;
+    --tabbar:#110f1f;
+    --toolbar:#0a0916;
+    --editor:#060510;
+    --gutter:#09081a;
+    --console:#060510;
+
+    /* Crystal border system */
+    --border:rgba(139,92,246,0.10);
+    --border-strong:rgba(139,92,246,0.22);
+
+    /* Text hierarchy */
+    --text:#e2dff5;
+    --text-dim:#7a73a8;
+    --text-faint:#3d3860;
+
+    /* OblivionX violet accent */
+    --accent:#a855f7;
+    --accent-dim:rgba(168,85,247,0.15);
+    --accent-glow:rgba(168,85,247,0.55);
+    --accent-fg:#0d0b1a;
+
+    /* Status */
+    --ok:#7ee787;
+    --err:#ff7b72;
+
+    /* UI */
+    --tab-active:#13102a;
+    --ui-font:'Chillax', sans-serif;
+    --window-radius:20px;
+  }
+
+  :root[data-theme="midnight"]{
+    --desk:#020109;
+    --win:#05040e;
+    --titlebar:#0a0817;
+    --tabbar:#0e0c1c;
+    --toolbar:#070615;
+    --editor:#040310;
+    --gutter:#07061a;
+    --console:#040310;
+    --tab-active:#0f0c22;
+  }
+  :root[data-theme="slate"]{
+    --desk:#06060f;
+    --win:#0d0c1c;
+    --titlebar:#161425;
+    --tabbar:#1b182d;
+    --toolbar:#131220;
+    --editor:#0a0918;
+    --gutter:#0e0d1f;
+    --console:#0a0918;
+    --tab-active:#181628;
+  }
+
+  *{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+  }
+  html,body{
+    height:100%;
+  }
+
+  body{
+    background:
+      radial-gradient(900px 600px at 15% -5%, rgba(139,92,246,0.07), transparent 55%),
+      radial-gradient(600px 400px at 85% 90%, rgba(76,29,149,0.06), transparent 50%),
+      var(--desk);
+    color:var(--text);
+    font-family:var(--ui-font);
+    height:100vh;
+    overflow:hidden;
+  }
+
+  /* Scanline texture overlay */
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    background:repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.03) 2px,
+      rgba(0,0,0,0.03) 4px
+    );
+    pointer-events:none;
+    z-index:999;
+  }
+
+  .window{
+    position:relative;
+    width:100vw;
+    height:100vh;
+    overflow:hidden;
+    background:var(--win);
+    display:flex;
+    flex-direction:column;
+    border-radius:var(--window-radius);
+    /* Crystal edge outline */
+    outline:1px solid rgba(139,92,246,0.18);
+    outline-offset:-1px;
+  }
+
+  /* ===== TITLEBAR ===== */
+  .titlebar{
+    height:48px;
+    background:var(--titlebar);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 14px 0 16px;
+    border-bottom:1px solid var(--border);
+    -webkit-user-select:none;
+    user-select:none;
+    /* Top crystal line */
+    box-shadow:inset 0 1px 0 rgba(168,85,247,0.15);
+  }
+
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .brand-mark{
+    width:24px;
+    height:24px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--accent);
+    filter:drop-shadow(0 0 6px var(--accent-glow));
+  }
+  .brand-mark svg, .brand-mark img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+  }
+  .brand-version{
+    font-size:12px;
+    font-weight:500;
+    color:var(--text-faint);
+    -webkit-user-select:none;
+    user-select:none;
+  }
+
+  .title-actions{
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+
+  .win-divider{
+    width:1px;
+    height:18px;
+    background:var(--border-strong);
+    margin:0 6px;
+  }
+
+  .icon-btn{
+    width:30px;
+    height:30px;
+    border-radius:6px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--text-dim);
+    background:transparent;
+    border:none;
+    cursor:pointer;
+    transition:background .15s ease, color .15s ease, box-shadow .15s ease;
+  }
+  .icon-btn:hover{
+    background:rgba(168,85,247,0.10);
+    color:var(--text);
+    box-shadow:0 0 0 1px rgba(168,85,247,0.2);
+  }
+  .icon-btn.active{
+    background:rgba(168,85,247,0.14);
+    color:var(--accent);
+    box-shadow:0 0 0 1px rgba(168,85,247,0.3), 0 0 12px rgba(168,85,247,0.15);
+  }
+  .icon-btn svg{
+    width:16px;
+    height:16px;
+  }
+  /* Close button */
+  .icon-btn.close:hover{
+    background:rgba(255,123,114,0.15);
+    color:#ff7b72;
+    box-shadow:0 0 0 1px rgba(255,123,114,0.3);
+  }
+
+  /* ===== TOOLTIPS ===== */
+  [data-tip]{
+    position:relative;
+  }
+  [data-tip]::after{
+    content:attr(data-tip);
+    position:absolute;
+    bottom:calc(100% + 9px);
+    right:0;
+    transform:translateY(4px);
+    background:#0d0b1a;
+    color:var(--text);
+    font-family:var(--ui-font);
+    font-size:11px;
+    font-weight:500;
+    letter-spacing:0.01em;
+    padding:5px 9px;
+    border-radius:5px;
+    white-space:nowrap;
+    border:1px solid var(--border-strong);
+    box-shadow:0 8px 20px rgba(0,0,0,0.55), 0 0 12px rgba(139,92,246,0.08);
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .12s ease, transform .12s ease;
+    z-index:50;
+  }
+  [data-tip]::before{
+    content:"";
+    position:absolute;
+    bottom:calc(100% + 4px);
+    right:10px;
+    border:5px solid transparent;
+    border-top-color:#0d0b1a;
+    opacity:0;
+    transition:opacity .12s ease;
+    pointer-events:none;
+    z-index:50;
+  }
+  [data-tip].tip-down::after{
+    bottom:auto;
+    top:calc(100% + 9px);
+    transform:translateY(-4px);
+  }
+  [data-tip].tip-down::before{
+    bottom:auto;
+    top:calc(100% + 4px);
+    border-top-color:transparent;
+    border-bottom-color:#0d0b1a;
+  }
+  [data-tip]:hover::after{
+    opacity:1;
+    transform:translateY(0);
+  }
+  [data-tip]:hover::before{
+    opacity:1;
+  }
+
+  .float-tip{
+    position:fixed;
+    left:0; top:0;
+    background:#0d0b1a;
+    color:var(--text);
+    font-family:var(--ui-font);
+    font-size:11px;
+    font-weight:500;
+    letter-spacing:0.01em;
+    padding:5px 9px;
+    border-radius:5px;
+    white-space:nowrap;
+    border:1px solid var(--border-strong);
+    box-shadow:0 8px 20px rgba(0,0,0,0.55);
+    opacity:0;
+    transform:translateY(4px);
+    pointer-events:none;
+    transition:opacity .12s ease, transform .12s ease;
+    z-index:60;
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .float-tip.open{
+    opacity:1;
+    transform:translateY(0);
+  }
+  .float-tip-dot{
+    width:7px; height:7px;
+    border-radius:50%;
+    background:var(--group-color, var(--text-dim));
+    flex-shrink:0;
+  }
+
+  /* ===== TABBAR ===== */
+  .tab-toolbar{
+    position:relative;
+    background:var(--toolbar);
+    border-bottom:1px solid var(--border);
+  }
+
+  .tabbar{
+    display:flex;
+    align-items:flex-end;
+    padding:6px 8px 0;
+    gap:2px;
+    position:relative;
+  }
+
+  .tab-caret-pin{
+    display:flex;
+    align-items:center;
+    flex-shrink:0;
+  }
+
+  .tab-scroll{
+    display:flex;
+    align-items:flex-end;
+    gap:2px;
+    min-width:0;
+    flex:1;
+    overflow-x:auto;
+    scrollbar-width:none;
+    padding-left:14px;
+  }
+  .tab-scroll::-webkit-scrollbar{ display:none; }
+
+  .tab-sep{
+    width:1px;
+    height:20px;
+    flex-shrink:0;
+    background:var(--border-strong);
+    margin:0 8px;
+    align-self:center;
+  }
+
+  .tab-caret{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:32px;
+    height:32px;
+    flex-shrink:0;
+    align-self:center;
+    color:var(--text-faint);
+    cursor:pointer;
+    border-radius:6px;
+    transition:background .15s ease, color .15s ease;
+  }
+  .tab-caret:hover, .tab-caret.open{
+    background:rgba(168,85,247,0.10);
+    color:var(--accent);
+  }
+  .tab-caret svg{
+    width:14px;
+    height:14px;
+    transition:transform .15s ease;
+  }
+  .tab-caret.open svg{ transform:rotate(180deg); }
+
+  /* Script dropdown */
+  .script-dropdown{
+    position:absolute;
+    top:44px;
+    left:8px;
+    width:260px;
+    background:#0d0b1a;
+    border:1px solid var(--border-strong);
+    border-radius:8px;
+    box-shadow:0 16px 40px rgba(0,0,0,0.6), 0 0 30px rgba(139,92,246,0.06);
+    padding:8px;
+    z-index:20;
+    display:none;
+  }
+  .script-dropdown.open{ display:block; }
+
+  .script-search{
+    width:100%;
+    background:rgba(139,92,246,0.06);
+    border:1px solid var(--border-strong);
+    border-radius:6px;
+    padding:8px 10px;
+    font-family:var(--ui-font);
+    font-size:13px;
+    color:var(--text);
+    outline:none;
+    transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  .script-search::placeholder{ color:var(--text-faint); }
+  .script-search:focus{
+    border-color:rgba(168,85,247,0.4);
+    box-shadow:0 0 0 2px rgba(168,85,247,0.08);
+  }
+
+  .script-divider{
+    height:1px;
+    background:var(--border-strong);
+    margin:8px -8px 8px;
+  }
+
+  .script-list{
+    display:flex;
+    flex-direction:column;
+    gap:1px;
+    max-height:220px;
+    overflow-y:auto;
+    scrollbar-width:thin;
+    scrollbar-color:rgba(139,92,246,0.25) transparent;
+  }
+  .script-list::-webkit-scrollbar{ width:8px; }
+  .script-list::-webkit-scrollbar-track{ background:transparent; }
+  .script-list::-webkit-scrollbar-thumb{
+    background:rgba(139,92,246,0.2);
+    border-radius:8px;
+    border:2px solid #0d0b1a;
+  }
+  .script-list::-webkit-scrollbar-thumb:hover{
+    background:rgba(139,92,246,0.35);
+  }
+
+  .script-item{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:8px 9px;
+    border-radius:6px;
+    font-size:13px;
+    color:var(--text-dim);
+    cursor:pointer;
+    transition:background .12s ease, color .12s ease;
+  }
+  .script-item:hover{
+    background:rgba(168,85,247,0.09);
+    color:var(--text);
+  }
+  .script-item.active{
+    background:rgba(168,85,247,0.14);
+    color:var(--accent);
+  }
+  .script-item .tab-icon{ opacity:.55; }
+  .script-item-name{
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .script-empty{
+    padding:10px 9px;
+    color:var(--text-faint);
+    font-size:13px;
+    font-style:italic;
+  }
+
+  .tab-rename-input{
+    width:70px;
+    max-width:160px;
+    background:rgba(139,92,246,0.10);
+    border:1px solid rgba(168,85,247,0.4);
+    border-radius:4px;
+    padding:1px 4px;
+    font-family:var(--ui-font);
+    font-size:13px;
+    font-weight:500;
+    color:var(--text);
+    outline:none;
+  }
+
+  /* ===== TABS ===== */
+  .tab{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:0 12px;
+    height:38px;
+    border-radius:7px 7px 0 0;
+    font-size:13px;
+    font-weight:500;
+    color:var(--text-dim);
+    background:transparent;
+    white-space:nowrap;
+    cursor:pointer;
+    position:relative;
+    flex-shrink:0;
+    transition:background .15s ease, color .15s ease;
+  }
+  .tab:hover{
+    color:var(--text);
+    background:rgba(168,85,247,0.06);
+  }
+  .tab.active{
+    background:var(--tab-active);
+    color:var(--text);
+    border-radius:7px 7px 0 0;
+    /* Top accent line */
+    box-shadow:inset 0 2px 0 var(--accent);
+  }
+  .tab.active::before,
+  .tab.active::after{
+    content:"";
+    position:absolute;
+    bottom:0;
+    width:14px;
+    height:14px;
+    pointer-events:none;
+  }
+  .tab.active::before{
+    left:-14px;
+    background:radial-gradient(circle at top left, transparent 14px, var(--tab-active) 14px);
+  }
+  .tab.active::after{
+    right:-14px;
+    background:radial-gradient(circle at top right, transparent 14px, var(--tab-active) 14px);
+  }
+
+  .tab-icon{
+    width:14px; height:14px;
+    flex-shrink:0;
+    opacity:.65;
+    display:flex;
+  }
+  .tab-icon svg{ width:100%; height:100%; }
+
+  .tab-close-slot{
+    position:relative;
+    width:16px; height:16px;
+    flex-shrink:0;
+  }
+  .tab-dirty-dot{
+    position:absolute;
+    top:50%; left:50%;
+    width:7px; height:7px;
+    margin:-3.5px 0 0 -3.5px;
+    border-radius:50%;
+    background:var(--accent);
+    opacity:0;
+    transition:opacity .1s ease;
+    pointer-events:none;
+    box-shadow:0 0 6px var(--accent-glow);
+  }
+  .tab.dirty .tab-dirty-dot{ opacity:1; }
+  .tab-close-slot:hover .tab-dirty-dot{ opacity:0; }
+  .tab-close{
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:4px;
+    color:var(--text-faint);
+    flex-shrink:0;
+    opacity:1;
+    transition:opacity .1s ease, background .15s ease;
+  }
+  .tab.dirty .tab-close{ opacity:0; pointer-events:none; }
+  .tab-close-slot:hover .tab-close{ opacity:1; pointer-events:auto; }
+  .tab-close:hover{
+    background:rgba(168,85,247,0.14);
+    color:var(--accent);
+  }
+  .tab-close svg{ width:10px; height:10px; }
+
+  .tab-add{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:32px;
+    height:32px;
+    margin:0 0 0 4px;
+    align-self:center;
+    border-radius:6px;
+    color:var(--text-dim);
+    flex-shrink:0;
+    cursor:pointer;
+    transition:background .15s ease, color .15s ease;
+  }
+  .tab-add:hover{
+    background:rgba(168,85,247,0.10);
+    color:var(--accent);
+  }
+  .tab-add svg{ width:14px; height:14px; }
+
+  /* ===== TOOLBAR ===== */
+  .toolbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:9px 14px;
+    background:var(--toolbar);
+  }
+  .tool-group{
+    display:flex;
+    align-items:center;
+    gap:4px;
+  }
+  .tool-btn{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    padding:7px 12px;
+    border-radius:6px;
+    font-size:13px;
+    font-weight:500;
+    color:var(--text-dim);
+    background:transparent;
+    border:none;
+    cursor:pointer;
+    font-family:var(--ui-font);
+    transition:background .15s ease, color .15s ease;
+  }
+  .tool-btn svg{ width:15px; height:15px; }
+  .tool-btn:hover{
+    background:rgba(168,85,247,0.10);
+    color:var(--text);
+  }
+  .tool-btn.primary{
+    color:var(--text);
+    background:rgba(168,85,247,0.12);
+    border:1px solid rgba(168,85,247,0.25);
+    box-shadow:0 0 14px rgba(168,85,247,0.08);
+  }
+  .tool-btn.primary svg{ color:var(--accent); }
+  .tool-btn.primary:hover{
+    background:rgba(168,85,247,0.20);
+    border-color:rgba(168,85,247,0.45);
+    box-shadow:0 0 20px rgba(168,85,247,0.18);
+  }
+
+  /* ===== EDITOR ===== */
+  .editor-wrap{
+    flex:1 1 0;
+    min-height:120px;
+    background:var(--editor);
+    border-bottom:1px solid var(--border);
+    position:relative;
+  }
+  #monacoContainer{ position:absolute; inset:0; }
+  #monacoContainer .inputarea,
+  #monacoContainer textarea{
+    outline:none !important;
+    border:none !important;
+    box-shadow:none !important;
+  }
+  .editor-loading{
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--text-faint);
+    font-size:13px;
+    letter-spacing:0.02em;
+  }
+
+  /* ===== CONSOLE ===== */
+  .console-wrap{
+    flex:0 0 auto;
+    height:260px;
+    display:flex;
+    flex-direction:column;
+    background:var(--console);
+    transition:height .28s cubic-bezier(.4,0,.2,1);
+  }
+  .console-label{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:8px 10px 8px 16px;
+    font-size:11px;
+    font-weight:600;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--text-faint);
+    border-bottom:1px solid var(--border);
+  }
+  .console-label-left{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-shrink:0;
+  }
+  .console-filter{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex:1;
+    min-width:0;
+    max-width:280px;
+    text-transform:none;
+    letter-spacing:0;
+  }
+  .console-filter-icon{
+    width:13px; height:13px;
+    flex-shrink:0;
+    opacity:.6;
+  }
+  .console-filter-input{
+    width:100%;
+    min-width:0;
+    background:rgba(139,92,246,0.06);
+    border:1px solid var(--border-strong);
+    border-radius:5px;
+    padding:5px 8px;
+    font-family:var(--ui-font);
+    font-size:12px;
+    font-weight:500;
+    color:var(--text);
+    outline:none;
+    transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  .console-filter-input::placeholder{ color:var(--text-faint); }
+  .console-filter-input:focus{
+    border-color:rgba(168,85,247,0.4);
+    box-shadow:0 0 0 2px rgba(168,85,247,0.07);
+  }
+
+  #consoleLevelPanel{
+    min-width:150px;
+    text-transform:none;
+    letter-spacing:0;
+  }
+  .console-level-dot{
+    width:8px; height:8px;
+    border-radius:50%;
+    flex-shrink:0;
+  }
+  .console-level-dot.ok{ background:var(--ok); box-shadow:0 0 5px rgba(126,231,135,0.5); }
+  .console-level-dot.info{ background:var(--text-dim); }
+  .console-level-dot.err{ background:var(--err); box-shadow:0 0 5px rgba(255,123,114,0.5); }
+
+  .console-dot{
+    color:var(--text-faint);
+    font-size:11px;
+    font-weight:500;
+    text-transform:none;
+    letter-spacing:0;
+    transition:color .15s ease;
+  }
+  .console-dot.live{
+    color:var(--accent);
+    animation:statusPulse 1s ease-in-out infinite;
+  }
+  @keyframes statusPulse{
+    0%, 100%{ opacity:1; }
+    50%{ opacity:.4; }
+  }
+
+  .console-actions{
+    display:flex;
+    align-items:center;
+    gap:2px;
+    flex-shrink:0;
+    margin-left:auto;
+  }
+  .icon-btn.small{
+    width:26px; height:26px;
+    border-radius:5px;
+  }
+  .icon-btn.small svg{ width:14px; height:14px; }
+  .icon-btn.small.toggle svg{ transition:transform .2s ease; }
+  .console-wrap.collapsed .icon-btn.small.toggle svg{ transform:rotate(180deg); }
+
+  .console-body{
+    flex:1;
+    padding:14px 16px;
+    font-family:var(--ui-font);
+    font-size:13px;
+    line-height:1.9;
+    overflow-y:auto;
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    scrollbar-width:thin;
+    scrollbar-color:rgba(139,92,246,0.22) transparent;
+  }
+  .console-body::-webkit-scrollbar{ width:8px; }
+  .console-body::-webkit-scrollbar-track{ background:transparent; }
+  .console-body::-webkit-scrollbar-thumb{
+    background:rgba(139,92,246,0.18);
+    border-radius:8px;
+    border:2px solid var(--console);
+  }
+  .console-body::-webkit-scrollbar-thumb:hover{
+    background:rgba(139,92,246,0.32);
+  }
+
+  .log-line{
+    display:flex;
+    gap:10px;
+    animation:logIn .22s ease both;
+  }
+  @keyframes logIn{
+    from{ opacity:0; transform:translateY(4px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+  .log-time{ color:var(--text-faint); flex-shrink:0; font-variant-numeric:tabular-nums; }
+  .log-ok{ color:var(--ok); }
+  .log-info{ color:var(--text-dim); }
+  .log-err{ color:var(--err); }
+  .log-line.log-hidden{ display:none; }
+  .console-body.hide-timestamps .log-time{ display:none; }
+
+  .bracket-grey{ color:#5a5480 !important; }
+
+  /* ===== PAGES ===== */
+  .editor-page, .hub-page{
+    flex:1;
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+    position:relative;
+  }
+  .editor-page[hidden], .hub-page[hidden]{ display:none; }
+
+  @keyframes pageIn{
+    from{ opacity:0; transform:translateY(8px); }
+    to{ opacity:1; transform:none; }
+  }
+  .page-enter{ animation:pageIn .22s cubic-bezier(.22,.61,.36,1); }
+
+  /* ===== HUB ===== */
+  .hub-header{
+    flex:0 0 auto;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:14px 16px 12px;
+    border-bottom:1px solid var(--border);
+  }
+  .hub-search{
+    flex:1;
+    box-sizing:border-box;
+    height:38px;
+    display:flex;
+    align-items:center;
+    gap:9px;
+    background:rgba(139,92,246,0.05);
+    border:1px solid var(--border-strong);
+    border-radius:8px;
+    padding:0 12px;
+    transition:border-color .15s ease, background .15s ease, box-shadow .15s ease;
+  }
+  .hub-search:focus-within{
+    border-color:rgba(168,85,247,0.40);
+    background:rgba(139,92,246,0.09);
+    box-shadow:0 0 0 2px rgba(168,85,247,0.07);
+  }
+  .hub-search svg{ width:15px; height:15px; color:var(--text-faint); flex-shrink:0; }
+  .hub-search input{
+    flex:1; min-width:0;
+    background:none; border:none; outline:none;
+    font-family:var(--ui-font);
+    font-size:13px;
+    color:var(--text);
+  }
+  .hub-search input::placeholder{ color:var(--text-faint); }
+
+  .hub-filters{
+    flex-shrink:0;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .hub-sort{
+    box-sizing:border-box;
+    height:38px;
+    display:flex;
+    align-items:center;
+    gap:2px;
+    background:rgba(139,92,246,0.05);
+    border:1px solid var(--border-strong);
+    border-radius:8px;
+    padding:3px;
+  }
+  .hub-sort button{
+    height:100%;
+    box-sizing:border-box;
+    display:flex;
+    align-items:center;
+    border:none;
+    background:transparent;
+    color:var(--text-dim);
+    font-family:var(--ui-font);
+    font-size:12px;
+    font-weight:500;
+    padding:0 12px;
+    border-radius:5px;
+    cursor:pointer;
+    transition:background .15s ease, color .15s ease;
+  }
+  .hub-sort button:hover{ color:var(--text); }
+  .hub-sort button.active{
+    background:rgba(168,85,247,0.18);
+    color:var(--accent);
+    box-shadow:0 0 8px rgba(168,85,247,0.12);
+  }
+
+  .hub-chip{
+    box-sizing:border-box;
+    height:38px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    background:rgba(139,92,246,0.05);
+    border:1px solid var(--border-strong);
+    color:var(--text-dim);
+    font-family:var(--ui-font);
+    font-size:12px;
+    font-weight:500;
+    padding:0 12px;
+    border-radius:8px;
+    cursor:pointer;
+    transition:background .15s ease, color .15s ease, border-color .15s ease;
+  }
+  .hub-chip svg{ width:12px; height:12px; opacity:.7; }
+  .hub-chip:hover{ color:var(--text); border-color:rgba(168,85,247,0.35); }
+  .hub-chip[aria-pressed="true"]{
+    background:rgba(168,85,247,0.16);
+    color:var(--accent);
+    border-color:rgba(168,85,247,0.4);
+    box-shadow:0 0 10px rgba(168,85,247,0.10);
+  }
+  .hub-chip[aria-pressed="true"] svg{ opacity:1; }
+
+  /* ===== DROPDOWNS ===== */
+  .dropdown{ position:relative; }
+  .dropdown-trigger{ position:relative; }
+  .dropdown-caret{ transition:transform .15s ease; opacity:.6; }
+  .dropdown[data-open="true"] .dropdown-trigger{
+    background:rgba(168,85,247,0.14);
+    color:var(--text);
+    border-color:rgba(168,85,247,0.35);
+  }
+  .dropdown[data-open="true"] .dropdown-caret{ transform:rotate(180deg); opacity:1; }
+
+  .dropdown-panel{
+    position:absolute;
+    top:calc(100% + 8px);
+    right:0;
+    min-width:240px;
+    background:#0d0b1a;
+    border:1px solid var(--border-strong);
+    border-radius:8px;
+    box-shadow:0 16px 40px rgba(0,0,0,0.6), 0 0 20px rgba(139,92,246,0.06);
+    padding:6px;
+    z-index:30;
+    display:none;
+  }
+  .dropdown[data-open="true"] .dropdown-panel{ display:block; }
+
+  .dropdown-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+    padding:8px 9px;
+    border-radius:6px;
+  }
+  .dropdown-row:hover{ background:rgba(168,85,247,0.07); }
+  .dropdown-row-title{ font-size:12.5px; font-weight:500; color:var(--text); }
+  .dropdown-row-desc{ font-size:11px; color:var(--text-faint); margin-top:2px; }
+  .dropdown-row-title-icon{ display:flex; align-items:center; gap:8px; }
+  .dropdown-row-icon{ width:15px; height:15px; border-radius:3px; object-fit:contain; flex-shrink:0; }
+  .dropdown-section-label{
+    font-size:10.5px; font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    color:var(--text-faint);
+    padding:10px 9px 4px;
+  }
+
+  .settings-select-trigger{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    height:30px;
+    padding:0 10px;
+    border-radius:6px;
+    background:rgba(139,92,246,0.07);
+    border:1px solid var(--border-strong);
+    color:var(--text);
+    font-family:var(--ui-font);
+    font-size:12.5px;
+    cursor:pointer;
+    transition:background .15s ease, border-color .15s ease;
+  }
+  .settings-select-trigger:hover{
+    background:rgba(139,92,246,0.12);
+    border-color:rgba(168,85,247,0.35);
+  }
+  .settings-select-trigger svg{ width:14px; height:14px; flex-shrink:0; }
+  .settings-select-value{ min-width:0; white-space:nowrap; }
+  .dropdown-panel.dropdown-panel-sm{ min-width:172px; }
+  .dropdown-row.dropdown-row-option{ cursor:pointer; }
+  .dropdown-row-check{ width:14px; height:14px; flex-shrink:0; opacity:0; color:var(--accent); }
+  .dropdown-row-option[aria-selected="true"] .dropdown-row-check{ opacity:1; }
+  .dropdown-row-option[aria-selected="true"] .dropdown-row-title{ color:var(--accent); font-weight:600; }
+
+  /* ===== SLIDERS ===== */
+  .settings-slider-control{ display:flex; align-items:center; gap:12px; }
+  .settings-slider{
+    -webkit-appearance:none;
+    appearance:none;
+    width:130px;
+    height:4px;
+    border-radius:999px;
+    background:rgba(139,92,246,0.18);
+    cursor:pointer;
+    outline:none;
+  }
+  .settings-slider::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    appearance:none;
+    width:14px; height:14px;
+    border-radius:50%;
+    background:var(--accent);
+    box-shadow:0 0 0 3px rgba(168,85,247,0.18), 0 0 10px rgba(168,85,247,0.3);
+    transition:box-shadow .15s ease;
+  }
+  .settings-slider:hover::-webkit-slider-thumb{
+    box-shadow:0 0 0 5px rgba(168,85,247,0.22), 0 0 16px rgba(168,85,247,0.4);
+  }
+  .settings-slider-value{
+    font-size:12.5px;
+    color:var(--text);
+    font-variant-numeric:tabular-nums;
+    min-width:32px;
+    text-align:right;
+  }
+
+  /* ===== SWITCH ===== */
+  .switch{
+    position:relative;
+    flex-shrink:0;
+    width:34px; height:20px;
+    cursor:pointer;
+  }
+  .switch input{
+    position:absolute; inset:0;
+    opacity:0; margin:0; cursor:pointer;
+  }
+  .switch-track{
+    position:absolute; inset:0;
+    background:rgba(139,92,246,0.12);
+    border:1px solid var(--border-strong);
+    border-radius:999px;
+    transition:background .15s ease, border-color .15s ease, box-shadow .15s ease;
+  }
+  .switch-track::before{
+    content:"";
+    position:absolute;
+    top:2px; left:2px;
+    width:14px; height:14px;
+    border-radius:50%;
+    background:var(--text-dim);
+    transition:transform .15s ease, background .15s ease;
+  }
+  .switch input:checked ~ .switch-track{
+    background:rgba(168,85,247,0.28);
+    border-color:rgba(168,85,247,0.5);
+    box-shadow:0 0 10px rgba(168,85,247,0.18);
+  }
+  .switch input:checked ~ .switch-track::before{
+    transform:translateX(14px);
+    background:var(--accent);
+  }
+
+  /* ===== HUB SCROLL + GRID ===== */
+  .hub-scroll{
+    flex:1;
+    min-height:0;
+    overflow-y:auto;
+    padding:16px 16px 64px;
+    scrollbar-width:thin;
+    scrollbar-color:rgba(139,92,246,0.22) transparent;
+  }
+  .hub-scroll::-webkit-scrollbar{ width:8px; }
+  .hub-scroll::-webkit-scrollbar-track{ background:transparent; }
+  .hub-scroll::-webkit-scrollbar-thumb{
+    background:rgba(139,92,246,0.18);
+    border-radius:8px;
+    border:2px solid var(--editor);
+  }
+  .hub-scroll::-webkit-scrollbar-thumb:hover{
+    background:rgba(139,92,246,0.32);
+  }
+
+  .hub-grid{
+    display:grid;
+    grid-template-columns:repeat(5, 1fr);
+    gap:12px;
+  }
+  @media (max-width:1000px){
+    .hub-grid{ grid-template-columns:repeat(3, 1fr); }
+  }
+  @media (max-width:680px){
+    .hub-grid{ grid-template-columns:repeat(2, 1fr); }
+  }
+
+  /* Hub cards */
+  .hub-card{
+    display:flex;
+    flex-direction:column;
+    background:var(--toolbar);
+    border:1px solid var(--border);
+    border-radius:8px;
+    overflow:hidden;
+    cursor:default;
+    animation:hubCardIn .2s ease both;
+    transition:border-color .15s ease, transform .15s ease, box-shadow .2s ease;
+  }
+  @keyframes hubCardIn{
+    from{ opacity:0; transform:translateY(4px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+  .hub-card:hover{
+    border-color:rgba(168,85,247,0.35);
+    transform:translateY(-2px);
+    box-shadow:0 12px 28px -10px rgba(0,0,0,0.7), 0 0 20px rgba(168,85,247,0.08);
+  }
+
+  .hub-thumb-wrap{
+    position:relative;
+    width:100%;
+    aspect-ratio:16/10;
+    background:var(--editor);
+    flex-shrink:0;
+  }
+  .hub-thumb{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
+  .hub-thumb-ph{
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--text-faint);
+  }
+  .hub-thumb-ph svg{ width:22px; height:22px; }
+  .hub-thumb-ph img{ width:26px; height:26px; object-fit:contain; opacity:.4; }
+
+  .hub-verified{
+    position:absolute;
+    top:6px; right:6px;
+    width:24px; height:24px;
+    filter:drop-shadow(0 2px 6px rgba(0,0,0,0.55));
+  }
+  .hub-verified-glass{
+    position:absolute;
+    inset:0;
+    clip-path:path("M12,0.6 L14.41,3.02 L17.7,2.13 L18.58,5.42 L21.87,6.3 L20.98,9.59 L23.4,12 L20.98,14.41 L21.87,17.7 L18.58,18.58 L17.7,21.87 L14.41,20.98 L12,23.4 L9.59,20.98 L6.3,21.87 L5.42,18.58 L2.13,17.7 L3.02,14.41 L0.6,12 L3.02,9.59 L2.13,6.3 L5.42,5.42 L6.3,2.13 L9.59,3.02 Z");
+    background:rgba(13,11,26,0.6);
+    -webkit-backdrop-filter:blur(6px) saturate(1.5);
+    backdrop-filter:blur(6px) saturate(1.5);
+    border:1px solid rgba(168,85,247,0.3);
+  }
+  .hub-verified-check{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+  }
+  .hub-verified-check path{
+    fill:none;
+    stroke:var(--accent);
+    stroke-width:2;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+  }
+
+  .hub-card-body{ padding:9px 10px 10px; display:flex; flex-direction:column; gap:4px; }
+  .hub-card-title{
+    font-size:12.5px; font-weight:600;
+    color:var(--text);
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .hub-card-meta{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  .hub-card-author{
+    display:flex; align-items:center; gap:5px;
+    min-width:0;
+    font-size:11px; color:var(--text-dim);
+  }
+  .hub-card-author svg{ width:11px; height:11px; flex-shrink:0; opacity:.6; }
+  .hub-avatar{ width:14px; height:14px; border-radius:50%; object-fit:cover; flex-shrink:0; }
+  .hub-card-author span{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .hub-card-views{
+    display:flex; align-items:center; gap:4px;
+    flex-shrink:0; font-size:11px; color:var(--text-faint);
+  }
+  .hub-card-views svg{ width:11px; height:11px; }
+
+  .hub-state{
+    text-align:center;
+    font-size:12px;
+    color:var(--text-faint);
+    padding:22px 0;
+  }
+
+  /* Paginator */
+  .hub-paginator{
+    position:absolute;
+    left:50%; bottom:16px;
+    transform:translateX(-50%);
+    z-index:5;
+    display:flex;
+    align-items:center;
+    gap:0;
+    padding:4px;
+    background:rgba(7,6,15,0.65);
+    -webkit-backdrop-filter:blur(14px) saturate(1.6);
+    backdrop-filter:blur(14px) saturate(1.6);
+    border:1px solid rgba(168,85,247,0.2);
+    border-radius:999px;
+    box-shadow:0 10px 30px -8px rgba(0,0,0,0.7), 0 0 14px rgba(168,85,247,0.08);
+  }
+  .page-btn{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    background:transparent;
+    border:none;
+    color:var(--text-dim);
+    font-family:var(--ui-font);
+    font-size:12px;
+    font-weight:500;
+    padding:7px 13px;
+    border-radius:999px;
+    cursor:pointer;
+    transition:background .15s ease, color .15s ease, opacity .15s ease;
+  }
+  .page-btn svg{ width:13px; height:13px; }
+  .page-btn:hover:not(:disabled){
+    background:rgba(168,85,247,0.14);
+    color:var(--accent);
+  }
+  .page-btn:disabled{ opacity:.4; cursor:default; }
+  .page-dot{ width:3px; height:3px; border-radius:50%; background:var(--text-faint); flex-shrink:0; }
+  .page-label{ color:var(--text); font-size:12px; font-weight:500; padding:0 13px; }
+
+  /* ===== SETTINGS ===== */
+  .settings-page{
+    flex:1; min-height:0;
+    display:flex;
+  }
+  .settings-page[hidden]{ display:none; }
+
+  .settings-nav{
+    width:212px;
+    flex-shrink:0;
+    padding:18px 12px;
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    border-right:1px solid var(--border);
+    overflow-y:auto;
+  }
+  .settings-nav-section{
+    font-size:10.5px; font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    color:var(--text-faint);
+    padding:10px 10px 6px;
+  }
+  .settings-nav-section:first-child{ padding-top:2px; }
+  .settings-nav-item{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    padding:9px 10px;
+    border-radius:7px;
+    border:none;
+    background:transparent;
+    color:var(--text-dim);
+    font-family:var(--ui-font);
+    font-size:13px;
+    font-weight:500;
+    cursor:pointer;
+    text-align:left;
+    transition:background .15s ease, color .15s ease;
+  }
+  .settings-nav-item svg{ width:16px; height:16px; flex-shrink:0; opacity:.8; }
+  .settings-nav-item:hover{
+    background:rgba(168,85,247,0.07);
+    color:var(--text);
+  }
+  .settings-nav-item.active{
+    background:rgba(168,85,247,0.13);
+    color:var(--accent);
+    box-shadow:inset 2px 0 0 var(--accent);
+  }
+
+  .settings-content{
+    flex:1; min-width:0;
+    overflow-y:auto;
+    padding:20px;
+    scrollbar-width:thin;
+    scrollbar-color:rgba(139,92,246,0.22) transparent;
+  }
+  .settings-pane{ display:none; }
+  .settings-pane.active{ display:block; }
+
+  .settings-card{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    background:var(--toolbar);
+    border:1px solid var(--border);
+    border-radius:9px;
+    padding:14px 16px;
+    transition:border-color .15s ease;
+  }
+  .settings-card:hover{ border-color:var(--border-strong); }
+  .settings-card + .settings-card{ margin-top:10px; }
+
+  .mini-btn{
+    background:rgba(139,92,246,0.08);
+    border:1px solid var(--border-strong);
+    color:var(--text);
+    font-family:var(--ui-font);
+    font-size:12px;
+    font-weight:500;
+    padding:7px 13px;
+    border-radius:6px;
+    cursor:pointer;
+    transition:background .15s ease, border-color .15s ease;
+  }
+  .mini-btn:hover{
+    background:rgba(139,92,246,0.15);
+    border-color:rgba(168,85,247,0.35);
+  }
+  .mini-btn.danger{
+    color:var(--err);
+    border-color:color-mix(in srgb, var(--err) 40%, transparent);
+  }
+  .mini-btn.danger:hover{ background:color-mix(in srgb, var(--err) 12%, transparent); }
+  .mini-btn.danger.armed{
+    background:color-mix(in srgb, var(--err) 20%, transparent);
+    border-color:var(--err);
+  }
+
+  /* Accent picker */
+  .accent-picker{ display:flex; align-items:center; gap:7px; }
+  .accent-swatch{
+    position:relative;
+    width:20px; height:20px;
+    border-radius:50%;
+    background:var(--sw, var(--accent));
+    border:1px solid rgba(255,255,255,0.18);
+    cursor:pointer;
+    padding:0;
+    flex-shrink:0;
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .accent-swatch:hover{ transform:scale(1.12); }
+  .accent-swatch.active{
+    box-shadow:0 0 0 2px var(--titlebar), 0 0 0 4px var(--sw, var(--accent)), 0 0 12px var(--sw, var(--accent-glow));
+  }
+  .accent-swatch-custom{
+    background:conic-gradient(#ff7b72, #fbbf24, #5eead4, #8ab4f8, #a78bfa, #f472b6, #ff7b72);
+    display:flex;
+    overflow:hidden;
+  }
+  .accent-swatch-custom.active{
+    box-shadow:0 0 0 2px var(--titlebar), 0 0 0 4px var(--accent);
+  }
+
+  /* Color picker */
+  .color-picker{
+    position:fixed;
+    z-index:220;
+    width:212px;
+    padding:10px;
+    border-radius:10px;
+    background:#0d0b1a;
+    border:1px solid var(--border-strong);
+    box-shadow:0 18px 44px rgba(0,0,0,0.65), 0 0 20px rgba(139,92,246,0.08);
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    animation:pageIn .14s ease-out;
+  }
+  .color-picker[hidden]{ display:none; }
+  .color-sv{
+    position:relative;
+    height:124px;
+    border-radius:7px;
+    cursor:crosshair;
+    background:
+      linear-gradient(to top, #000, rgba(0,0,0,0)),
+      linear-gradient(to right, #fff, var(--hue-color, #f00));
+  }
+  .color-sv-thumb, .color-hue-thumb{
+    position:absolute;
+    border-radius:50%;
+    border:2px solid #fff;
+    box-shadow:0 0 0 1px rgba(0,0,0,0.45), 0 1px 4px rgba(0,0,0,0.5);
+    pointer-events:none;
+  }
+  .color-sv-thumb{ width:12px; height:12px; transform:translate(-50%,-50%); }
+  .color-hue{
+    position:relative;
+    height:12px;
+    border-radius:999px;
+    cursor:pointer;
+    background:linear-gradient(to right,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00);
+  }
+  .color-hue-thumb{
+    top:50%;
+    width:14px; height:14px;
+    background:transparent;
+    transform:translate(-50%,-50%);
+  }
+  .color-foot{ display:flex; align-items:center; gap:8px; }
+  .color-preview{
+    width:24px; height:24px;
+    flex-shrink:0;
+    border-radius:6px;
+    border:1px solid rgba(168,85,247,0.3);
+    background:var(--preview-color, var(--accent));
+  }
+  .color-hex{
+    flex:1; min-width:0;
+    height:26px;
+    padding:0 8px;
+    border-radius:6px;
+    border:1px solid var(--border-strong);
+    background:rgba(139,92,246,0.05);
+    color:var(--text);
+    font-family:inherit;
+    font-size:12px;
+    letter-spacing:.04em;
+    outline:none;
+    text-transform:lowercase;
+  }
+  .color-hex:focus{ border-color:rgba(168,85,247,0.45); }
+
+  .settings-card-icon{
+    width:34px; height:34px;
+    flex-shrink:0;
+    border-radius:8px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:rgba(139,92,246,0.08);
+  }
+  .settings-card-icon svg{ width:18px; height:18px; color:var(--accent); opacity:0.8; }
+  .settings-card-text{ flex:1; min-width:0; }
+  .settings-card-title{ font-size:13px; font-weight:600; color:var(--text); }
+  .settings-card-desc{ font-size:11.5px; color:var(--text-faint); margin-top:2px; }
+  .settings-card-control{ display:flex; align-items:center; gap:9px; flex-shrink:0; }
+  .settings-card-state{ font-size:12px; font-weight:500; color:var(--text-dim); min-width:22px; }
+
+  /* Tour */
+  @keyframes tourFadeOut{
+    from{ opacity:1; transform:translateY(0); }
+    to{ opacity:0; transform:translateY(4px); }
+  }
+
+  .tour-overlay{ position:fixed; inset:0; z-index:500; pointer-events:none; }
+  .tour-overlay[hidden]{ display:none; }
+  .tour-spot{
+    position:absolute;
+    border-radius:9px;
+    box-shadow:0 0 0 2000px rgba(4,3,10,0.80);
+    border:1px solid rgba(168,85,247,0.5);
+    box-shadow:0 0 0 2000px rgba(4,3,10,0.80), 0 0 20px rgba(168,85,247,0.25);
+    transition:top .25s cubic-bezier(.4,0,.2,1), left .25s cubic-bezier(.4,0,.2,1),
+               width .25s cubic-bezier(.4,0,.2,1), height .25s cubic-bezier(.4,0,.2,1);
+  }
+  .tour-card{
+    position:absolute;
+    width:266px;
+    background:#0d0b1a;
+    border:1px solid var(--border-strong);
+    border-radius:10px;
+    box-shadow:0 20px 50px rgba(0,0,0,0.65), 0 0 20px rgba(139,92,246,0.08);
+    padding:16px;
+    pointer-events:auto;
+    transition:top .25s cubic-bezier(.4,0,.2,1), left .25s cubic-bezier(.4,0,.2,1);
+  }
+  .tour-step{
+    font-size:10.5px; font-weight:600;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--accent);
+    opacity:0.7;
+    margin-bottom:6px;
+  }
+  .tour-title{ font-size:14px; font-weight:600; color:var(--text); margin-bottom:5px; }
+  .tour-desc{ font-size:12px; line-height:1.5; color:var(--text-dim); }
+  .tour-actions{ display:flex; align-items:center; justify-content:space-between; margin-top:14px; }
+  .tour-skip{
+    background:none; border:none;
+    color:var(--text-faint);
+    font-family:var(--ui-font);
+    font-size:12px;
+    cursor:pointer;
+  }
+  .tour-skip:hover{ color:var(--text-dim); }
+  .tour-next{
+    background:var(--accent);
+    color:#0d0b1a;
+    border:none;
+    font-family:var(--ui-font);
+    font-size:12px; font-weight:600;
+    padding:7px 14px;
+    border-radius:6px;
+    cursor:pointer;
+    box-shadow:0 0 12px rgba(168,85,247,0.35);
+  }
+  .tour-next:hover{ opacity:.88; }
+
+  /* Command palette */
+  .cmdk-overlay{
+    position:fixed; inset:0;
+    z-index:600;
+    background:rgba(4,3,10,0.72);
+    display:flex;
+    justify-content:center;
+    padding-top:14vh;
+  }
+  .cmdk-overlay[hidden]{ display:none; }
+  .cmdk-panel{
+    width:560px;
+    max-width:calc(100vw - 32px);
+    max-height:60vh;
+    display:flex;
+    flex-direction:column;
+    background:#0d0b1a;
+    border:1px solid var(--border-strong);
+    border-radius:10px;
+    box-shadow:0 24px 60px rgba(0,0,0,0.65), 0 0 30px rgba(139,92,246,0.08);
+    overflow:hidden;
+    height:fit-content;
+  }
+  .cmdk-input-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:14px 16px;
+    border-bottom:1px solid var(--border-strong);
+    flex-shrink:0;
+  }
+  .cmdk-input-row svg{ width:16px; height:16px; opacity:.5; flex-shrink:0; color:var(--accent); }
+  .cmdk-input-row input{
+    flex:1; min-width:0;
+    background:none; border:none; outline:none;
+    font-family:var(--ui-font);
+    font-size:14px;
+    color:var(--text);
+  }
+  .cmdk-input-row input::placeholder{ color:var(--text-faint); }
+  .cmdk-list{
+    overflow-y:auto;
+    padding:6px;
+    scrollbar-width:thin;
+    scrollbar-color:rgba(139,92,246,0.22) transparent;
+  }
+  .cmdk-group-label{
+    font-size:10.5px; font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    color:var(--accent);
+    opacity:0.55;
+    padding:8px 10px 4px;
+  }
+  .cmdk-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:9px 10px;
+    border-radius:6px;
+    font-size:13px;
+    color:var(--text);
+    cursor:pointer;
+    transition:background .12s ease;
+  }
+  .cmdk-item svg{ width:15px; height:15px; flex-shrink:0; opacity:.6; }
+  .cmdk-item span{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .cmdk-item-hint{ margin-left:auto; flex-shrink:0; color:var(--text-faint); font-size:11.5px; }
+  .cmdk-item:hover, .cmdk-item.active{
+    background:rgba(168,85,247,0.09);
+  }
+  .cmdk-empty{
+    padding:16px 10px;
+    color:var(--text-faint);
+    font-size:13px;
+    font-style:italic;
+    text-align:center;
+  }
+
+  @media (max-width:760px){
+    .toolbar{ flex-wrap:wrap; gap:8px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="window">
+
+  <div class="titlebar">
+    <div class="brand">
+      <div class="brand-mark">
+        <img src="icon.png" alt="">
+      </div>
+      <span class="brand-version" id="brandVersion" hidden>v0.1.0</span>
+    </div>
+    <div class="title-actions">
+      <button class="icon-btn tip-down active" data-tip="Editor" id="navEditorBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></button>
+      <button class="icon-btn tip-down" data-tip="Script Hub" id="navHubBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg></button>
+      <button class="icon-btn tip-down" data-tip="Settings" id="navSettingsBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.2 2h-.4a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.5a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.4a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></button>
+      <div class="win-divider"></div>
+      <button class="icon-btn tip-down" data-tip="Minimize" id="winMinimizeBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg></button>
+      <button class="icon-btn maximize tip-down" data-tip="Maximize" id="winMaximizeBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="5" y="5" rx="2"/></svg></button>
+      <button class="icon-btn close tip-down" data-tip="Close" id="winCloseBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+    </div>
+  </div>
+
+  <div class="editor-page" id="editorPage">
+  <div class="tab-toolbar">
+    <div class="tabbar" id="tabbar">
+      <div class="tab-caret-pin">
+        <div class="tab-caret" id="tabCaret">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+        <div class="tab-sep"></div>
+      </div>
+      <div class="tab-scroll" id="tabScroll">
+        
+        <div class="tab-add" id="tabAdd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg></div>
+      </div>
+    </div>
+
+    <div class="script-dropdown" id="scriptDropdown">
+      <input type="text" class="script-search" id="scriptSearch" placeholder="Search scripts…">
+      <div class="script-divider"></div>
+      <div class="script-list" id="scriptList"></div>
+    </div>
+
+
+
+    <div class="float-tip" id="floatTip"></div>
+
+    <div class="toolbar">
+      <div class="tool-group">
+        <button class="tool-btn primary" id="btnExecute"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 6.5 Q7 4 9.08 5.39 L16.92 10.61 Q19 12 16.92 13.39 L9.08 18.61 Q7 20 7 17.5 Z"/></svg>Execute</button>
+        <button class="tool-btn" id="btnClear"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>Clear</button>
+        <button class="tool-btn" id="btnOpen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 14 1.45-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.55 6a2 2 0 0 1-1.94 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"/></svg>Open</button>
+        <button class="tool-btn" id="btnSave"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/></svg>Save</button>
+      </div>
+      <div class="tool-group">
+        <button class="tool-btn" id="btnAttach"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>Attach</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="editor-wrap">
+    <div id="monacoContainer"></div>
+    <div class="editor-loading" id="editorLoading">Loading editor…</div>
+  </div>
+
+  <div class="console-wrap" id="consoleWrap">
+    <div class="console-label">
+      <div class="console-label-left">
+        <span>Console</span>
+        <span class="console-dot" id="consoleStatus"></span>
+      </div>
+      <div class="console-filter">
+        <svg class="console-filter-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="text" class="console-filter-input" id="consoleFilterInput" placeholder="Filter…" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="console-actions">
+        <div class="dropdown" id="consoleLevelDropdown">
+          <button class="icon-btn small dropdown-trigger" id="consoleLevelTrigger" data-tip="Log levels" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg></button>
+          <div class="dropdown-panel dropdown-panel-sm" id="consoleLevelPanel">
+            <div class="dropdown-row">
+              <div class="dropdown-row-title dropdown-row-title-icon"><span class="console-level-dot ok"></span>Success logs</div>
+              <label class="switch"><input type="checkbox" id="consoleLevelOk" data-level="ok" checked><span class="switch-track"></span></label>
+            </div>
+            <div class="dropdown-row">
+              <div class="dropdown-row-title dropdown-row-title-icon"><span class="console-level-dot info"></span>Info logs</div>
+              <label class="switch"><input type="checkbox" id="consoleLevelInfo" data-level="info" checked><span class="switch-track"></span></label>
+            </div>
+            <div class="dropdown-row">
+              <div class="dropdown-row-title dropdown-row-title-icon"><span class="console-level-dot err"></span>Error logs</div>
+              <label class="switch"><input type="checkbox" id="consoleLevelErr" data-level="err" checked><span class="switch-track"></span></label>
+            </div>
+          </div>
+        </div>
+        <button class="icon-btn small" id="btnClearConsole" data-tip="Clear console"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></button>
+        <button class="icon-btn small toggle" id="btnToggleConsole" data-tip="Collapse console"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>
+      </div>
+    </div>
+    <div class="console-body" id="consoleBody"></div>
+  </div>
+  </div>
+
+  <div class="hub-page" id="hubPage" hidden>
+    <div class="hub-header">
+      <div class="hub-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="text" id="hubSearchInput" placeholder="Search for; e.g RIVALS, Steal A Brainrot" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="hub-filters">
+        <div class="hub-sort" id="hubSortGroup">
+          <button class="active" data-value="trending">Trending</button>
+          <button data-value="latest">Latest</button>
+        </div>
+        <div class="dropdown" id="hubFilterDropdown">
+          <button class="hub-chip dropdown-trigger" id="hubFilterTrigger" aria-expanded="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+            Filters
+            <svg class="dropdown-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+          <div class="dropdown-panel" id="hubFilterPanel">
+            <div class="dropdown-row" id="hubVerifiedRow">
+              <div class="dropdown-row-title">Verified only</div>
+              <label class="switch"><input type="checkbox" id="hubVerifiedToggle"><span class="switch-track"></span></label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hub-scroll">
+      <div class="hub-grid" id="hubGrid"></div>
+      <div class="hub-state" id="hubState"></div>
+    </div>
+
+    <div class="hub-paginator" id="hubPaginator" hidden>
+      <button class="page-btn" id="hubPrevBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+        Back
+      </button>
+      <span class="page-dot"></span>
+      <span class="page-label">Page <span id="hubPageNum">1</span></span>
+      <span class="page-dot"></span>
+      <button class="page-btn" id="hubNextBtn">
+        Next
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="settings-page" id="settingsPage" hidden>
+    <div class="settings-nav">
+      <div class="settings-nav-section">CORE</div>
+      <button class="settings-nav-item active" data-pane="general">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="21" y1="4" x2="14" y2="4"/><line x1="10" y1="4" x2="3" y2="4"/><line x1="21" y1="12" x2="12" y2="12"/><line x1="8" y1="12" x2="3" y2="12"/><line x1="21" y1="20" x2="16" y2="20"/><line x1="12" y1="20" x2="3" y2="20"/><line x1="14" y1="2" x2="14" y2="6"/><line x1="8" y1="10" x2="8" y2="14"/><line x1="16" y1="18" x2="16" y2="22"/></svg>
+        General
+      </button>
+      <button class="settings-nav-item" data-pane="appearance">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a1 1 0 0 1 0-20 10 9 0 0 1 10 9 5 5 0 0 1-5 5h-2.25a1.75 1.75 0 0 0-1.4 2.8l.3.4a1.75 1.75 0 0 1-1.4 2.8Z"/><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/></svg>
+        Appearance
+      </button>
+      <button class="settings-nav-item" data-pane="editor">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        Editor
+      </button>
+      <button class="settings-nav-item" data-pane="console">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+        Console
+      </button>
+</div>
+    <div class="settings-content">
+      <div class="settings-pane active" data-pane="general">
+        <div class="settings-card">
+          <div class="settings-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a1 1 0 0 1 0-20 10 9 0 0 1 10 9 5 5 0 0 1-5 5h-2.25a1.75 1.75 0 0 0-1.4 2.8l.3.4a1.75 1.75 0 0 1-1.4 2.8Z"/><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/></svg>
+          </div>
+          <div class="settings-card-text">
+            <div class="settings-card-title">Welcome Tour</div>
+            <div class="settings-card-desc">Replay the guide of OblivionX.</div>
+          </div>
+          <div class="settings-card-control">
+            <button class="mini-btn" id="replayTourBtn">Replay</button>
+          </div>
+        </div>
+      </div>
+      <div class="settings-pane" data-pane="appearance" hidden>
+        <div class="settings-card">
+          <div class="settings-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v2"/><path d="M14.837 16.385a6 6 0 1 1-7.223-7.222c.624-.147.97.66.715 1.248a4 4 0 0 0 5.26 5.259c.589-.255 1.396.09 1.248.715"/><path d="M16 12a4 4 0 0 0-4-4"/><path d="m19 5-1.256 1.256"/><path d="M20 12h2"/></svg>
+          </div>
+          <div class="settings-card-text">
+            <div class="settings-card-title">Theme</div>
+            <div class="settings-card-desc">Overall colour scheme applied to the entire application.</div>
+          </div>
+          <div class="settings-card-control">
+            <div class="dropdown" id="themeDropdown">
+              <button class="settings-select-trigger dropdown-trigger" id="themeTrigger" aria-expanded="false">
+                <span class="settings-select-value" id="themeValue">OblivionX Dark</span>
+                <svg class="dropdown-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+              </button>
+              <div class="dropdown-panel dropdown-panel-sm" id="themePanel">
+                <div class="dropdown-row dropdown-row-option" data-value="dark" aria-selected="true">
+                  <div class="dropdown-row-title">OblivionX Dark</div>
+                  <svg class="dropdown-row-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                </div>
+                <div class="dropdown-row dropdown-row-option" data-value="midnight" aria-selected="false">
+                  <div class="dropdown-row-title">Midnight</div>
+                  <svg class="dropdown-row-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                </div>
+                <div class="dropdown-row dropdown-row-option" data-value="slate" aria-selected="false">
+                  <div class="dropdown-row-title">Slate</div>
+                  <svg class="dropdown-row-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="settings-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v16"/><path d="M4 7V5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2"/><path d="M9 20h6"/></svg>
+          </div>
+          <div class="settings-card-text">
+            <div class="settings-card-title">App Font</div>
+            <div class="settings-card-desc">Font used throughout the entire application.</div>
+          </div>
+          <div class="settings-card-control">
+            <div class="dropdown" id="fontDropdown">
+              <button class="settings-select-trigger dropdown-trigger" id="fontTrigger" aria-expanded="false">
+                <span class="settings-select-value" id="fontValue">Chillax</span>
+                <svg class="dropdown-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+              </button>
+              <div class="dropdown-panel dropdown-panel-sm" id="fontPanel">
+                <div class="dropdown-row dropdown-row-option" data-value="chillax" aria-selected="true">
+                  <div class="dropdown-row-title">Chillax</div>
+                  <svg class="dropdown-row-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                </div>
+                <div class="dropdown-row dropdown-row-option" data-value="inter" aria-selected="false">
+                  <div class="dropdown-row-title">Inter</div>
+                  <svg class="dropdown-row-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                </div>
+                <div class="dropdown-row dropdown-row-option" data-value="system" aria-selected="false">
+                  <div class="dropdown-row-title">System UI</div>
+                  <svg class="dropdown-row-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                </div>
+                <div class="dropdown-row dropdown-row-option" data-value="space-grotesk" aria-selected="false">
+                  <div class="dropdown-row-title">Space Grotesk</div>
+                  <svg class="dropdown-row-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="settings-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2Z"/></svg>
+          </div>
+          <div class="settings-card-text">
+            <div class="settings-card-title">Accent Color</div>
+            <div class="settings-card-desc">Highlight color for active states, glows, and primary actions.</div>
+          </div>
+          <div class="settings-card-control">
+            <div class="accent-picker" id="accentPicker">
+              <button class="accent-swatch active" data-value="#ffffff" style="--sw:#ffffff" data-float-tip="OblivionX White"></button>
+              <button class="accent-swatch" data-value="#8ab4f8" style="--sw:#8ab4f8" data-float-tip="Azure"></button>
+              <button class="accent-swatch" data-value="#a78bfa" style="--sw:#a78bfa" data-float-tip="Violet"></button>
+              <button class="accent-swatch" data-value="#5eead4" style="--sw:#5eead4" data-float-tip="Teal"></button>
+              <button class="accent-swatch" data-value="#fbbf24" style="--sw:#fbbf24" data-float-tip="Amber"></button>
+              <button class="accent-swatch" data-value="#f472b6" style="--sw:#f472b6" data-float-tip="Rose"></button>
+              <button class="accent-swatch accent-swatch-custom" id="accentCustomBtn" data-float-tip="Custom"></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="settings-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+          </div>
+          <div class="settings-card-text">
+            <div class="settings-card-title">App Version in Titlebar</div>
+            <div class="settings-card-desc">Show the OblivionX version next to the app name.</div>
+          </div>
+          <div class="settings-card-control">
+            <label class="switch"><input type="checkbox" id="versionTitlebarToggle"><span class="switch-track"></span></label>
+            <span class="settings-card-state" id="versionTitlebarState">Off</span>
+          </div>
+        </div>
+      </div>
+      <div class="settings-pane" data-pane="editor" hidden>
+        <div class="settings-card">
+          <div class="settings-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.4 2.4 0 0 1 0-3.4l2.6-2.6a2.4 2.4 0 0 1 3.4 0Z"/><path d="m14.5 12.5 2-2"/><path d="m11.5 9.5 2-2"/><path d="m8.5 6.5 2-2"/><path d="m17.5 15.5 2-2"/></svg>
+          </div>
+          <div class="settings-card-text">
+            <div class="settings-card-title">Font Size</div>
+            <div class="settings-card-desc">Text size inside the code editor.</div>
+          </div>
+          <div class="settings-card-control settings-slider-control">
+            <input type="range" class="settings-slider" id="editorFontSizeSlider" min="10" max="24" step="1" value="14">
+            <span class="settings-slider-value" id="editorFontSizeSliderValue">14px</span>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="settings-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v16"/><path d="M4 7V5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2"/><path d="M9 20h6"/></svg>
+          </div>
+          <div class="settings-card-text">
+            <div class="settings-card-title">Editor Font</div>
+            <div class="settings-card-desc">Font used inside the code editor.</div>
+          </div>
+          <div class="settings-card-control">
+            <div class="dropdown" id="editorFontDropdown">
+              <button class="settings-select-trigger dropdown-trigger" id="editorFontTrigger" aria-expanded="false">
+                <span class="settings-select-value" id="editorFontValue">JetBrains Mono</span>
+                <svg class="dropdown-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+              </button>
+              <div class="dropdown-panel dropdown-panel-sm" id="editorFontPanel">
+                <div class="dropdown-row dropdown-row-option" data-value="jetbrains-mono" aria-selected="true">
+                  <div class="dropdown-row-title">JetBrains Mono</div>
+                  <svg class="dropdown-row-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                </div>
+                <div class="dropdown-row dropdown-row-option" data-value="fira-code" aria-selected="false">
+                  <div class="dropdown-row-title">Fira Code</div>
+                  <svg class="dropdown-row-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                </div>
+                <div class="dropdown-row dropdown-row-option" data-value="cascadia-code" aria-selected="false">
+                  <div class="dropdown-row-title">Cascadia Code</div>
+                  <svg class="dropdown-row-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                </div>
+                <div class="dropdown-row dropdown-row-option" data-value="consolas" aria-selected="false">
+                  <div class="dropdown-row-title">Consolas</div>
+                  <svg class="dropdown-row-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="settings-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17H7A5 5 0 0 1 7 7h2"/><path d="M15 7h2a5 5 0 1 1 0 10h-2"/><line x1="8" x2="16" y1="12" y2="12"/></svg>
+          </div>
+          <div class="settings-card-text">
+            <div class="settings-card-title">Font Ligatures</div>
+            <div class="settings-card-desc">Combine character sequences like != and =&gt; into single glyphs.</div>
+          </div>
+          <div class="settings-card-control">
+            <label class="switch"><input type="checkbox" id="editorLigaturesToggle"><span class="switch-track"></span></label>
+            <span class="settings-card-state" id="editorLigaturesState">Off</span>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="settings-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 4h1a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-1"/><path d="M7 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h1"/><line x1="12" x2="12" y1="4" y2="20"/></svg>
+          </div>
+          <div class="settings-card-text">
+            <div class="settings-card-title">Caret Blinking</div>
+            <div class="settings-card-desc">Animation style for the blinking text caret.</div>
+          </div>
+          <div class="settings-card-control">
+            <div class="dropdown" id="caretBlinkDropdown">
+              <button class="settings-select-trigger dropdown-trigger" id="caretBlinkTrigger" aria-expanded="false">
+                <span class="settings-select-value" id="caretBlinkValue">Blink</span>
+                <svg class="dropdown-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+              </button>
+              <div class="dropdown-panel dropdown-panel-sm" id="caretBlinkPanel">
+                <div class="dropdown-row dropdown-row-option" data-value="blink" aria-selected="true">
+                  <div class="dropdown-row-title">Blink</div>
+                  <svg class="dropdown-row-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                </div>
+                <div class="dropdown-row dropdown-row-option" data-value="smooth" aria-selected="false">
+                  <div class="dropdown-row-title">Smooth</div>
+                  <svg class="dropdown-row-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                </div>
+                <div class="dropdown-row dropdown-row-option" data-value="phase" aria-selected="false">
+                  <div class="dropdown-row-title">Phase</div>
+                  <svg class="dropdown-row-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                </div>
+                <div class="dropdown-row dropdown-row-option" data-value="expand" aria-selected="false">
+                  <div class="dropdown-row-title">Expand</div>
+                  <svg class="dropdown-row-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                </div>
+                <div class="dropdown-row dropdown-row-option" data-value="solid" aria-selected="false">
+                  <div class="dropdown-row-title">Solid</div>
+                  <svg class="dropdown-row-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="settings-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.586 12.586 19 19"/><path d="M3.688 3.037a.497.497 0 0 0-.651.651l6.5 15.999a.501.501 0 0 0 .947-.062l1.569-6.083a2 2 0 0 1 1.448-1.479l6.124-1.579a.5.5 0 0 0 .063-.947z"/></svg>
+          </div>
+          <div class="settings-card-text">
+            <div class="settings-card-title">Cursor Style</div>
+            <div class="settings-card-desc">Shape of the editing caret.</div>
+          </div>
+          <div class="settings-card-control">
+            <div class="dropdown" id="cursorStyleDropdown">
+              <button class="settings-select-trigger dropdown-trigger" id="cursorStyleTrigger" aria-expanded="false">
+                <span class="settings-select-value" id="cursorStyleValue">Line</span>
+                <svg class="dropdown-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+              </button>
+              <div class="dropdown-panel dropdown-panel-sm" id="cursorStylePanel">
+                <div class="dropdown-row dropdown-row-option" data-value="line" aria-selected="true">
+                  <div class="dropdown-row-title">Line</div>
+                  <svg class="dropdown-row-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                </div>
+                <div class="dropdown-row dropdown-row-option" data-value="block" aria-selected="false">
+                  <div class="dropdown-row-title">Block</div>
+                  <svg class="dropdown-row-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                </div>
+                <div class="dropdown-row dropdown-row-option" data-value="underline" aria-selected="false">
+                  <div class="dropdown-row-title">Underline</div>
+                  <svg class="dropdown-row-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="settings-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/></svg>
+          </div>
+          <div class="settings-card-text">
+            <div class="settings-card-title">Smooth Typing</div>
+            <div class="settings-card-desc">Animate the caret gliding to its new position as you type instead of jumping instantly.</div>
+          </div>
+          <div class="settings-card-control">
+            <label class="switch"><input type="checkbox" id="editorSmoothTypingToggle"><span class="switch-track"></span></label>
+            <span class="settings-card-state" id="editorSmoothTypingState">Off</span>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="settings-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>
+          </div>
+          <div class="settings-card-text">
+            <div class="settings-card-title">Smooth Scrolling</div>
+            <div class="settings-card-desc">Animate the editor scrolling instead of jumping instantly.</div>
+          </div>
+          <div class="settings-card-control">
+            <label class="switch"><input type="checkbox" id="editorSmoothScrollToggle"><span class="switch-track"></span></label>
+            <span class="settings-card-state" id="editorSmoothScrollState">Off</span>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="settings-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" x2="21" y1="6" y2="6"/><path d="M3 12h15a3 3 0 1 1 0 6h-4"/><polyline points="16 16 14 18 16 20"/><line x1="3" x2="10" y1="18" y2="18"/></svg>
+          </div>
+          <div class="settings-card-text">
+            <div class="settings-card-title">Word Wrap</div>
+            <div class="settings-card-desc">Wrap long lines instead of scrolling horizontally.</div>
+          </div>
+          <div class="settings-card-control">
+            <label class="switch"><input type="checkbox" id="editorWordWrapToggle"><span class="switch-track"></span></label>
+            <span class="settings-card-state" id="editorWordWrapState">Off</span>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="settings-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="18" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/></svg>
+          </div>
+          <div class="settings-card-text">
+            <div class="settings-card-title">Minimap</div>
+            <div class="settings-card-desc">Show a zoomed out preview of the tab in the editor.</div>
+          </div>
+          <div class="settings-card-control">
+            <label class="switch"><input type="checkbox" id="editorMinimapToggle"><span class="switch-track"></span></label>
+            <span class="settings-card-state" id="editorMinimapState">Off</span>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="settings-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M3 6v3a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6"/><path d="M3 14h6"/><path d="M3 18h6"/><path d="M13 14h8"/><path d="M13 18h8"/></svg>
+          </div>
+          <div class="settings-card-text">
+            <div class="settings-card-title">Sticky Scroll</div>
+            <div class="settings-card-desc">Keep the current function name visible while scrolling.</div>
+          </div>
+          <div class="settings-card-control">
+            <label class="switch"><input type="checkbox" id="editorStickyScrollToggle"><span class="switch-track"></span></label>
+            <span class="settings-card-state" id="editorStickyScrollState">Off</span>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="settings-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 8 4 4-4 4"/><line x1="11" y1="12" x2="21" y2="12"/></svg>
+          </div>
+          <div class="settings-card-text">
+            <div class="settings-card-title">Tab Size</div>
+            <div class="settings-card-desc">Number of spaces a single indent level uses.</div>
+          </div>
+          <div class="settings-card-control settings-slider-control">
+            <input type="range" class="settings-slider" id="editorTabSizeSlider" min="2" max="8" step="1" value="4">
+            <span class="settings-slider-value" id="editorTabSizeSliderValue">4</span>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="settings-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5a2 2 0 0 0 2 2h1"/><path d="M16 3h1a2 2 0 0 1 2 2v5a2 2 0 0 0 2 2 2 2 0 0 0-2 2v5a2 2 0 0 1-2 2h-1"/></svg>
+          </div>
+          <div class="settings-card-text">
+            <div class="settings-card-title">Auto-Closing Brackets</div>
+            <div class="settings-card-desc">Insert matching brackets when typing.</div>
+          </div>
+          <div class="settings-card-control">
+            <label class="switch"><input type="checkbox" id="editorAutoClosingToggle"><span class="switch-track"></span></label>
+            <span class="settings-card-state" id="editorAutoClosingState">Off</span>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="settings-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg>
+          </div>
+          <div class="settings-card-text">
+            <div class="settings-card-title">Line Numbers</div>
+            <div class="settings-card-desc">How line numbers are shown in the editor gutter.</div>
+          </div>
+          <div class="settings-card-control">
+            <div class="dropdown" id="editorLineNumbersDropdown">
+              <button class="settings-select-trigger dropdown-trigger" id="editorLineNumbersTrigger" aria-expanded="false">
+                <span class="settings-select-value" id="editorLineNumbersValue">On</span>
+                <svg class="dropdown-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+              </button>
+              <div class="dropdown-panel dropdown-panel-sm" id="editorLineNumbersPanel">
+                <div class="dropdown-row dropdown-row-option" data-value="on" aria-selected="true">
+                  <div class="dropdown-row-title">On</div>
+                  <svg class="dropdown-row-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                </div>
+                <div class="dropdown-row dropdown-row-option" data-value="relative" aria-selected="false">
+                  <div class="dropdown-row-title">Relative</div>
+                  <svg class="dropdown-row-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                </div>
+                <div class="dropdown-row dropdown-row-option" data-value="off" aria-selected="false">
+                  <div class="dropdown-row-title">Off</div>
+                  <svg class="dropdown-row-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-pane" data-pane="console" hidden>
+        <div class="settings-card">
+          <div class="settings-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9"/><path d="M3 19h18"/><path d="M8 9h8"/><path d="M8 12h5"/></svg>
+          </div>
+          <div class="settings-card-text">
+            <div class="settings-card-title">Max Log Lines</div>
+            <div class="settings-card-desc">Max output lines console can output.</div>
+          </div>
+          <div class="settings-card-control settings-slider-control">
+            <input type="range" class="settings-slider" id="consoleMaxLinesSlider" min="100" max="5000" step="100" value="1000">
+            <span class="settings-slider-value" id="consoleMaxLinesSliderValue">1000</span>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="settings-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
+          </div>
+          <div class="settings-card-text">
+            <div class="settings-card-title">Autoscroll</div>
+            <div class="settings-card-desc">Follow new log lines as they arrive.</div>
+          </div>
+          <div class="settings-card-control">
+            <label class="switch"><input type="checkbox" id="consoleAutoscrollToggle" checked><span class="switch-track"></span></label>
+            <span class="settings-card-state" id="consoleAutoscrollState">On</span>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="settings-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div class="settings-card-text">
+            <div class="settings-card-title">Show Timestamps</div>
+            <div class="settings-card-desc">Show the time each log line was written.</div>
+          </div>
+          <div class="settings-card-control">
+            <label class="switch"><input type="checkbox" id="consoleTimestampsToggle" checked><span class="switch-track"></span></label>
+            <span class="settings-card-state" id="consoleTimestampsState">On</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <input type="file" id="fileInput" accept=".lua,.txt" style="display:none">
+
+
+
+  
+  <div class="color-picker" id="colorPicker" hidden>
+    <div class="color-sv" id="colorSV"><div class="color-sv-thumb" id="colorSVThumb"></div></div>
+    <div class="color-hue" id="colorHue"><div class="color-hue-thumb" id="colorHueThumb"></div></div>
+    <div class="color-foot">
+      <span class="color-preview" id="colorPreview"></span>
+      <input class="color-hex" id="colorHex" spellcheck="false" maxlength="7">
+    </div>
+  </div>
+
+  <div class="tour-overlay" id="tourOverlay" hidden>
+    <div class="tour-spot" id="tourSpot"></div>
+    <div class="tour-card" id="tourCard">
+      <div class="tour-step" id="tourStep">Step 1 of 5</div>
+      <div class="tour-title" id="tourTitle"></div>
+      <div class="tour-desc" id="tourDesc"></div>
+      <div class="tour-actions">
+        <button class="tour-skip" id="tourSkipBtn">Skip</button>
+        <button class="tour-next" id="tourNextBtn">Next</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="cmdk-overlay" id="cmdkOverlay" hidden>
+    <div class="cmdk-panel">
+      <div class="cmdk-input-row">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="text" id="cmdkInput" placeholder="Type a command or search open scripts…" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="cmdk-list" id="cmdkList"></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.49.0/min/vs/loader.js"></script>
+<script>
+(function(){
+  const tabbar = document.getElementById('tabbar');
+  const tabScroll = document.getElementById('tabScroll');
+  
+  const floatTip = document.getElementById('floatTip');
+  let floatTipShowTimer = null;
+  const tabAdd = document.getElementById('tabAdd');
+  const consoleBody = document.getElementById('consoleBody');
+  const consoleStatus = document.getElementById('consoleStatus');
+  const fileInput = document.getElementById('fileInput');
+  const editorLoading = document.getElementById('editorLoading');
+  const tabCaret = document.getElementById('tabCaret');
+  const scriptDropdown = document.getElementById('scriptDropdown');
+  const scriptSearch = document.getElementById('scriptSearch');
+  const scriptList = document.getElementById('scriptList');
+
+  
+  let consoleFilterLevels = new Set(['ok', 'info', 'err']);
+  let consoleFilterText = '';
+  let consoleMaxLines = 1000;
+  let consoleAutoscroll = true;
+  try{
+    const storedMax = localStorage.getItem('oblivionxUiConsoleMaxLines');
+    if (storedMax !== null) consoleMaxLines = parseInt(storedMax, 10) || 1000;
+    consoleAutoscroll = localStorage.getItem('oblivionxUiConsoleAutoscroll') !== 'off';
+  } catch(e){}
+
+  function matchesConsoleFilter(kind, textLower){
+    if (!consoleFilterLevels.has(kind)) return false;
+    if (consoleFilterText && !textLower.includes(consoleFilterText)) return false;
+    return true;
+  }
+
+  function applyConsoleFilter(){
+    consoleBody.querySelectorAll('.log-line').forEach(line => {
+      const visible = matchesConsoleFilter(line.dataset.kind, line.dataset.text);
+      line.classList.toggle('log-hidden', !visible);
+    });
+  }
+
+  function escapeHtml(s){
+    return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  function log(kind, text){
+    const now = new Date();
+    const time = now.toTimeString().slice(0,8);
+    const line = document.createElement('div');
+    line.className = 'log-line';
+    line.dataset.kind = kind;
+    line.dataset.text = text.toLowerCase();
+    line.innerHTML = '<span class="log-time">' + time + '</span><span class="log-' + kind + '">' + escapeHtml(text) + '</span>';
+    if (!matchesConsoleFilter(kind, line.dataset.text)) line.classList.add('log-hidden');
+    consoleBody.appendChild(line);
+    
+    while (consoleBody.childElementCount > consoleMaxLines){
+      consoleBody.removeChild(consoleBody.firstElementChild);
+    }
+    
+    if (consoleAutoscroll) consoleBody.scrollTop = consoleBody.scrollHeight;
+  }
+
+  
+
+  
+  function hasWebView2(){ return !!(window.chrome && window.chrome.webview); }
+  function webviewPost(action, payload){
+    if (!hasWebView2()){
+      log('err', 'No WebView2  detected.');
+      return false;
+    }
+    window.chrome.webview.postMessage(JSON.stringify(Object.assign({ action }, payload || {})));
+    return true;
+  }
+  if (hasWebView2()){
+    window.chrome.webview.addEventListener('message', (evt) => {
+      let data; try { data = typeof evt.data === 'string' ? JSON.parse(evt.data) : evt.data; } catch(e){ return; }
+      if (!data || !data.action) return;
+      if (data.action === 'console'){
+        const level = ['ok', 'info', 'err'].includes(data.level) ? data.level : 'info';
+        log(level, String(data.text || ''));
+        return;
+      }
+      if (data.ok) log('ok', (data.message || (data.action + ' succeeded')));
+      else log('err', (data.message || (data.action + ' failed')));
+    });
+  } else {
+    log('info', 'Running in browser...');
+  }
+
+  document.getElementById('winMinimizeBtn').addEventListener('click', () => webviewPost('window-minimize'));
+  document.getElementById('winMaximizeBtn').addEventListener('click', () => webviewPost('window-maximize'));
+  document.getElementById('winCloseBtn').addEventListener('click', () => webviewPost('window-close'));
+
+  const STORAGE_KEY = 'oblivionxUiState';
+  const DEFAULT_TABS = [
+    { id: 'a', name: 'Script #1', code: '-- empty script' }
+  ];
+
+  let tabs = DEFAULT_TABS;
+  let activeId = 'a';
+  let editor = null;
+  const models = new Map();
+
+  function genId(){
+    return 'id' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  }
+
+  
+  function shouldRestoreSession(){
+    try{ return localStorage.getItem('oblivionxUiRestoreSession') !== 'off'; } catch(e){ return true; }
+  }
+
+  
+  const sessionStore = {
+    async load(){
+      try{ return localStorage.getItem(STORAGE_KEY); } catch(e){ return null; }
+    },
+    async save(contents){
+      try{ localStorage.setItem(STORAGE_KEY, contents); } catch(e){}
+    },
+    async clear(){
+      try{ localStorage.removeItem(STORAGE_KEY); } catch(e){}
+    }
+  };
+
+  
+  let sessionLoaded = false;
+
+  async function loadSavedState(){
+    if (!shouldRestoreSession()){ sessionLoaded = true; return false; }
+    const raw = await sessionStore.load();
+    sessionLoaded = true;
+    try{
+      if (!raw) return false;
+      const saved = JSON.parse(raw);
+      if (!Array.isArray(saved.tabs) || saved.tabs.length === 0) return false;
+      tabs = saved.tabs;
+      activeId = tabs.some(t => t.id === saved.activeId) ? saved.activeId : tabs[0].id;
+      return true;
+    }catch(e){ return false; }
+  }
+
+  
+  let sessionWritePending = false;
+  let sessionWriteQueued = null;
+
+  function snapshotSession(){
+    return JSON.stringify({
+      activeId,
+      tabs: tabs.map(t => ({
+        id: t.id,
+        name: t.name,
+        code: models.has(t.id) ? models.get(t.id).getValue() : t.code,
+        savedCode: t.savedCode != null ? t.savedCode : null
+      }))
+    });
+  }
+
+  function saveState(){
+    if (!sessionLoaded) return;
+    sessionWriteQueued = snapshotSession();
+    if (sessionWritePending) return;
+    sessionWritePending = true;
+    queueMicrotask(async () => {
+      while (sessionWriteQueued !== null){
+        const payload = sessionWriteQueued;
+        sessionWriteQueued = null;
+        try{ await sessionStore.save(payload); }
+        catch(e){ log('err', 'Could not save session: ' + e); break; }
+      }
+      sessionWritePending = false;
+    });
+  }
+
+  const sessionReady = loadSavedState();
+
+  function fileIcon(){
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="m10 12.5-2 2.5 2 2.5"/><path d="m14 12.5 2 2.5-2 2.5"/></svg>';
+  }
+
+  function nextAutoName(){
+    const used = new Set();
+    tabs.forEach(t => {
+      const m = /^Script #(\d+)$/.exec(t.name);
+      if (m) used.add(parseInt(m[1], 10));
+    });
+    let n = 1;
+    while (used.has(n)) n++;
+    return 'Script #' + n;
+  }
+
+  
+  const CLOSED_TABS_LIMIT = 20;
+  let closedTabsStack = [];
+
+  function pushClosedTab(t){
+    const code = models.has(t.id) ? models.get(t.id).getValue() : t.code;
+    closedTabsStack.push({
+      id: t.id,
+      name: t.name,
+      code,
+      savedCode: t.savedCode != null ? t.savedCode : null
+    });
+    if (closedTabsStack.length > CLOSED_TABS_LIMIT) closedTabsStack.shift();
+  }
+
+  
+  function isTabDirty(t){
+    if (t.savedCode == null) return false;
+    const current = models.has(t.id) ? models.get(t.id).getValue() : t.code;
+    return current !== t.savedCode;
+  }
+
+  
+  function updateDirtyIndicator(){
+    const t = tabs.find(t => t.id === activeId);
+    if (!t) return;
+    const el = tabScroll.querySelector('.tab[data-id="' + t.id + '"]');
+    if (el) el.classList.toggle('dirty', isTabDirty(t));
+  }
+
+  function renderTabs(){
+    hideFloatTip();
+    tabScroll.querySelectorAll('.tab').forEach(el => el.remove());
+    tabs.forEach(t => {
+      const el = document.createElement('div');
+      el.className = 'tab' +
+        (t.id === activeId ? ' active' : '') +
+        (isTabDirty(t) ? ' dirty' : '');
+      el.dataset.id = t.id;
+      el.innerHTML =
+        '<span class="tab-icon">' + fileIcon() + '</span>' +
+        '<span class="tab-name">' + escapeHtml(t.name) + '</span>' +
+        '<span class="tab-close-slot">' +
+          '<span class="tab-dirty-dot"></span>' +
+          '<span class="tab-close">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>' +
+          '</span>' +
+        '</span>';
+      el.addEventListener('click', (e) => {
+        if (e.target.closest('.tab-close-slot')) return;
+        setActive(t.id);
+      });
+      el.querySelector('.tab-close').addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeTab(t.id);
+      });
+      el.addEventListener('dblclick', (e) => {
+        if (e.target.closest('.tab-close-slot')) return;
+        startRename(t.id);
+      });
+      tabScroll.insertBefore(el, tabAdd);
+    });
+  }
+
+
+  function startRename(id){
+    const el = tabScroll.querySelector('.tab[data-id="' + id + '"]');
+    const t = tabs.find(t => t.id === id);
+    const nameEl = el && el.querySelector('.tab-name');
+    if (!el || !t || !nameEl) return;
+    const input = document.createElement('input');
+    input.className = 'tab-rename-input';
+    input.value = t.name;
+    nameEl.replaceWith(input);
+    input.focus();
+    input.select();
+    input.addEventListener('click', (e) => e.stopPropagation());
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') input.blur();
+      if (e.key === 'Escape'){ input.value = t.name; input.blur(); }
+    });
+    input.addEventListener('blur', () => {
+      const value = input.value.trim();
+      if (value) t.name = value;
+      renderTabs();
+      saveState();
+    }, { once: true });
+  }
+
+  
+  sessionReady.then(() => renderTabs());
+
+  function refreshBrackets(model){
+    const decos = [];
+    const re = /[()[\]{}]/g;
+    const lineCount = model.getLineCount();
+    for (let ln = 1; ln <= lineCount; ln++){
+      const content = model.getLineContent(ln);
+      re.lastIndex = 0;
+      let m;
+      while ((m = re.exec(content))){
+        const col = m.index + 1;
+        decos.push({
+          range: new monaco.Range(ln, col, ln, col + 1),
+          options: { inlineClassName: 'bracket-grey' }
+        });
+      }
+    }
+    model._bracketDecoIds = model.deltaDecorations(model._bracketDecoIds || [], decos);
+  }
+
+  function getModel(t){
+    if (!models.has(t.id)){
+      const model = monaco.editor.createModel(t.code, 'lua');
+      models.set(t.id, model);
+      refreshBrackets(model);
+      let bracketDebounce;
+      model.onDidChangeContent(() => {
+        clearTimeout(bracketDebounce);
+        bracketDebounce = setTimeout(() => refreshBrackets(model), 120);
+      });
+    }
+    return models.get(t.id);
+  }
+
+  
+  let tabScrollTarget = null;
+  let tabScrollRaf = null;
+
+  function stepTabScroll(){
+    const current = tabScroll.scrollLeft;
+    const diff = tabScrollTarget - current;
+    if (Math.abs(diff) < 0.5){
+      tabScroll.scrollLeft = tabScrollTarget;
+      tabScrollRaf = null;
+      return;
+    }
+    tabScroll.scrollLeft = current + diff * 0.25;
+    tabScrollRaf = requestAnimationFrame(stepTabScroll);
+  }
+
+  tabScroll.addEventListener('wheel', (e) => {
+    hideFloatTip();
+    if (tabScroll.scrollWidth <= tabScroll.clientWidth) return;
+    const delta = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+    if (delta === 0) return;
+    e.preventDefault();
+    const maxScroll = tabScroll.scrollWidth - tabScroll.clientWidth;
+    if (tabScrollTarget === null) tabScrollTarget = tabScroll.scrollLeft;
+    tabScrollTarget = Math.max(0, Math.min(maxScroll, tabScrollTarget + delta));
+    if (!tabScrollRaf) tabScrollRaf = requestAnimationFrame(stepTabScroll);
+  }, { passive: false });
+
+  function setActive(id){
+    activeId = id;
+    const t = tabs.find(t => t.id === id);
+    if (editor && t) editor.setModel(getModel(t));
+    renderTabs();
+  }
+
+  function closeTab(id){
+    const idx = tabs.findIndex(t => t.id === id);
+    if (idx === -1) return;
+    const t = tabs[idx];
+    pushClosedTab(t);
+    if (models.has(id)){ models.get(id).dispose(); models.delete(id); }
+    tabs.splice(idx, 1);
+    if (tabs.length === 0){
+      tabs.push({ id: genId(), name: nextAutoName(), code: '' });
+    }
+    if (activeId === id){
+      const fallback = tabs[Math.max(0, idx - 1)] || tabs[0];
+      activeId = fallback.id;
+      if (editor) editor.setModel(getModel(fallback));
+    }
+    renderTabs();
+    saveState();
+  }
+
+  
+  function reopenClosedTab(){
+    const entry = closedTabsStack.pop();
+    if (!entry) return;
+    const t = { id: entry.id, name: entry.name, code: entry.code, savedCode: entry.savedCode };
+    tabs.push(t);
+    setActive(t.id);
+    saveState();
+    log('info', 'Reopened "' + t.name + '".');
+  }
+
+  tabAdd.addEventListener('click', () => {
+    const t = { id: genId(), name: nextAutoName(), code: '' };
+    tabs.push(t);
+    activeId = t.id;
+    if (editor) editor.setModel(getModel(t));
+    renderTabs();
+    saveState();
+  });
+
+  
+  function showFloatTip(anchorEl, text, color){
+    floatTip.style.setProperty('--group-color', color || 'var(--text-dim)');
+    floatTip.innerHTML = (color ? '<span class="float-tip-dot"></span>' : '') +
+      '<span>' + escapeHtml(text) + '</span>';
+    floatTip.style.left = '0px';
+    floatTip.style.top = '0px';
+    const tRect = floatTip.getBoundingClientRect();
+    const aRect = anchorEl.getBoundingClientRect();
+    const maxX = window.innerWidth - tRect.width - 8;
+    floatTip.style.left = Math.max(8, Math.min(aRect.left, maxX)) + 'px';
+    floatTip.style.top = (aRect.bottom + 8) + 'px';
+    floatTip.classList.add('open');
+  }
+
+  function scheduleFloatTip(anchorEl, text, color){
+    clearTimeout(floatTipShowTimer);
+    floatTipShowTimer = setTimeout(() => showFloatTip(anchorEl, text, color), 250);
+  }
+
+  function hideFloatTip(){
+    clearTimeout(floatTipShowTimer);
+    floatTip.classList.remove('open');
+  }
+
+  window.addEventListener('resize', () => { hideFloatTip(); });
+  window.addEventListener('blur', () => { hideFloatTip(); });
+  document.addEventListener('keydown', (e) => {
+    if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 't'){
+      e.preventDefault();
+      reopenClosedTab();
+    }
+    
+    if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'p'){
+      e.preventDefault();
+      openCmdk();
+    }
+  });
+
+  
+  const cmdkOverlay = document.getElementById('cmdkOverlay');
+  const cmdkInput = document.getElementById('cmdkInput');
+  const cmdkList = document.getElementById('cmdkList');
+  let cmdkVisibleItems = [];
+  let cmdkActiveIndex = 0;
+
+  function clickCommand(id){
+    return () => { const el = document.getElementById(id); if (el) el.click(); };
+  }
+
+  function getCommands(){
+    const cmds = [];
+
+    tabs.forEach(t => {
+      cmds.push({
+        group: 'Scripts',
+        icon: fileIcon(),
+        label: t.name,
+        hint: t.id === activeId ? 'Current' : '',
+        keywords: t.name.toLowerCase(),
+        run: () => setActive(t.id)
+      });
+    });
+
+    const actionDefs = [
+      ['New Tab', 'tabAdd'],
+      ['Execute Script', 'btnExecute'],
+      ['Save Script', 'btnSave'],
+      ['Open Script…', 'btnOpen'],
+      ['Clear Editor', 'btnClear'],
+      ['Clear Console', 'btnClearConsole'],
+      ['Toggle Console', 'btnToggleConsole'],
+      ['Replay Welcome Tour', 'replayTourBtn']
+    ];
+    actionDefs.forEach(([label, id]) => {
+      cmds.push({ group: 'Actions', icon: '', label, hint: '', keywords: label.toLowerCase(), run: clickCommand(id) });
+    });
+    cmds.push({ group: 'Actions', icon: '', label: 'Reopen Closed Tab', hint: closedTabsStack.length ? '' : 'Nothing to reopen', keywords: 'reopen closed tab undo', run: reopenClosedTab });
+
+    const navDefs = [
+      ['Go to Editor', () => showPage('editor')],
+      ['Go to Script Hub', () => showPage('hub')],
+      ['Go to Settings — General', () => { showPage('settings'); showSettingsPane('general'); }],
+      ['Go to Settings — Appearance', () => { showPage('settings'); showSettingsPane('appearance'); }],
+      ['Go to Settings — Editor', () => { showPage('settings'); showSettingsPane('editor'); }]
+    ];
+    navDefs.forEach(([label, run]) => {
+      cmds.push({ group: 'Navigate', icon: '', label, hint: '', keywords: label.toLowerCase(), run });
+    });
+
+    return cmds;
+  }
+
+  function setCmdkActive(i){
+    cmdkActiveIndex = i;
+    [...cmdkList.querySelectorAll('.cmdk-item')].forEach(el => {
+      el.classList.toggle('active', Number(el.dataset.index) === i);
+    });
+    const el = cmdkList.querySelector('.cmdk-item.active');
+    if (el) el.scrollIntoView({ block: 'nearest' });
+  }
+
+  function renderCmdk(query){
+    const q = query.trim().toLowerCase();
+    const all = getCommands();
+    cmdkVisibleItems = q ? all.filter(c => c.keywords.includes(q)) : all;
+    cmdkActiveIndex = 0;
+    cmdkList.innerHTML = '';
+    if (cmdkVisibleItems.length === 0){
+      const empty = document.createElement('div');
+      empty.className = 'cmdk-empty';
+      empty.textContent = 'No matching commands';
+      cmdkList.appendChild(empty);
+      return;
+    }
+    let prevGroup = null;
+    cmdkVisibleItems.forEach((cmd, i) => {
+      if (cmd.group !== prevGroup){
+        const label = document.createElement('div');
+        label.className = 'cmdk-group-label';
+        label.textContent = cmd.group;
+        cmdkList.appendChild(label);
+        prevGroup = cmd.group;
+      }
+      const item = document.createElement('div');
+      item.className = 'cmdk-item' + (i === 0 ? ' active' : '');
+      item.dataset.index = i;
+      item.innerHTML = (cmd.icon || '') + '<span>' + escapeHtml(cmd.label) + '</span>' +
+        (cmd.hint ? '<span class="cmdk-item-hint">' + escapeHtml(cmd.hint) + '</span>' : '');
+      item.addEventListener('click', () => runCmdk(i));
+      item.addEventListener('mouseenter', () => setCmdkActive(i));
+      cmdkList.appendChild(item);
+    });
+  }
+
+  function runCmdk(i){
+    const cmd = cmdkVisibleItems[i];
+    if (!cmd) return;
+    closeCmdk();
+    cmd.run();
+  }
+
+  function openCmdk(){
+    cmdkOverlay.hidden = false;
+    cmdkInput.value = '';
+    renderCmdk('');
+    cmdkInput.focus();
+  }
+
+  function closeCmdk(){
+    cmdkOverlay.hidden = true;
+  }
+
+  cmdkInput.addEventListener('input', () => renderCmdk(cmdkInput.value));
+  cmdkOverlay.addEventListener('click', (e) => { if (e.target === cmdkOverlay) closeCmdk(); });
+  cmdkInput.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowDown'){
+      e.preventDefault();
+      e.stopPropagation();
+      setCmdkActive(Math.min(cmdkActiveIndex + 1, cmdkVisibleItems.length - 1));
+    } else if (e.key === 'ArrowUp'){
+      e.preventDefault();
+      e.stopPropagation();
+      setCmdkActive(Math.max(cmdkActiveIndex - 1, 0));
+    } else if (e.key === 'Enter'){
+      e.preventDefault();
+      e.stopPropagation();
+      runCmdk(cmdkActiveIndex);
+    } else if (e.key === 'Escape'){
+      e.preventDefault();
+      e.stopPropagation();
+      closeCmdk();
+    }
+  });
+
+  
+  function renderScriptList(filter){
+    const q = (filter || '').trim().toLowerCase();
+    const matches = tabs.filter(t => t.name.toLowerCase().includes(q));
+    scriptList.innerHTML = '';
+    if (matches.length === 0){
+      const empty = document.createElement('div');
+      empty.className = 'script-empty';
+      empty.textContent = 'No scripts match "' + filter + '"';
+      scriptList.appendChild(empty);
+      return;
+    }
+    matches.forEach(t => {
+      const row = document.createElement('div');
+      row.className = 'script-item' + (t.id === activeId ? ' active' : '');
+      row.innerHTML =
+        '<span class="tab-icon">' + fileIcon() + '</span>' +
+        '<span class="script-item-name">' + escapeHtml(t.name) + '</span>';
+      row.addEventListener('click', () => {
+        setActive(t.id);
+        closeDropdown();
+      });
+      scriptList.appendChild(row);
+    });
+  }
+
+  function openDropdown(){
+    scriptDropdown.classList.add('open');
+    tabCaret.classList.add('open');
+    scriptSearch.value = '';
+    renderScriptList('');
+    scriptSearch.focus();
+  }
+
+  function closeDropdown(){
+    scriptDropdown.classList.remove('open');
+    tabCaret.classList.remove('open');
+  }
+
+  tabCaret.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (scriptDropdown.classList.contains('open')) closeDropdown();
+    else openDropdown();
+  });
+
+  scriptSearch.addEventListener('input', () => renderScriptList(scriptSearch.value));
+  scriptSearch.addEventListener('click', (e) => e.stopPropagation());
+  scriptDropdown.addEventListener('click', (e) => e.stopPropagation());
+
+  document.addEventListener('click', () => closeDropdown());
+
+  const consoleFilterInput = document.getElementById('consoleFilterInput');
+  consoleFilterInput.addEventListener('input', () => {
+    consoleFilterText = consoleFilterInput.value.trim().toLowerCase();
+    applyConsoleFilter();
+  });
+  const consoleLevelDropdown = document.getElementById('consoleLevelDropdown');
+  const consoleLevelTrigger = document.getElementById('consoleLevelTrigger');
+  function openConsoleLevelDropdown(){ consoleLevelDropdown.dataset.open = 'true'; consoleLevelTrigger.setAttribute('aria-expanded', 'true'); }
+  function closeConsoleLevelDropdown(){ consoleLevelDropdown.dataset.open = 'false'; consoleLevelTrigger.setAttribute('aria-expanded', 'false'); }
+  consoleLevelTrigger.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (consoleLevelDropdown.dataset.open === 'true') closeConsoleLevelDropdown();
+    else openConsoleLevelDropdown();
+  });
+  consoleLevelDropdown.querySelector('.dropdown-panel').addEventListener('click', (e) => e.stopPropagation());
+  document.addEventListener('click', () => closeConsoleLevelDropdown());
+
+  [...document.querySelectorAll('#consoleLevelPanel input[data-level]')].forEach(input => {
+    input.addEventListener('change', () => {
+      const level = input.dataset.level;
+      if (!input.checked){
+        if (consoleFilterLevels.size === 1){ input.checked = true; return; }
+        consoleFilterLevels.delete(level);
+      } else {
+        consoleFilterLevels.add(level);
+      }
+      applyConsoleFilter();
+    });
+  });
+
+  document.getElementById('btnExecute').addEventListener('click', () => {
+    const t = tabs.find(t => t.id === activeId);
+    const code = editor ? editor.getValue() : (t ? t.code : '');
+    webviewPost('execute', { script: code });
+  });
+
+  
+  document.getElementById('btnClear').addEventListener('click', () => {
+    if (editor) editor.setValue('');
+  });
+
+  
+  document.getElementById('btnClearConsole').addEventListener('click', () => {
+    consoleBody.innerHTML = '';
+  });
+
+  const consoleWrap = document.getElementById('consoleWrap');
+  const consoleLabelEl = consoleWrap.querySelector('.console-label');
+  const btnToggleConsole = document.getElementById('btnToggleConsole');
+  let expandedConsoleHeight = consoleWrap.getBoundingClientRect().height || 260;
+
+  btnToggleConsole.addEventListener('click', () => {
+    const collapsing = !consoleWrap.classList.contains('collapsed');
+    if (collapsing){
+      expandedConsoleHeight = consoleWrap.getBoundingClientRect().height;
+      const labelHeight = consoleLabelEl.getBoundingClientRect().height;
+      consoleWrap.style.height = labelHeight + 'px';
+    } else {
+      consoleWrap.style.height = expandedConsoleHeight + 'px';
+    }
+    consoleWrap.classList.toggle('collapsed', collapsing);
+    btnToggleConsole.setAttribute('data-tip', collapsing ? 'Expand console' : 'Collapse console');
+  });
+
+  document.getElementById('btnSave').addEventListener('click', () => {
+    const t = tabs.find(t => t.id === activeId);
+    const code = editor ? editor.getValue() : t.code;
+    const blob = new Blob([code], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = t.name.replace(/[^\w.\- \[\]]/g, '') + '.lua';
+    a.click();
+    URL.revokeObjectURL(url);
+    
+    t.savedCode = code;
+    updateDirtyIndicator();
+    log('info', 'Saved "' + t.name + '" to disk.');
+  });
+
+  document.getElementById('btnOpen').addEventListener('click', () => fileInput.click());
+  document.getElementById('btnAttach').addEventListener('click', () => webviewPost('attach', {}));
+
+  fileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const t = { id: genId(), name: file.name.replace(/\.(lua|txt)$/i, ''), code: reader.result, savedCode: reader.result };
+      tabs.push(t);
+      activeId = t.id;
+      if (editor) editor.setModel(getModel(t));
+      renderTabs();
+      saveState();
+      log('info', 'Opened "' + file.name + '".');
+    };
+    reader.readAsText(file);
+    fileInput.value = '';
+  });
+
+  
+  const navEditorBtn = document.getElementById('navEditorBtn');
+  const navHubBtn = document.getElementById('navHubBtn');
+  const navSettingsBtn = document.getElementById('navSettingsBtn');
+  const editorPage = document.getElementById('editorPage');
+  const hubPage = document.getElementById('hubPage');
+  const settingsPage = document.getElementById('settingsPage');
+  let hubLoadedOnce = false;
+
+  let currentPage = null;
+  function showPage(name){
+    const changed = currentPage !== null && currentPage !== name;
+    currentPage = name;
+    editorPage.hidden = name !== 'editor';
+    hubPage.hidden = name !== 'hub';
+    settingsPage.hidden = name !== 'settings';
+    navEditorBtn.classList.toggle('active', name === 'editor');
+    navHubBtn.classList.toggle('active', name === 'hub');
+    navSettingsBtn.classList.toggle('active', name === 'settings');
+    if (changed){
+      const el = name === 'editor' ? editorPage : name === 'hub' ? hubPage : settingsPage;
+      
+      el.classList.remove('page-enter');
+      void el.offsetWidth;
+      el.classList.add('page-enter');
+    }
+    if (name === 'hub' && !hubLoadedOnce){
+      hubLoadedOnce = true;
+      loadHub(true);
+    }
+  }
+  navEditorBtn.addEventListener('click', () => showPage('editor'));
+  navHubBtn.addEventListener('click', () => showPage('hub'));
+  navSettingsBtn.addEventListener('click', () => showPage('settings'));
+
+  
+  const settingsNavItems = [...document.querySelectorAll('.settings-nav-item')];
+  const settingsPanes = [...document.querySelectorAll('.settings-pane')];
+  function showSettingsPane(pane){
+    settingsNavItems.forEach(b => b.classList.toggle('active', b.dataset.pane === pane));
+    settingsPanes.forEach(p => {
+      const active = p.dataset.pane === pane;
+      p.classList.toggle('active', active);
+      p.hidden = !active;
+    });
+  }
+  settingsNavItems.forEach(btn => {
+    btn.addEventListener('click', () => showSettingsPane(btn.dataset.pane));
+  });
+
+  
+  function initSettingsSelect(opts){
+    const dropdown = document.getElementById(opts.dropdownId);
+    const trigger = document.getElementById(opts.triggerId);
+    const valueEl = document.getElementById(opts.valueId);
+    const rows = [...dropdown.querySelectorAll('.dropdown-row-option')];
+
+    function select(value, persist){
+      const row = rows.find(r => r.dataset.value === value) || rows[0];
+      rows.forEach(r => r.setAttribute('aria-selected', String(r === row)));
+      valueEl.textContent = row.querySelector('.dropdown-row-title').textContent;
+      if (persist){ try{ localStorage.setItem(opts.storageKey, row.dataset.value); } catch(e){} }
+      opts.onChange(row.dataset.value);
+    }
+
+    let saved = opts.defaultValue;
+    try{ saved = localStorage.getItem(opts.storageKey) || opts.defaultValue; } catch(e){}
+    select(saved, false);
+
+    function close(){ dropdown.dataset.open = 'false'; trigger.setAttribute('aria-expanded', 'false'); }
+    trigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const opening = dropdown.dataset.open !== 'true';
+      document.querySelectorAll('.settings-select-trigger').forEach(t => {
+        if (t === trigger) return;
+        t.closest('.dropdown').dataset.open = 'false';
+        t.setAttribute('aria-expanded', 'false');
+      });
+      dropdown.dataset.open = opening ? 'true' : 'false';
+      trigger.setAttribute('aria-expanded', String(opening));
+    });
+    dropdown.querySelector('.dropdown-panel').addEventListener('click', (e) => e.stopPropagation());
+    rows.forEach(row => {
+      row.addEventListener('click', () => {
+        select(row.dataset.value, true);
+        close();
+      });
+    });
+    document.addEventListener('click', close);
+  }
+
+  initSettingsSelect({
+    dropdownId: 'themeDropdown', triggerId: 'themeTrigger', valueId: 'themeValue',
+    storageKey: 'oblivionxUiTheme', defaultValue: 'dark',
+    onChange: (value) => document.documentElement.setAttribute('data-theme', value)
+  });
+
+  initSettingsSelect({
+    dropdownId: 'fontDropdown', triggerId: 'fontTrigger', valueId: 'fontValue',
+    storageKey: 'oblivionxUiFont', defaultValue: 'chillax',
+    onChange: (value) => {
+      const stacks = {
+        chillax: "'Chillax', sans-serif",
+        inter: "'Inter', sans-serif",
+        system: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+        'space-grotesk': "'Space Grotesk', sans-serif"
+      };
+      document.documentElement.style.setProperty('--ui-font', stacks[value] || stacks.chillax);
+    }
+  });
+
+  const versionTitlebarToggle = document.getElementById('versionTitlebarToggle');
+  const versionTitlebarState = document.getElementById('versionTitlebarState');
+  const brandVersion = document.getElementById('brandVersion');
+  try{ versionTitlebarToggle.checked = localStorage.getItem('oblivionxUiShowVersion') === 'on'; } catch(e){}
+  brandVersion.hidden = !versionTitlebarToggle.checked;
+  versionTitlebarState.textContent = versionTitlebarToggle.checked ? 'On' : 'Off';
+  versionTitlebarToggle.addEventListener('change', () => {
+    brandVersion.hidden = !versionTitlebarToggle.checked;
+    versionTitlebarState.textContent = versionTitlebarToggle.checked ? 'On' : 'Off';
+    try{ localStorage.setItem('oblivionxUiShowVersion', versionTitlebarToggle.checked ? 'on' : 'off'); } catch(e){}
+  });
+
+  
+  const editorFontStacks = {
+    'jetbrains-mono': "'JetBrains Mono', monospace",
+    'fira-code': "'Fira Code', monospace",
+    'cascadia-code': "'Cascadia Code', monospace",
+    consolas: "Consolas, monospace"
+  };
+  function getEditorFontSize(){
+    let px = 14;
+    try{ const stored = localStorage.getItem('oblivionxUiEditorFontSize'); if (stored !== null) px = parseInt(stored, 10); } catch(e){}
+    return px;
+  }
+  
+  function computeEditorLineHeight(fontSize){
+    return Math.round(fontSize * (24 / 14));
+  }
+  function getEditorFontFamily(){
+    let value = 'jetbrains-mono';
+    try{ value = localStorage.getItem('oblivionxUiEditorFont') || value; } catch(e){}
+    return editorFontStacks[value] || editorFontStacks['jetbrains-mono'];
+  }
+  function getEditorBoolPref(key){
+    try{ return localStorage.getItem(key) === 'on'; } catch(e){ return false; }
+  }
+  function getEditorStringPref(key, fallback){
+    try{ return localStorage.getItem(key) || fallback; } catch(e){ return fallback; }
+  }
+  function getEditorTabSize(){
+    let n = 4;
+    try{ const stored = localStorage.getItem('oblivionxUiEditorTabSize'); if (stored !== null) n = parseInt(stored, 10) || 4; } catch(e){}
+    return n;
+  }
+  
+  function getEditorAutoClosing(){
+    try{ return localStorage.getItem('oblivionxUiEditorAutoClosing') !== 'off'; } catch(e){ return true; }
+  }
+  function updateEditorOption(opts){
+    if (editor) editor.updateOptions(opts);
+  }
+
+  const editorFontSizeSlider = document.getElementById('editorFontSizeSlider');
+  const editorFontSizeSliderValue = document.getElementById('editorFontSizeSliderValue');
+  function applyEditorFontSizeSlider(px){
+    editorFontSizeSliderValue.textContent = px + 'px';
+    const min = Number(editorFontSizeSlider.min), max = Number(editorFontSizeSlider.max);
+    const pct = ((px - min) / (max - min)) * 100;
+    editorFontSizeSlider.style.background = 'linear-gradient(to right, var(--accent) ' + pct + '%, rgba(255,255,255,0.12) ' + pct + '%)';
+  }
+  const savedEditorFontSize = getEditorFontSize();
+  editorFontSizeSlider.value = savedEditorFontSize;
+  applyEditorFontSizeSlider(savedEditorFontSize);
+  editorFontSizeSlider.addEventListener('input', () => {
+    const px = Number(editorFontSizeSlider.value);
+    applyEditorFontSizeSlider(px);
+    updateEditorOption({ fontSize: px, lineHeight: computeEditorLineHeight(px) });
+  });
+  editorFontSizeSlider.addEventListener('change', () => {
+    try{ localStorage.setItem('oblivionxUiEditorFontSize', editorFontSizeSlider.value); } catch(e){}
+  });
+
+  initSettingsSelect({
+    dropdownId: 'editorFontDropdown', triggerId: 'editorFontTrigger', valueId: 'editorFontValue',
+    storageKey: 'oblivionxUiEditorFont', defaultValue: 'jetbrains-mono',
+    onChange: (value) => {
+      updateEditorOption({ fontFamily: editorFontStacks[value] || editorFontStacks['jetbrains-mono'] });
+      if (window.monaco) monaco.editor.remeasureFonts();
+    }
+  });
+
+  const editorLigaturesToggle = document.getElementById('editorLigaturesToggle');
+  const editorLigaturesState = document.getElementById('editorLigaturesState');
+  editorLigaturesToggle.checked = getEditorBoolPref('oblivionxUiEditorLigatures');
+  editorLigaturesState.textContent = editorLigaturesToggle.checked ? 'On' : 'Off';
+  editorLigaturesToggle.addEventListener('change', () => {
+    editorLigaturesState.textContent = editorLigaturesToggle.checked ? 'On' : 'Off';
+    try{ localStorage.setItem('oblivionxUiEditorLigatures', editorLigaturesToggle.checked ? 'on' : 'off'); } catch(e){}
+    updateEditorOption({ fontLigatures: editorLigaturesToggle.checked });
+  });
+
+  initSettingsSelect({
+    dropdownId: 'caretBlinkDropdown', triggerId: 'caretBlinkTrigger', valueId: 'caretBlinkValue',
+    storageKey: 'oblivionxUiEditorCursorBlink', defaultValue: 'blink',
+    onChange: (value) => updateEditorOption({ cursorBlinking: value })
+  });
+
+  initSettingsSelect({
+    dropdownId: 'cursorStyleDropdown', triggerId: 'cursorStyleTrigger', valueId: 'cursorStyleValue',
+    storageKey: 'oblivionxUiEditorCursorStyle', defaultValue: 'line',
+    onChange: (value) => updateEditorOption({ cursorStyle: value })
+  });
+
+  const editorSmoothTypingToggle = document.getElementById('editorSmoothTypingToggle');
+  const editorSmoothTypingState = document.getElementById('editorSmoothTypingState');
+  editorSmoothTypingToggle.checked = getEditorBoolPref('oblivionxUiEditorSmoothTyping');
+  editorSmoothTypingState.textContent = editorSmoothTypingToggle.checked ? 'On' : 'Off';
+  editorSmoothTypingToggle.addEventListener('change', () => {
+    editorSmoothTypingState.textContent = editorSmoothTypingToggle.checked ? 'On' : 'Off';
+    try{ localStorage.setItem('oblivionxUiEditorSmoothTyping', editorSmoothTypingToggle.checked ? 'on' : 'off'); } catch(e){}
+    updateEditorOption({ cursorSmoothCaretAnimation: editorSmoothTypingToggle.checked ? 'on' : 'off' });
+  });
+
+  const editorSmoothScrollToggle = document.getElementById('editorSmoothScrollToggle');
+  const editorSmoothScrollState = document.getElementById('editorSmoothScrollState');
+  editorSmoothScrollToggle.checked = getEditorBoolPref('oblivionxUiEditorSmoothScroll');
+  editorSmoothScrollState.textContent = editorSmoothScrollToggle.checked ? 'On' : 'Off';
+  editorSmoothScrollToggle.addEventListener('change', () => {
+    editorSmoothScrollState.textContent = editorSmoothScrollToggle.checked ? 'On' : 'Off';
+    try{ localStorage.setItem('oblivionxUiEditorSmoothScroll', editorSmoothScrollToggle.checked ? 'on' : 'off'); } catch(e){}
+    updateEditorOption({ smoothScrolling: editorSmoothScrollToggle.checked });
+  });
+
+  const editorWordWrapToggle = document.getElementById('editorWordWrapToggle');
+  const editorWordWrapState = document.getElementById('editorWordWrapState');
+  editorWordWrapToggle.checked = getEditorBoolPref('oblivionxUiEditorWordWrap');
+  editorWordWrapState.textContent = editorWordWrapToggle.checked ? 'On' : 'Off';
+  editorWordWrapToggle.addEventListener('change', () => {
+    editorWordWrapState.textContent = editorWordWrapToggle.checked ? 'On' : 'Off';
+    try{ localStorage.setItem('oblivionxUiEditorWordWrap', editorWordWrapToggle.checked ? 'on' : 'off'); } catch(e){}
+    updateEditorOption({ wordWrap: editorWordWrapToggle.checked ? 'on' : 'off' });
+  });
+
+  const editorMinimapToggle = document.getElementById('editorMinimapToggle');
+  const editorMinimapState = document.getElementById('editorMinimapState');
+  editorMinimapToggle.checked = getEditorBoolPref('oblivionxUiEditorMinimap');
+  editorMinimapState.textContent = editorMinimapToggle.checked ? 'On' : 'Off';
+  editorMinimapToggle.addEventListener('change', () => {
+    editorMinimapState.textContent = editorMinimapToggle.checked ? 'On' : 'Off';
+    try{ localStorage.setItem('oblivionxUiEditorMinimap', editorMinimapToggle.checked ? 'on' : 'off'); } catch(e){}
+    updateEditorOption({ minimap: { enabled: editorMinimapToggle.checked } });
+  });
+
+  const editorStickyScrollToggle = document.getElementById('editorStickyScrollToggle');
+  const editorStickyScrollState = document.getElementById('editorStickyScrollState');
+  editorStickyScrollToggle.checked = getEditorBoolPref('oblivionxUiEditorStickyScroll');
+  editorStickyScrollState.textContent = editorStickyScrollToggle.checked ? 'On' : 'Off';
+  editorStickyScrollToggle.addEventListener('change', () => {
+    editorStickyScrollState.textContent = editorStickyScrollToggle.checked ? 'On' : 'Off';
+    try{ localStorage.setItem('oblivionxUiEditorStickyScroll', editorStickyScrollToggle.checked ? 'on' : 'off'); } catch(e){}
+    updateEditorOption({ stickyScroll: { enabled: editorStickyScrollToggle.checked } });
+  });
+
+  
+  const editorTabSizeSlider = document.getElementById('editorTabSizeSlider');
+  const editorTabSizeSliderValue = document.getElementById('editorTabSizeSliderValue');
+  function applyEditorTabSizeSlider(n){
+    editorTabSizeSliderValue.textContent = String(n);
+    const min = Number(editorTabSizeSlider.min), max = Number(editorTabSizeSlider.max);
+    const pct = ((n - min) / (max - min)) * 100;
+    editorTabSizeSlider.style.background = 'linear-gradient(to right, var(--accent) ' + pct + '%, rgba(255,255,255,0.12) ' + pct + '%)';
+  }
+  const savedTabSize = getEditorTabSize();
+  editorTabSizeSlider.value = savedTabSize;
+  applyEditorTabSizeSlider(savedTabSize);
+  editorTabSizeSlider.addEventListener('input', () => {
+    const n = Number(editorTabSizeSlider.value);
+    applyEditorTabSizeSlider(n);
+    updateEditorOption({ tabSize: n });
+  });
+  editorTabSizeSlider.addEventListener('change', () => {
+    try{ localStorage.setItem('oblivionxUiEditorTabSize', editorTabSizeSlider.value); } catch(e){}
+  });
+
+  const editorAutoClosingToggle = document.getElementById('editorAutoClosingToggle');
+  const editorAutoClosingState = document.getElementById('editorAutoClosingState');
+  editorAutoClosingToggle.checked = getEditorAutoClosing();
+  editorAutoClosingState.textContent = editorAutoClosingToggle.checked ? 'On' : 'Off';
+  editorAutoClosingToggle.addEventListener('change', () => {
+    const on = editorAutoClosingToggle.checked;
+    editorAutoClosingState.textContent = on ? 'On' : 'Off';
+    try{ localStorage.setItem('oblivionxUiEditorAutoClosing', on ? 'on' : 'off'); } catch(e){}
+    updateEditorOption({
+      autoClosingBrackets: on ? 'languageDefined' : 'never',
+      autoClosingQuotes: on ? 'languageDefined' : 'never'
+    });
+  });
+
+  initSettingsSelect({
+    dropdownId: 'editorLineNumbersDropdown', triggerId: 'editorLineNumbersTrigger', valueId: 'editorLineNumbersValue',
+    storageKey: 'oblivionxUiEditorLineNumbers', defaultValue: 'on',
+    onChange: (value) => updateEditorOption({ lineNumbers: value })
+  });
+
+  
+  const consoleMaxLinesSlider = document.getElementById('consoleMaxLinesSlider');
+  const consoleMaxLinesSliderValue = document.getElementById('consoleMaxLinesSliderValue');
+  function applyConsoleMaxLinesSlider(n){
+    consoleMaxLinesSliderValue.textContent = String(n);
+    const min = Number(consoleMaxLinesSlider.min), max = Number(consoleMaxLinesSlider.max);
+    const pct = ((n - min) / (max - min)) * 100;
+    consoleMaxLinesSlider.style.background = 'linear-gradient(to right, var(--accent) ' + pct + '%, rgba(255,255,255,0.12) ' + pct + '%)';
+  }
+  consoleMaxLinesSlider.value = consoleMaxLines;
+  applyConsoleMaxLinesSlider(consoleMaxLines);
+  consoleMaxLinesSlider.addEventListener('input', () => {
+    consoleMaxLines = Number(consoleMaxLinesSlider.value);
+    applyConsoleMaxLinesSlider(consoleMaxLines);
+    
+    while (consoleBody.childElementCount > consoleMaxLines){
+      consoleBody.removeChild(consoleBody.firstElementChild);
+    }
+  });
+  consoleMaxLinesSlider.addEventListener('change', () => {
+    try{ localStorage.setItem('oblivionxUiConsoleMaxLines', consoleMaxLinesSlider.value); } catch(e){}
+  });
+
+  const consoleAutoscrollToggle = document.getElementById('consoleAutoscrollToggle');
+  const consoleAutoscrollState = document.getElementById('consoleAutoscrollState');
+  consoleAutoscrollToggle.checked = consoleAutoscroll;
+  consoleAutoscrollState.textContent = consoleAutoscroll ? 'On' : 'Off';
+  consoleAutoscrollToggle.addEventListener('change', () => {
+    consoleAutoscroll = consoleAutoscrollToggle.checked;
+    consoleAutoscrollState.textContent = consoleAutoscroll ? 'On' : 'Off';
+    try{ localStorage.setItem('oblivionxUiConsoleAutoscroll', consoleAutoscroll ? 'on' : 'off'); } catch(e){}
+    if (consoleAutoscroll) consoleBody.scrollTop = consoleBody.scrollHeight;
+  });
+
+  const consoleTimestampsToggle = document.getElementById('consoleTimestampsToggle');
+  const consoleTimestampsState = document.getElementById('consoleTimestampsState');
+  function applyConsoleTimestamps(on){
+    consoleBody.classList.toggle('hide-timestamps', !on);
+    consoleTimestampsState.textContent = on ? 'On' : 'Off';
+  }
+  let savedTimestamps = true;
+  try{ savedTimestamps = localStorage.getItem('oblivionxUiConsoleTimestamps') !== 'off'; } catch(e){}
+  consoleTimestampsToggle.checked = savedTimestamps;
+  applyConsoleTimestamps(savedTimestamps);
+  consoleTimestampsToggle.addEventListener('change', () => {
+    applyConsoleTimestamps(consoleTimestampsToggle.checked);
+    try{ localStorage.setItem('oblivionxUiConsoleTimestamps', consoleTimestampsToggle.checked ? 'on' : 'off'); } catch(e){}
+  });
+
+  
+  const accentPicker = document.getElementById('accentPicker');
+  const accentCustomBtn = document.getElementById('accentCustomBtn');
+  const accentSwatches = [...accentPicker.querySelectorAll('.accent-swatch[data-value]')];
+
+  function hexToRgb(hex){
+    const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(String(hex).trim());
+    if (!m) return { r: 255, g: 255, b: 255 };
+    return { r: parseInt(m[1], 16), g: parseInt(m[2], 16), b: parseInt(m[3], 16) };
+  }
+  function relativeLuminance({ r, g, b }){
+    const chan = (c) => {
+      const s = c / 255;
+      return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+    };
+    return 0.2126 * chan(r) + 0.7152 * chan(g) + 0.0722 * chan(b);
+  }
+  function applyAccent(hex){
+    const { r, g, b } = hexToRgb(hex);
+    const root = document.documentElement.style;
+    root.setProperty('--accent', hex);
+    root.setProperty('--accent-dim', 'rgba(' + r + ',' + g + ',' + b + ',0.12)');
+    root.setProperty('--accent-glow', 'rgba(' + r + ',' + g + ',' + b + ',0.45)');
+    root.setProperty('--accent-fg', relativeLuminance({ r, g, b }) > 0.45 ? '#111114' : '#f5f5f7');
+    let matchedPreset = false;
+    accentSwatches.forEach(s => {
+      const on = s.dataset.value.toLowerCase() === hex.toLowerCase();
+      if (on) matchedPreset = true;
+      s.classList.toggle('active', on);
+    });
+    
+    accentCustomBtn.classList.toggle('active', !matchedPreset);
+  }
+  let savedAccent = '#ffffff';
+  try{ savedAccent = localStorage.getItem('oblivionxUiAccent') || '#a855f7'; } catch(e){}
+  applyAccent(savedAccent);
+  accentSwatches.forEach(sw => {
+    sw.addEventListener('click', () => {
+      applyAccent(sw.dataset.value);
+      try{ localStorage.setItem('oblivionxUiAccent', sw.dataset.value); } catch(e){}
+    });
+  });
+
+  
+  const colorPicker = document.getElementById('colorPicker');
+  const colorSV = document.getElementById('colorSV');
+  const colorSVThumb = document.getElementById('colorSVThumb');
+  const colorHue = document.getElementById('colorHue');
+  const colorHueThumb = document.getElementById('colorHueThumb');
+  const colorPreview = document.getElementById('colorPreview');
+  const colorHex = document.getElementById('colorHex');
+  let hsv = { h: 0, s: 0, v: 1 };
+
+  function hsvToHex({ h, s, v }){
+    const f = (n) => {
+      const k = (n + h / 60) % 6;
+      const c = v - v * s * Math.max(0, Math.min(k, 4 - k, 1));
+      return Math.round(c * 255).toString(16).padStart(2, '0');
+    };
+    return '#' + f(5) + f(3) + f(1);
+  }
+  function rgbToHsv({ r, g, b }){
+    r /= 255; g /= 255; b /= 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min;
+    let h = 0;
+    if (d){
+      if (max === r) h = 60 * (((g - b) / d) % 6);
+      else if (max === g) h = 60 * ((b - r) / d + 2);
+      else h = 60 * ((r - g) / d + 4);
+    }
+    return { h: (h + 360) % 360, s: max ? d / max : 0, v: max };
+  }
+  function syncPicker(){
+    const hex = hsvToHex(hsv);
+    colorPicker.style.setProperty('--hue-color', 'hsl(' + hsv.h + ',100%,50%)');
+    colorPicker.style.setProperty('--preview-color', hex);
+    colorSVThumb.style.left = (hsv.s * 100) + '%';
+    colorSVThumb.style.top = ((1 - hsv.v) * 100) + '%';
+    colorHueThumb.style.left = (hsv.h / 360 * 100) + '%';
+    colorHueThumb.style.background = 'hsl(' + hsv.h + ',100%,50%)';
+    if (document.activeElement !== colorHex) colorHex.value = hex;
+    return hex;
+  }
+  function commitPickerColor(){
+    const hex = syncPicker();
+    applyAccent(hex);
+    try{ localStorage.setItem('oblivionxUiAccent', hex); } catch(e){}
+  }
+
+  
+  function trackDrag(el, onMove){
+    const handle = (e) => {
+      const r = el.getBoundingClientRect();
+      onMove(
+        Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)),
+        Math.min(1, Math.max(0, (e.clientY - r.top) / r.height))
+      );
+      commitPickerColor();
+    };
+    el.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      handle(e);
+      
+      try{ el.setPointerCapture(e.pointerId); } catch(err){}
+      const move = (ev) => handle(ev);
+      const up = () => {
+        el.removeEventListener('pointermove', move);
+        el.removeEventListener('pointerup', up);
+      };
+      el.addEventListener('pointermove', move);
+      el.addEventListener('pointerup', up);
+    });
+  }
+  trackDrag(colorSV, (x, y) => { hsv.s = x; hsv.v = 1 - y; });
+  trackDrag(colorHue, (x) => { hsv.h = x * 360; });
+
+  colorHex.addEventListener('input', () => {
+    const v = colorHex.value.trim();
+    if (!/^#?[0-9a-f]{6}$/i.test(v)) return;
+    hsv = rgbToHsv(hexToRgb(v));
+    commitPickerColor();
+  });
+
+  function openColorPicker(){
+    hsv = rgbToHsv(hexToRgb(getComputedStyle(document.documentElement).getPropertyValue('--accent') || '#ffffff'));
+    syncPicker();
+    colorPicker.hidden = false;
+    const r = accentCustomBtn.getBoundingClientRect();
+    const w = colorPicker.offsetWidth, h = colorPicker.offsetHeight;
+    
+    colorPicker.style.left = Math.max(8, Math.min(r.right - w, window.innerWidth - w - 8)) + 'px';
+    colorPicker.style.top = (r.bottom + 8 + h > window.innerHeight ? Math.max(8, r.top - h - 8) : r.bottom + 8) + 'px';
+  }
+  function closeColorPicker(){ colorPicker.hidden = true; }
+
+  accentCustomBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideFloatTip();
+    if (colorPicker.hidden) openColorPicker(); else closeColorPicker();
+  });
+  colorPicker.addEventListener('click', (e) => e.stopPropagation());
+  document.addEventListener('click', () => closeColorPicker());
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeColorPicker(); });
+  window.addEventListener('resize', closeColorPicker);
+  document.querySelector('.settings-content').addEventListener('scroll', closeColorPicker);
+
+  
+  document.querySelectorAll('[data-float-tip]').forEach(el => {
+    el.addEventListener('mouseenter', () => scheduleFloatTip(el, el.dataset.floatTip, null));
+    el.addEventListener('mouseleave', () => hideFloatTip());
+  });
+  document.querySelector('.settings-content').addEventListener('scroll', () => hideFloatTip());
+
+  
+  const TOUR_STEPS = [
+    { target: '.brand', page: 'editor', title: 'Welcome to OblivionX', desc: "Here's a quick tour of the editor, the script hub, and settings." },
+    { target: '#navEditorBtn', page: 'editor', title: 'The Editor', desc: 'Write code and switch between multiple open scripts with tabs.' },
+    { target: '#btnExecute', page: 'editor', title: 'Execute', desc: 'Runs the scripts in your current active tab with console showing output.' },
+    { target: '#navHubBtn', page: 'hub', title: 'Script Hub', desc: 'Browse scripts straight from ScriptBlox.' },
+    { target: '#navSettingsBtn', page: 'settings', title: 'Settings', desc: 'Appearance, editor and console preferences — replay this tour anytime from General.' }
+  ];
+
+  const tourOverlay = document.getElementById('tourOverlay');
+  const tourSpot = document.getElementById('tourSpot');
+  const tourCard = document.getElementById('tourCard');
+  const tourStepEl = document.getElementById('tourStep');
+  const tourTitleEl = document.getElementById('tourTitle');
+  const tourDescEl = document.getElementById('tourDesc');
+  const tourNextBtn = document.getElementById('tourNextBtn');
+  const tourSkipBtn = document.getElementById('tourSkipBtn');
+  let tourIndex = 0;
+
+  function positionTour(){
+    const step = TOUR_STEPS[tourIndex];
+    const el = document.querySelector(step.target);
+    if (!el) { endTour(); return; }
+    const r = el.getBoundingClientRect();
+    const pad = 6;
+    tourSpot.style.top = (r.top - pad) + 'px';
+    tourSpot.style.left = (r.left - pad) + 'px';
+    tourSpot.style.width = (r.width + pad * 2) + 'px';
+    tourSpot.style.height = (r.height + pad * 2) + 'px';
+
+    const cardW = tourCard.offsetWidth || 266;
+    let cardTop = r.bottom + 14;
+    if (cardTop + 140 > window.innerHeight) cardTop = Math.max(14, r.top - 154);
+    let cardLeft = r.left + r.width / 2 - cardW / 2;
+    cardLeft = Math.min(Math.max(14, cardLeft), window.innerWidth - cardW - 14);
+    tourCard.style.top = cardTop + 'px';
+    tourCard.style.left = cardLeft + 'px';
+  }
+
+  function renderTourStep(){
+    const step = TOUR_STEPS[tourIndex];
+    showPage(step.page);
+    tourStepEl.textContent = 'Step ' + (tourIndex + 1) + ' of ' + TOUR_STEPS.length;
+    tourTitleEl.textContent = step.title;
+    tourDescEl.textContent = step.desc;
+    tourNextBtn.textContent = tourIndex === TOUR_STEPS.length - 1 ? 'Finish' : 'Next';
+    requestAnimationFrame(positionTour);
+  }
+
+  function startTour(){
+    tourIndex = 0;
+    tourOverlay.hidden = false;
+    renderTourStep();
+  }
+  function endTour(){
+    tourOverlay.hidden = true;
+    try{ localStorage.setItem('oblivionxUiTourSeen', '1'); } catch(e){}
+  }
+  tourNextBtn.addEventListener('click', () => {
+    if (tourIndex >= TOUR_STEPS.length - 1) { endTour(); return; }
+    tourIndex++;
+    renderTourStep();
+  });
+  tourSkipBtn.addEventListener('click', endTour);
+  window.addEventListener('resize', () => { if (!tourOverlay.hidden) positionTour(); });
+  document.getElementById('replayTourBtn').addEventListener('click', startTour);
+
+  try{
+    if (!localStorage.getItem('oblivionxUiTourSeen')) setTimeout(startTour, 500);
+  } catch(e){}
+
+  
+  const hubGrid = document.getElementById('hubGrid');
+  const hubState = document.getElementById('hubState');
+  const hubSearchInput = document.getElementById('hubSearchInput');
+  const hubSortGroup = document.getElementById('hubSortGroup');
+  const hubPaginator = document.getElementById('hubPaginator');
+  const hubPrevBtn = document.getElementById('hubPrevBtn');
+  const hubNextBtn = document.getElementById('hubNextBtn');
+  const hubPageNum = document.getElementById('hubPageNum');
+  const hubFilterDropdown = document.getElementById('hubFilterDropdown');
+  const hubFilterTrigger = document.getElementById('hubFilterTrigger');
+  const hubVerifiedToggle = document.getElementById('hubVerifiedToggle');
+
+  
+  function openFilterDropdown(){ hubFilterDropdown.dataset.open = 'true'; hubFilterTrigger.setAttribute('aria-expanded', 'true'); }
+  function closeFilterDropdown(){ hubFilterDropdown.dataset.open = 'false'; hubFilterTrigger.setAttribute('aria-expanded', 'false'); }
+  hubFilterTrigger.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (hubFilterDropdown.dataset.open === 'true') closeFilterDropdown();
+    else openFilterDropdown();
+  });
+  hubFilterDropdown.querySelector('.dropdown-panel').addEventListener('click', (e) => e.stopPropagation());
+  document.addEventListener('click', () => closeFilterDropdown());
+
+  let hubQuery = '';
+  let hubSort = 'trending';
+  let hubVerifiedOnly = false;
+  let hubFetchPage = 1;
+  let hubBusy = false;
+
+  async function fetchTrending(){
+    const res = await fetch('https://scriptblox.com/api/script/trending');
+    const json = await res.json();
+    const batch = json?.result?.scripts || json?.scripts || [];
+    return batch.map(normScript.bind(null, 'scriptblox'));
+  }
+  async function fetchBrowse(page){
+    const res = await fetch('https://scriptblox.com/api/script/fetch?page=' + page);
+    const json = await res.json();
+    return (json?.result?.scripts || []).map(normScript.bind(null, 'scriptblox'));
+  }
+  async function fetchSearch(q, page){
+    const url = 'https://scriptblox.com/api/script/search?q=' + encodeURIComponent(q) + '&page=' + page;
+    const res = await fetch(url);
+    const json = await res.json();
+    return (json?.result?.scripts || []).map(normScript.bind(null, 'scriptblox'));
+  }
+
+  
+  function normScript(src, raw){
+    return {
+      _id: raw._id || '',
+      title: raw.title || 'Untitled',
+      image: raw.image || (raw.game && raw.game.imageUrl) || '',
+      verified: !!raw.verified,
+      views: raw.views || 0,
+      ownerName: (raw.owner && (raw.owner.username || raw.owner.name)) || null,
+      avatarUrl: (raw.owner && raw.owner.profilePicture) || '',
+      codeUrl: '',
+      src: 'scriptblox'
+    };
+  }
+
+  function hubResolveUrl(src, raw){
+    if (!raw) return '';
+    if (raw.startsWith('http')) return raw;
+    return 'https://scriptblox.com' + raw;
+  }
+
+  const HUB_EYE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+  
+  const HUB_VERIFIED_BADGE =
+    '<span class="hub-verified-glass"></span>' +
+    '<svg class="hub-verified-check" viewBox="0 0 24 24"><path d="M8.4 12.4l2.3 2.3 4.7-4.9"/></svg>';
+  const HUB_USER = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.2"/><path d="M4.5 19.2c.9-3.8 3.6-5.7 7.5-5.7s6.6 1.9 7.5 5.7"/></svg>';
+
+  function renderHubCard(s){
+    const title = s.title;
+    const author = s.ownerName || 'Unknown';
+    const avatarUrl = hubResolveUrl(s.src, s.avatarUrl);
+    const views = s.views || 0;
+    const imgUrl = hubResolveUrl(s.src, s.image);
+
+    const card = document.createElement('div');
+    card.className = 'hub-card';
+    card.innerHTML =
+      '<div class="hub-thumb-wrap">' +
+        (imgUrl
+          ? '<img class="hub-thumb" src="' + imgUrl + '" loading="lazy" ' +
+            'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">' +
+            '<div class="hub-thumb-ph" style="display:none"><img src="icon.png" alt=""></div>'
+          : '<div class="hub-thumb-ph"><img src="icon.png" alt=""></div>') +
+        (s.verified ? '<span class="hub-verified" data-tip="Verified">' + HUB_VERIFIED_BADGE + '</span>' : '') +
+      '</div>' +
+      '<div class="hub-card-body">' +
+        '<div class="hub-card-title">' + escapeHtml(title) + '</div>' +
+        '<div class="hub-card-meta">' +
+          '<span class="hub-card-author">' +
+            (avatarUrl
+              ? '<img class="hub-avatar" src="' + avatarUrl + '" loading="lazy" ' +
+                'onerror="this.outerHTML=\'' + HUB_USER.replace(/'/g, "\\'") + '\';">'
+              : HUB_USER) +
+            '<span>' + escapeHtml(author) + '</span>' +
+          '</span>' +
+          '<span class="hub-card-views">' + HUB_EYE + views.toLocaleString() + ' views</span>' +
+        '</div>' +
+      '</div>';
+
+    card.addEventListener('click', () => {
+      const t = { id: genId(), name: title, code: '-- fetching script…' };
+      tabs.push(t);
+      activeId = t.id;
+      if (editor) editor.setModel(getModel(t));
+      renderTabs();
+      showPage('editor');
+
+      const resolveCode = fetch('https://scriptblox.com/api/script/' + s._id)
+            .then(res => res.json())
+            .then(json => (json && json.script && json.script.script) || '');
+
+      resolveCode
+        .then(code => {
+          const model = getModel(t);
+          const value = code || '-- could not load script content';
+          model.setValue(value);
+          t.code = value;
+          saveState();
+        })
+        .catch(() => { const model = getModel(t); model.setValue('-- could not load script content'); });
+    });
+
+    return card;
+  }
+
+  
+  async function loadHub(resetToPageOne){
+    if (hubBusy) return;
+    hubBusy = true;
+    if (resetToPageOne) hubFetchPage = 1;
+    hubGrid.innerHTML = '';
+    hubState.textContent = 'Loading scripts…';
+    hubPaginator.hidden = true;
+    hubPrevBtn.disabled = true;
+    hubNextBtn.disabled = true;
+    try{
+      const jobs = [];
+      if (hubQuery) jobs.push(fetchSearch(hubQuery, hubFetchPage));
+      else if (hubSort === 'trending' && hubFetchPage === 1) jobs.push(fetchTrending());
+      else jobs.push(fetchBrowse(hubFetchPage));
+
+      const settled = await Promise.allSettled(jobs);
+      let batch = [];
+      settled.forEach(r => { if (r.status === 'fulfilled') batch.push(...r.value); });
+      const anyFulfilled = settled.some(r => r.status === 'fulfilled');
+
+      if (hubVerifiedOnly) batch = batch.filter(s => s.verified);
+      batch = Array.from(new Map(batch.map(s => [s.src + ':' + s._id, s])).values());
+
+      
+      if (batch.length > 5) batch = batch.slice(0, Math.floor(batch.length / 5) * 5);
+
+      if (!anyFulfilled){
+        hubState.textContent = "Couldn't reach the selected sources — check your connection.";
+      } else if (!batch.length){
+        hubState.textContent = hubFetchPage === 1 ? 'No scripts found.' : 'No more scripts on this page.';
+      } else {
+        hubState.textContent = '';
+        batch.forEach(s => hubGrid.appendChild(renderHubCard(s)));
+      }
+      hubPageNum.textContent = String(hubFetchPage);
+      hubPrevBtn.disabled = hubFetchPage <= 1;
+      hubNextBtn.disabled = batch.length === 0;
+      hubPaginator.hidden = false;
+    } catch(e){
+      hubState.textContent = "Couldn't reach the selected sources — check your connection.";
+    }
+    hubBusy = false;
+  }
+
+  let hubSearchTimer = null;
+  hubSearchInput.addEventListener('input', function(){
+    clearTimeout(hubSearchTimer);
+    const q = this.value.trim();
+    hubSearchTimer = setTimeout(() => { hubQuery = q; loadHub(true); }, 350);
+  });
+
+  hubSortGroup.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn || btn.classList.contains('active')) return;
+    [...hubSortGroup.children].forEach(b => b.classList.toggle('active', b === btn));
+    hubSort = btn.dataset.value;
+    loadHub(true);
+  });
+
+  hubVerifiedToggle.addEventListener('change', () => {
+    hubVerifiedOnly = hubVerifiedToggle.checked;
+    loadHub(true);
+  });
+
+  hubPrevBtn.addEventListener('click', () => {
+    if (hubFetchPage <= 1) return;
+    hubFetchPage--;
+    loadHub(false);
+  });
+  hubNextBtn.addEventListener('click', () => {
+    hubFetchPage++;
+    loadHub(false);
+  });
+
+  require.config({ paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.49.0/min/vs' } });
+  window.MonacoEnvironment = {
+    getWorkerUrl: function(){
+      return 'data:text/javascript;charset=utf-8,' + encodeURIComponent(
+        "self.MonacoEnvironment = { baseUrl: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.49.0/min/' };" +
+        "importScripts('https://cdn.jsdelivr.net/npm/monaco-editor@0.49.0/min/vs/base/worker/workerMain.js');"
+      );
+    }
+  };
+
+  
+  require(['vs/editor/editor.main'], async function(){
+    monaco.editor.defineTheme('executorTheme', {
+      base: 'vs-dark',
+      inherit: false,
+      rules: [
+        // OblivionX — violet-tinted token palette
+        { token: '', foreground: 'dcd9f5' },
+        { token: 'identifier', foreground: 'dcd9f5' },
+        { token: 'keyword', foreground: 'c4a8fa' },
+        { token: 'string', foreground: 'a8d8b8' },
+        { token: 'number', foreground: 'e8b86d' },
+        { token: 'operator', foreground: 'b89af5' },
+        { token: 'type', foreground: 'c4a8fa' },
+        { token: 'tag', foreground: 'c4a8fa' },
+        { token: 'attribute', foreground: 'a8b8fa' },
+        { token: 'variable', foreground: 'dcd9f5' },
+        { token: 'constant', foreground: 'e8b86d' },
+        { token: 'support', foreground: 'b89af5' },
+        { token: 'entity', foreground: 'c4a8fa' },
+        { token: 'predefined', foreground: 'c4a8fa' },
+        { token: 'annotation', foreground: '7a73a8' },
+        { token: 'meta', foreground: 'dcd9f5' },
+        { token: 'namespace', foreground: 'c4a8fa' },
+        { token: 'delimiter', foreground: '6e6890' },
+        { token: 'delimiter.bracket', foreground: '6e6890' },
+        { token: 'delimiter.parenthesis', foreground: '6e6890' },
+        { token: 'delimiter.square', foreground: '6e6890' },
+        { token: 'delimiter.curly', foreground: '6e6890' },
+        { token: 'delimiter.angle', foreground: '6e6890' },
+        { token: 'comment', foreground: '3d3860', fontStyle: 'italic' }
+      ],
+      colors: {
+        'editor.background': '#060510',
+        'editor.foreground': '#dcd9f5',
+        'editorGutter.background': '#09081a',
+        'editorLineNumber.foreground': '#3d3860',
+        'editorLineNumber.activeForeground': '#7a73a8',
+        'editorCursor.foreground': '#a855f7',
+        'editor.selectionBackground': '#a855f722',
+        'editor.lineHighlightBackground': '#a855f708',
+        'editor.lineHighlightBorder': '#00000000',
+        'focusBorder': '#00000000',
+        'editorIndentGuide.background': '#8b5cf614',
+        'scrollbarSlider.background': '#8b5cf618',
+        'scrollbarSlider.hoverBackground': '#8b5cf628',
+
+        'menu.background': '#0d0b1a',
+        'menu.foreground': '#dcd9f5',
+        'menu.border': '#8b5cf638',
+        'menu.separatorBackground': '#8b5cf620',
+        'menu.selectionBackground': '#a855f720',
+        'menu.selectionForeground': '#e2dff5',
+
+        'editorWidget.background': '#0d0b1a',
+        'editorWidget.foreground': '#dcd9f5',
+        'editorWidget.border': '#8b5cf638',
+        'editorWidget.resizeBorder': '#8b5cf638',
+        'editorHoverWidget.background': '#0d0b1a',
+        'editorHoverWidget.foreground': '#dcd9f5',
+        'editorHoverWidget.border': '#8b5cf638',
+        'widget.shadow': '#00000088',
+
+        'input.background': '#060510',
+        'input.foreground': '#dcd9f5',
+        'input.border': '#ffffff1f',
+        'input.placeholderForeground': '#55555d',
+        'inputOption.activeBackground': '#ffffff1a',
+        'inputOption.activeBorder': '#ffffff3a',
+        'inputOption.activeForeground': '#ffffff',
+
+        'editor.findMatchBackground': '#ffffff33',
+        'editor.findMatchBorder': '#ffffff55',
+        'editor.findMatchHighlightBackground': '#ffffff1a',
+        'editor.findMatchHighlightBorder': '#00000000',
+
+        'list.hoverBackground': '#a855f710',
+        'list.hoverForeground': '#dcd9f5',
+        'list.activeSelectionBackground': '#a855f722',
+        'list.activeSelectionForeground': '#e2dff5',
+        'list.inactiveSelectionBackground': '#8b5cf614',
+        'list.focusBackground': '#8b5cf618',
+        'list.focusForeground': '#e2dff5',
+
+        'button.background': '#a855f720',
+        'button.foreground': '#e2dff5',
+        'button.hoverBackground': '#a855f732',
+        'dropdown.background': '#0d0b1a',
+        'dropdown.foreground': '#dcd9f5',
+        'dropdown.border': '#8b5cf638',
+        'icon.foreground': '#7a73a8'
+      }
+    });
+
+    await sessionReady;
+    renderTabs();
+
+    const initialEditorFontSize = getEditorFontSize();
+    editor = monaco.editor.create(document.getElementById('monacoContainer'), {
+      model: getModel(tabs.find(t => t.id === activeId)),
+      theme: 'executorTheme',
+      fontFamily: getEditorFontFamily(),
+      fontLigatures: getEditorBoolPref('oblivionxUiEditorLigatures'),
+      fontSize: initialEditorFontSize,
+      lineHeight: computeEditorLineHeight(initialEditorFontSize),
+      cursorBlinking: getEditorStringPref('oblivionxUiEditorCursorBlink', 'blink'),
+      cursorStyle: getEditorStringPref('oblivionxUiEditorCursorStyle', 'line'),
+      cursorSmoothCaretAnimation: getEditorBoolPref('oblivionxUiEditorSmoothTyping') ? 'on' : 'off',
+      smoothScrolling: getEditorBoolPref('oblivionxUiEditorSmoothScroll'),
+      wordWrap: getEditorBoolPref('oblivionxUiEditorWordWrap') ? 'on' : 'off',
+      minimap: { enabled: getEditorBoolPref('oblivionxUiEditorMinimap') },
+      stickyScroll: { enabled: getEditorBoolPref('oblivionxUiEditorStickyScroll') },
+      tabSize: getEditorTabSize(),
+      autoClosingBrackets: getEditorAutoClosing() ? 'languageDefined' : 'never',
+      autoClosingQuotes: getEditorAutoClosing() ? 'languageDefined' : 'never',
+      lineNumbers: getEditorStringPref('oblivionxUiEditorLineNumbers', 'on'),
+      renderLineHighlight: 'line',
+      scrollBeyondLastLine: false,
+      folding: false,
+      bracketPairColorization: { enabled: false },
+      guides: { bracketPairs: false, bracketPairsHorizontal: false, indentation: true },
+      matchBrackets: 'never',
+      automaticLayout: true,
+      padding: { top: 12 },
+      overviewRulerBorder: false,
+      hideCursorInOverviewRuler: true,
+      scrollbar: { verticalScrollbarSize: 8, horizontalScrollbarSize: 8 }
+    });
+
+    let saveDebounce;
+    editor.onDidChangeModelContent(() => {
+      updateDirtyIndicator();
+      clearTimeout(saveDebounce);
+      saveDebounce = setTimeout(saveState, 400);
+    });
+
+    
+    if (document.fonts && document.fonts.ready){
+      document.fonts.load(initialEditorFontSize + "px " + getEditorFontFamily()).catch(() => {});
+      document.fonts.ready.then(() => {
+        monaco.editor.remeasureFonts();
+      });
+    }
+
+    editorLoading.remove();
+  });
+})();
+</script>
+
+</body>
 </html>
